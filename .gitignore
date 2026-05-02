@@ -1,0 +1,6 @@
+daemon/
+service.js
+node_modules/
+Pitahaya/package-lock.json
+package-lock.json
+package.json
