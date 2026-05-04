@@ -640,16 +640,19 @@ class SettingsModalHandler {
             document.body.style.backgroundImage = 'none';
         }
         
-        // 3. 应用搜索框位置
+        // 3. 应用图标圆角
+        this.applyIconRadius(settings.iconRadius);
+        
+        // 4. 应用搜索框位置
         this.applySearchBoxPosition(settings.searchBoxPosition);
         
-        // 4. 应用搜索框样式
+        // 5. 应用搜索框样式
         this.applySearchBoxStyle(settings.searchBoxStyle);
         
-        // 5. 应用网格设置
+        // 6. 应用网格设置
         this.applyGridSettings(settings);
         
-        // 6. 应用 Dock 设置
+        // 7. 应用 Dock 设置
         this.applyDockSettings(settings);
         
         console.log('✅ 所有设置已应用');
@@ -704,6 +707,15 @@ class SettingsModalHandler {
                 searchBox.style.borderRadius = '0.5rem';
                 break;
         }
+    }
+    
+    /**
+     * 应用图标圆角设置
+     */
+    applyIconRadius(radius) {
+        const radiusValue = radius || 0.5;
+        document.documentElement.style.setProperty('--icon-radius', `${radiusValue}rem`);
+        console.log(`✅ 图标圆角已更新: ${radiusValue}rem`);
     }
     
     /**

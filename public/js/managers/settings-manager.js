@@ -61,6 +61,10 @@ class SettingsManager {
             document.body.style.backgroundImage = 'none';
         }
 
+        // 应用图标圆角
+        const iconRadius = this.settings.icon_radius || '0.5';
+        document.documentElement.style.setProperty('--icon-radius', `${iconRadius}rem`);
+
         // 应用头像
         const avatarUrl = this.settings.avatar_url || this.defaultSettings.avatar_url;
         const avatarImg = document.getElementById('avatar');
