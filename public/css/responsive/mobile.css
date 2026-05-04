@@ -1,0 +1,38 @@
+/* ==================== 移动端适配 ==================== */
+@media (max-width: 767px) {
+    .sidebar {
+        display: none;
+    }
+    
+    .content-area {
+        width: 100%;
+        margin-left: 0;
+    }
+    
+    .search-container {
+        left: 1rem;
+        right: 1rem;
+    }
+    
+    .category-panel {
+        padding: 1rem;
+        min-width: 100%;
+        margin-right: 0;
+    }
+}
+
+/* 平板端适配 */
+@media (min-width: 768px) and (max-width: 1023px) {
+    .sidebar {
+        width: 8%;
+    }
+    
+    .content-area {
+        width: calc(100% - 8%);
+        margin-left: 8%;
+    }
+    
+    .category-panel {
+        min-width: 600px;
+    }
+}

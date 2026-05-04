@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Votilarus - 个人导航页</title>
+    <link rel="stylesheet" href="/css/main.css">
+</head>
+<body>
+    <!-- 左侧悬浮侧栏 -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-avatar" id="avatar">
+            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" alt="用户头像">
+        </div>
+        <div class="sidebar-categories" id="categories">
+            <!-- 分类列表将通过 JS 动态生成 -->
+        </div>
+    </aside>
+
+    <!-- 搜索框 -->
+    <div class="search-container">
+        <input type="text" class="search-box" id="searchBox" placeholder="搜索...">
+        <button class="search-engine-btn" id="searchEngineBtn" title="切换搜索引擎">
+            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%233B82F6'%3E%3Cpath d='M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z'/%3E%3C/svg%3E" alt="搜索">
+        </button>
+    </div>
+
+    <!-- 右侧内容区 -->
+    <main class="content-area" id="contentArea">
+        <!-- 分类面板将通过 JS 动态生成 -->
+    </main>
+
+    <script src="/js/main.js" type="module"></script>
+</body>
+</html>

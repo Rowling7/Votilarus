@@ -1,0 +1,60 @@
+/* ==================== 搜索框 ==================== */
+.search-container {
+    position: fixed;
+    top: 2rem;
+    left: calc(var(--sidebar-width) + 2rem);
+    right: 2rem;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.search-box {
+    flex: 1;
+    max-width: 600px;
+    padding: 0.75rem 1.5rem;
+    border: 2px solid var(--border-color);
+    border-radius: 2rem;
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    color: var(--text-primary);
+    font-size: 1rem;
+    outline: none;
+    transition: all var(--transition-fast);
+}
+
+.search-box:focus {
+    border-color: var(--theme-color);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.search-box::placeholder {
+    color: var(--text-tertiary);
+}
+
+/* 搜索引擎切换按钮 */
+.search-engine-btn {
+    width: 40px;
+    height: 40px;
+    border: none;
+    border-radius: 50%;
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur));
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--transition-fast);
+}
+
+.search-engine-btn:hover {
+    background: var(--bg-tertiary);
+    transform: scale(1.1);
+}
+
+.search-engine-btn img {
+    width: 24px;
+    height: 24px;
+}

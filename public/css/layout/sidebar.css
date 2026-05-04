@@ -1,0 +1,72 @@
+/* ==================== 左侧悬浮侧栏 ==================== */
+.sidebar {
+    position: fixed;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: var(--sidebar-width);
+    height: auto;
+    max-height: 80vh;
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border-radius: 1rem;
+    box-shadow: var(--shadow-lg);
+    z-index: 1000;
+    padding: 1rem 0.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+/* 头像 */
+.sidebar-avatar {
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform var(--transition-normal);
+    border: 2px solid var(--theme-color);
+}
+
+.sidebar-avatar:hover {
+    transform: scale(1.1);
+}
+
+.sidebar-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* 分类列表 */
+.sidebar-categories {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.sidebar-category {
+    width: 100%;
+    padding: 0.75rem 0.5rem;
+    text-align: center;
+    color: var(--text-secondary);
+    cursor: pointer;
+    border-radius: 0.5rem;
+    transition: all var(--transition-fast);
+    font-size: 0.9rem;
+}
+
+.sidebar-category:hover {
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+}
+
+.sidebar-category.active {
+    background: var(--theme-color);
+    color: white;
+    font-weight: bold;
+}
