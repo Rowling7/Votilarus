@@ -113,7 +113,7 @@ router.post('/import', (req, res) => {
     
     for (const [key, value] of Object.entries(settings)) {
         const promise = new Promise((resolve, reject) => {
-            const updateSql = 'UPDATE stettings SET value = ?, upDatetime = CURRENT_TIMESTAMP WHERE key = ?';
+            const updateSql = 'UPDATE stettings SET value = ? WHERE key = ?';
             db.run(updateSql, [value.toString(), key], function(err) {
                 if (err) {
                     reject(err);
@@ -189,7 +189,7 @@ router.post('/reset', (req, res) => {
     
     for (const [key, value] of Object.entries(defaultSettings)) {
         const promise = new Promise((resolve, reject) => {
-            const updateSql = 'UPDATE stettings SET value = ?, upDatetime = CURRENT_TIMESTAMP WHERE key = ?';
+            const updateSql = 'UPDATE stettings SET value = ? WHERE key = ?';
             db.run(updateSql, [value, key], function(err) {
                 if (err) {
                     reject(err);

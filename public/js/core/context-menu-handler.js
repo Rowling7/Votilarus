@@ -13,22 +13,38 @@ class ContextMenuHandler {
         // 创建右键菜单 DOM
         this.createMenuElement();
 
-        // 监听右键事件
+        // 监听右键事件（整个页面）
         document.addEventListener('contextmenu', (e) => {
             const gridItem = e.target.closest('.grid-item');
             const gridContainer = e.target.closest('.grid-container');
+            const dockItem = e.target.closest('.dock-item');
+            const sidebar = e.target.closest('.sidebar');
+            const searchBox = e.target.closest('.search-container');
 
             if (gridItem) {
                 // 图标上的右键
                 e.preventDefault();
                 this.showItemMenu(e, gridItem);
+            } else if (dockItem) {
+                // Dock 图标上的右键
+                e.preventDefault();
+                this.showDockItemMenu(e, dockItem);
             } else if (gridContainer) {
-                // 空白区域的右键
+                // 网格空白区域的右键
                 e.preventDefault();
                 this.showEmptyMenu(e, gridContainer);
+            } else if (sidebar) {
+                // 侧栏区域的右键
+                e.preventDefault();
+                this.showSidebarMenu(e);
+            } else if (searchBox) {
+                // 搜索框区域的右键
+                e.preventDefault();
+                this.showSearchMenu(e);
             } else {
-                // 其他区域隐藏菜单
-                this.hideMenu();
+                // 页面其他空白区域的右键
+                e.preventDefault();
+                this.showPageMenu(e);
             }
         });
 
@@ -302,6 +318,130 @@ class ContextMenuHandler {
             };
         }
         return { width: 1, height: 1 };
+    }
+
+    /**
+     * 显示 Dock 图标右键菜单
+     */
+    showDockItemMenu(e, dockItem) {
+        const itemUuid = dockItem.dataset.itemUuid;
+
+        const menuItems = [
+            {
+                label: '打开链接',
+                action: () => {
+                    const url = dockItem.dataset.url;
+                    if (url) window.open(url, '_blank');
+                }
+            },
+            {
+                label: '复制链接',
+                action: () => {
+                    const url = dockItem.dataset.url;
+                    if (url) {
+                        navigator.clipboard.writeText(url).then(() => {
+                            console.log('✅ 链接已复制');
+                        });
+                    }
+                }
+            },
+            {
+                label: '从 Dock 移除',
+                action: () => this.removeFromDock(itemUuid),
+                className: 'danger'
+            }
+        ];
+
+        this.renderMenu(menuItems, e.clientX, e.clientY);
+    }
+
+    /**
+     * 显示侧栏右键菜单
+     */
+    showSidebarMenu(e) {
+        const menuItems = [
+            {
+                label: '刷新页面',
+                action: () => location.reload()
+            },
+            {
+                label: '打开设置',
+                action: () => {
+                    const avatar = document.getElementById('avatar');
+                    if (avatar) avatar.click();
+                }
+            }
+        ];
+
+        this.renderMenu(menuItems, e.clientX, e.clientY);
+    }
+
+    /**
+     * 显示搜索框右键菜单
+     */
+    showSearchMenu(e) {
+        const menuItems = [
+            {
+                label: '清空搜索',
+                action: () => {
+                    const searchBox = document.getElementById('searchBox');
+                    if (searchBox) searchBox.value = '';
+                }
+            },
+            {
+                label: '刷新页面',
+                action: () => location.reload()
+            }
+        ];
+
+        this.renderMenu(menuItems, e.clientX, e.clientY);
+    }
+
+    /**
+     * 显示页面空白区域右键菜单
+     */
+    showPageMenu(e) {
+        const menuItems = [
+            {
+                label: '刷新页面',
+                action: () => location.reload()
+            },
+            {
+                label: '打开设置',
+                action: () => {
+                    const avatar = document.getElementById('avatar');
+                    if (avatar) avatar.click();
+                }
+            },
+            {
+                label: '返回顶部',
+                action: () => {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+            }
+        ];
+
+        this.renderMenu(menuItems, e.clientX, e.clientY);
+    }
+
+    /**
+     * 从 Dock 移除图标
+     */
+    async removeFromDock(itemUuid) {
+        try {
+            const { removeFromDock } = await import('./api.js');
+            await removeFromDock(itemUuid);
+            console.log('✅ 已从 Dock 移除');
+            
+            // 从 DOM 中移除
+            const dockItem = document.querySelector(`.dock-item[data-item-uuid="${itemUuid}"]`);
+            if (dockItem) {
+                dockItem.remove();
+            }
+        } catch (error) {
+            console.error('❌ 从 Dock 移除失败:', error);
+            alert('移除失败: ' + error.message);
+        }
     }
 }
 

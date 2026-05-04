@@ -1,6 +1,6 @@
 // ==================== Dock 栏渲染器 ====================
 
-import { fetchDockItems, removeFromDock, reorderDock } from '../core/api.js';
+import { fetchDockItems, reorderDock } from '../core/api.js';
 
 class DockRenderer {
     constructor() {
@@ -100,12 +100,6 @@ class DockRenderer {
             }
         });
         
-        // 右键菜单 - 从 Dock 移除
-        dockItem.addEventListener('contextmenu', (e) => {
-            e.preventDefault();
-            this.showRemoveMenu(e, item);
-        });
-        
         // 启用拖拽
         dockItem.draggable = true;
         dockItem.addEventListener('dragstart', (e) => {
@@ -151,52 +145,6 @@ class DockRenderer {
         });
         
         return dockItem;
-    }
-
-    /**
-     * 显示移除菜单
-     */
-    showRemoveMenu(event, item) {
-        // 创建临时菜单
-        const menu = document.createElement('div');
-        menu.className = 'context-menu';
-        menu.style.left = `${event.clientX}px`;
-        menu.style.top = `${event.clientY}px`;
-        
-        const removeItem = document.createElement('div');
-        removeItem.className = 'context-menu-item danger';
-        removeItem.textContent = '从 Dock 移除';
-        
-        removeItem.addEventListener('click', async () => {
-            try {
-                await removeFromDock(item.item_uuid);
-                console.log('✅ 已从 Dock 移除:', item.name);
-                
-                // 重新加载
-                await this.loadDockItems();
-                
-                // 隐藏菜单
-                document.body.removeChild(menu);
-            } catch (error) {
-                console.error('❌ 移除失败:', error);
-                alert('移除失败: ' + error.message);
-            }
-        });
-        
-        menu.appendChild(removeItem);
-        document.body.appendChild(menu);
-        
-        // 点击其他地方关闭菜单
-        const closeMenu = (e) => {
-            if (!menu.contains(e.target)) {
-                document.body.removeChild(menu);
-                document.removeEventListener('click', closeMenu);
-            }
-        };
-        
-        setTimeout(() => {
-            document.addEventListener('click', closeMenu);
-        }, 0);
     }
 
     /**
