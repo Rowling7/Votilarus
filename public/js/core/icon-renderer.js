@@ -41,20 +41,47 @@ class IconRenderer {
         
         this.contentArea.innerHTML = '';
         
+        // 创建“首页”面板（data-category-id = -1）
+        const homePanel = this.createHomePanel();
+        this.contentArea.appendChild(homePanel);
+        
+        // 渲染其他分类
         categories.forEach((category, index) => {
             console.log(`\n🎨 渲染分类面板: ${category.name} (${category.uuid})`);
             const panel = this.createCategoryPanel(category, index);
             this.contentArea.appendChild(panel);
         });
         
-        // 激活第一个分类
-        if (categories.length > 0) {
-            const firstPanel = document.getElementById(`category-${categories[0].uuid}`);
-            if (firstPanel) {
-                firstPanel.classList.add('active');
-                console.log(`  - ✅ 激活第一个分类: ${categories[0].name}`);
-            }
+        // 激活首页面板
+        const homePanelElement = document.getElementById('category--1');
+        if (homePanelElement) {
+            homePanelElement.classList.add('active');
+            console.log('  - ✅ 激活首页面板');
         }
+    }
+
+    /**
+     * 创建首页面板（data-category-id = -1）
+     */
+    createHomePanel() {
+        const panel = document.createElement('div');
+        panel.className = 'category-panel';
+        panel.id = 'category--1';
+        panel.dataset.categoryId = '-1';
+        
+        // 创建网格容器
+        const gridContainer = document.createElement('div');
+        gridContainer.className = 'grid-container';
+        
+        // 首页可以显示欢迎信息或常用图标
+        // 这里暂时留空，后续可以添加常用图标或小组件
+        
+        // 使用 requestAnimationFrame 优化渲染
+        requestAnimationFrame(() => {
+            panel.appendChild(gridContainer);
+        });
+        
+        return panel;
     }
 
     createCategoryPanel(category, index) {

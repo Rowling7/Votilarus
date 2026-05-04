@@ -10,6 +10,25 @@ class SidebarRenderer {
     render(categories) {
         this.categoriesContainer.innerHTML = '';
         
+        // 添加“首页”分类（data-category-id = -1）
+        const homeCategoryDiv = document.createElement('div');
+        homeCategoryDiv.className = 'sidebar-category';
+        homeCategoryDiv.textContent = '🏠';  // 使用图标
+        homeCategoryDiv.dataset.categoryId = '-1';
+        homeCategoryDiv.title = '首页';
+        
+        // 如果当前没有选中任何分类，默认选中首页
+        if (!categoryManager.getCurrentCategory()) {
+            homeCategoryDiv.classList.add('active');
+        }
+        
+        homeCategoryDiv.addEventListener('click', () => {
+            this.switchCategory('-1');
+        });
+        
+        this.categoriesContainer.appendChild(homeCategoryDiv);
+        
+        // 渲染其他分类
         categories.forEach(category => {
             const categoryDiv = document.createElement('div');
             categoryDiv.className = 'sidebar-category';
