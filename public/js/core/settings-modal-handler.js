@@ -722,18 +722,21 @@ class SettingsModalHandler {
      * 应用网格设置
      */
     applyGridSettings(settings) {
-        const contentArea = document.getElementById('contentArea');
-        if (!contentArea) return;
-        
-        // 更新网格行列数
-        contentArea.style.gridTemplateColumns = `repeat(${settings.gridCols || 13}, 1fr)`;
-        contentArea.style.gridTemplateRows = `repeat(${settings.gridRows || 5}, 1fr)`;
-        
-        // 更新网格间距
+        // 更新网格间距 CSS 变量
         const gapValue = settings.gridGap || 2;
         document.documentElement.style.setProperty('--cell-gap', `${gapValue}rem`);
-        
         console.log(`✅ 网格间距已更新: ${gapValue}rem`);
+        
+        // 更新所有网格容器的行列数
+        const gridContainers = document.querySelectorAll('.grid-container');
+        gridContainers.forEach(container => {
+            // 设置固定的列数
+            container.style.gridTemplateColumns = `repeat(${settings.gridCols || 13}, var(--cell-base-size))`;
+            // 设置固定的行数（如果需要）
+            // container.style.gridTemplateRows = `repeat(${settings.gridRows || 5}, var(--cell-base-size))`;
+        });
+        
+        console.log(`✅ 网格列数已更新: ${settings.gridCols || 13}`);
     }
     
     /**
