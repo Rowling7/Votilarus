@@ -4,11 +4,18 @@
     --theme-color: #3B82F6;
     --theme-color-light: #60A5FA;
     --theme-color-dark: #2563EB;
+    --theme-color-rgb: 59, 130, 246;
+    
+    /* 状态颜色 */
+    --error-color: #EF4444;
+    --success-color: #10B981;
+    --warning-color: #F59E0B;
     
     /* 背景色 */
     --bg-primary: #ffffff;
     --bg-secondary: #f5f5f5;
     --bg-tertiary: #e5e5e5;
+    --bg-hover: rgba(59, 130, 246, 0.1);
     
     /* 文字颜色 */
     --text-primary: #1a1a1a;
@@ -44,6 +51,7 @@
     --bg-primary: #1a1a1a;
     --bg-secondary: #2d2d2d;
     --bg-tertiary: #404040;
+    --bg-hover: rgba(96, 165, 250, 0.15);
     
     --text-primary: #ffffff;
     --text-secondary: #b0b0b0;
@@ -57,4 +65,6 @@
     
     --glass-bg: rgba(30, 30, 30, 0.7);
     --glass-border: rgba(255, 255, 255, 0.1);
+    
+    --theme-color-rgb: 59, 130, 246;
 }

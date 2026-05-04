@@ -42,6 +42,11 @@
     position: relative;
     transition: all var(--transition-normal);
     cursor: pointer;
+    user-select: none;
+}
+
+.grid-item:active {
+    cursor: grabbing;
 }
 
 /* 图标基础样式 */

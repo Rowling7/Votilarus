@@ -77,6 +77,141 @@ class SettingsManager {
     getAll() {
         return { ...this.settings };
     }
+
+    /**
+     * 获取所有设置（用于 Modal）
+     */
+    getAllSettings() {
+        return {
+            // 基础设置
+            gridRows: parseInt(this.settings.grid_rows) || 5,
+            gridCols: parseInt(this.settings.grid_cols) || 13,
+            sidebarWidth: parseInt(this.settings.sidebar_width) || 6,
+            
+            // 外观主题
+            themeMode: this.settings.theme_mode || 'dark',
+            themeColor: this.settings.theme_color || '#3B82F6',
+            bgImageUrl: this.settings.bg_image_url || '',
+            bgBlur: parseInt(this.settings.bg_blur) || 5,
+            bgOpacity: parseFloat(this.settings.bg_opacity) || 0.8,
+            overlayColor: this.settings.overlay_color || '#000000',
+            overlayOpacity: parseFloat(this.settings.overlay_opacity) || 0.3,
+            
+            // 图标样式
+            iconRadius: parseFloat(this.settings.icon_radius) || 0.5,
+            iconShadow: this.settings.icon_shadow !== '0',
+            iconHoverEffect: this.settings.icon_hover_effect || 'scale',
+            showTitle: this.settings.show_title !== '0',
+            titlePosition: this.settings.title_position || 'bottom',
+            titleFontSize: parseInt(this.settings.title_font_size) || 12,
+            titleFontColor: this.settings.title_font_color || '#ffffff',
+            titleMaxLength: parseInt(this.settings.title_max_length) || 8,
+            tooltipDelay: parseInt(this.settings.tooltip_delay) || 300,
+            
+            // Dock 设置
+            dockPosition: this.settings.dock_position || 'bottom',
+            dockMaxIcons: parseInt(this.settings.dock_max_icons) || 10,
+            dockBlur: parseInt(this.settings.dock_blur) || 10,
+            dockOpacity: parseFloat(this.settings.dock_opacity) || 0.3,
+            fisheyeScale: parseFloat(this.settings.fisheye_scale) || 1.5,
+            fisheyeRange: parseInt(this.settings.fisheye_range) || 2,
+            
+            // 搜索设置
+            defaultSearchEngine: this.settings.search_engine || 'baidu',
+            searchBoxPosition: this.settings.search_box_position || 'center',
+            searchBoxStyle: this.settings.search_box_style || 'rounded',
+            
+            // 交互行为
+            scrollAnimationSpeed: parseInt(this.settings.scroll_animation_speed) || 300,
+            dragSensitivity: parseInt(this.settings.drag_sensitivity) || 5,
+            enableContextMenu: this.settings.enable_context_menu !== '0',
+            
+            // 个人信息
+            avatarUrl: this.settings.avatar_url || '',
+            username: this.settings.username || '',
+            bio: this.settings.bio || ''
+        };
+    }
+
+    /**
+     * 保存所有设置
+     */
+    async saveAllSettings(newSettings) {
+        const settingsMap = {
+            // 基础设置
+            grid_rows: newSettings.gridRows,
+            grid_cols: newSettings.gridCols,
+            sidebar_width: newSettings.sidebarWidth,
+            
+            // 外观主题
+            theme_mode: newSettings.themeMode,
+            theme_color: newSettings.themeColor,
+            bg_image_url: newSettings.bgImageUrl,
+            bg_blur: newSettings.bgBlur,
+            bg_opacity: newSettings.bgOpacity,
+            overlay_color: newSettings.overlayColor,
+            overlay_opacity: newSettings.overlayOpacity,
+            
+            // 图标样式
+            icon_radius: newSettings.iconRadius,
+            icon_shadow: newSettings.iconShadow ? '1' : '0',
+            icon_hover_effect: newSettings.iconHoverEffect,
+            show_title: newSettings.showTitle ? '1' : '0',
+            title_position: newSettings.titlePosition,
+            title_font_size: newSettings.titleFontSize,
+            title_font_color: newSettings.titleFontColor,
+            title_max_length: newSettings.titleMaxLength,
+            tooltip_delay: newSettings.tooltipDelay,
+            
+            // Dock 设置
+            dock_position: newSettings.dockPosition,
+            dock_max_icons: newSettings.dockMaxIcons,
+            dock_blur: newSettings.dockBlur,
+            dock_opacity: newSettings.dockOpacity,
+            fisheye_scale: newSettings.fisheyeScale,
+            fisheye_range: newSettings.fisheyeRange,
+            
+            // 搜索设置
+            search_engine: newSettings.defaultSearchEngine,
+            search_box_position: newSettings.searchBoxPosition,
+            search_box_style: newSettings.searchBoxStyle,
+            
+            // 交互行为
+            scroll_animation_speed: newSettings.scrollAnimationSpeed,
+            drag_sensitivity: newSettings.dragSensitivity,
+            enable_context_menu: newSettings.enableContextMenu ? '1' : '0',
+            
+            // 个人信息
+            avatar_url: newSettings.avatarUrl,
+            username: newSettings.username,
+            bio: newSettings.bio
+        };
+
+        // 批量更新设置
+        for (const [key, value] of Object.entries(settingsMap)) {
+            if (value !== undefined && value !== null) {
+                await updateSettings({ [key]: value });
+                this.settings[key] = value;
+            }
+        }
+
+        // 应用新设置
+        this.applySettings();
+    }
+
+    /**
+     * 恢复默认设置
+     */
+    async resetToDefault() {
+        // 重置为默认值
+        this.settings = { ...this.defaultSettings };
+        
+        // 保存到数据库
+        await updateSettings(this.defaultSettings);
+        
+        // 应用默认设置
+        this.applySettings();
+    }
 }
 
 export default new SettingsManager();

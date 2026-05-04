@@ -5,6 +5,9 @@ import categoryManager from './managers/category-manager.js';
 import iconRenderer from './core/icon-renderer.js';
 import sidebarRenderer from './core/sidebar-renderer.js';
 import searchHandler from './core/search-handler.js';
+import dragHandler from './core/drag-handler.js';
+import contextMenuHandler from './core/context-menu-handler.js';
+import settingsModalHandler from './core/settings-modal-handler.js';
 
 class App {
     constructor() {
@@ -25,6 +28,18 @@ class App {
             
             // 渲染所有图标
             iconRenderer.renderAllCategories();
+            
+            // 初始化拖拽功能
+            dragHandler.init();
+            
+            // 初始化右键菜单
+            contextMenuHandler.init();
+            
+            // 初始化设置 Modal
+            settingsModalHandler.init();
+            
+            // 绑定头像点击事件（打开设置）
+            this.bindAvatarClick();
             
             // 设置横向滚动支持（Shift + 滚轮）
             this.setupHorizontalScroll();
@@ -70,6 +85,18 @@ class App {
 
     updateActiveCategoryOnScroll() {
         // 此方法不再需要，因为现在使用显示/隐藏切换
+    }
+
+    /**
+     * 绑定头像点击事件
+     */
+    bindAvatarClick() {
+        const avatar = document.querySelector('.sidebar-avatar');
+        if (avatar) {
+            avatar.addEventListener('click', () => {
+                settingsModalHandler.open();
+            });
+        }
     }
 }
 

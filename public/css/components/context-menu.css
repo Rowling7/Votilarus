@@ -1,0 +1,60 @@
+/* ==================== 右键菜单样式 ==================== */
+
+.context-menu {
+    position: fixed;
+    z-index: 10000;
+    min-width: 160px;
+    padding: 0.5rem 0;
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--border-color);
+    border-radius: 0.75rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    animation: menuFadeIn 0.15s ease;
+}
+
+@keyframes menuFadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.context-menu-item {
+    padding: 0.6rem 1.2rem;
+    cursor: pointer;
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    transition: all var(--transition-fast);
+    user-select: none;
+}
+
+.context-menu-item:hover {
+    background: var(--bg-hover);
+    color: var(--theme-color);
+}
+
+.context-menu-item.danger {
+    color: var(--error-color);
+}
+
+.context-menu-item.danger:hover {
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--error-color);
+}
+
+/* 拖拽样式 */
+.grid-item.dragging {
+    opacity: 0.5;
+    transform: scale(0.95);
+}
+
+.category-panel.drag-over {
+    background: rgba(var(--theme-color-rgb), 0.05);
+    border: 2px dashed var(--theme-color);
+}

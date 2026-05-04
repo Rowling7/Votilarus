@@ -1,6 +1,7 @@
 // ==================== 图标渲染器 ====================
 
 import categoryManager from '../managers/category-manager.js';
+import dragHandler from './drag-handler.js';
 
 class IconRenderer {
     constructor() {
@@ -96,6 +97,9 @@ class IconRenderer {
         }
         
         gridItem.appendChild(iconDiv);
+        
+        // 启用拖拽
+        dragHandler.enableDrag(gridItem);
         
         // 添加标题
         const showTitle = true; // 从设置中获取

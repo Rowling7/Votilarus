@@ -35,10 +35,24 @@ router.put('/', (req, res) => {
     
     for (const [key, value] of Object.entries(updates)) {
         const promise = new Promise((resolve, reject) => {
-            const sql = 'UPDATE stettings SET value = ? WHERE key = ?';
-            db.run(sql, [value, key], function(err) {
-                if (err) reject(err);
-                else resolve({ changes: this.changes });
+            // 先尝试更新，如果没有影响行数，则插入
+            const updateSql = 'UPDATE stettings SET value = ? WHERE key = ?';
+            db.run(updateSql, [value, key], function(err) {
+                if (err) {
+                    reject(err);
+                    return;
+                }
+                
+                // 如果没有更新任何行，说明 key 不存在，需要插入
+                if (this.changes === 0) {
+                    const insertSql = 'INSERT INTO stettings (key, value, type, isdisplay, isdel) VALUES (?, ?, ?, ?, ?)';
+                    db.run(insertSql, [key, value, 'personal', '1', '0'], function(insertErr) {
+                        if (insertErr) reject(insertErr);
+                        else resolve({ changes: 1, inserted: true });
+                    });
+                } else {
+                    resolve({ changes: this.changes, inserted: false });
+                }
             });
         });
         promises.push(promise);
