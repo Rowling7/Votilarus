@@ -13,6 +13,7 @@ import dockRenderer from './core/dock-renderer.js';
 import iconEditorHandler from './core/icon-editor-handler.js';
 import tooltipManager from './core/tooltip-manager.js';
 import addIconDialog from './core/add-icon-dialog.js';
+import addWidgetDialog from './core/add-widget-dialog.js';
 
 class App {
     constructor() {
@@ -57,6 +58,9 @@ class App {
             
             // 初始化添加图标对话框
             addIconDialog.init();
+            
+            // 初始化添加小组件对话框
+            addWidgetDialog.init();
             
             // 绑定头像点击事件（打开设置）
             this.bindAvatarClick();

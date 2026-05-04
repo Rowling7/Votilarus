@@ -307,9 +307,16 @@ class ContextMenuHandler {
     /**
      * 添加小组件
      */
-    addWidget(categoryId) {
-        console.log(` 添加小组件到分类: ${categoryId}`);
-        console.log(' 待实现：添加小组件对话框');
+    async addWidget(categoryId) {
+        console.log(`🧩 添加小组件到分类: ${categoryId}`);
+        
+        try {
+            const addWidgetDialog = await import('./add-widget-dialog.js');
+            addWidgetDialog.default.open(categoryId);
+        } catch (error) {
+            console.error('❌ 打开添加小组件对话框失败:', error);
+            toast.error('打开对话框失败');
+        }
     }
 
     /**
