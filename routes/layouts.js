@@ -33,7 +33,7 @@ router.get('/grid', (req, res) => {
     
     const sql = `
         SELECT 
-            (SELECT value FROM stettings WHERE key = 'grid_columns' AND isdel = '0') as columns,
+            (SELECT value FROM stettings WHERE key = 'grid_cols' AND isdel = '0') as columns,
             (SELECT value FROM stettings WHERE key = 'grid_rows' AND isdel = '0') as rows,
             (SELECT value FROM stettings WHERE key = 'cell_base_size' AND isdel = '0') as cell_base_size,
             (SELECT value FROM stettings WHERE key = 'cell_gap' AND isdel = '0') as cell_gap
@@ -68,7 +68,7 @@ router.put('/grid', (req, res) => {
     const updates = [];
     
     if (columns !== undefined) {
-        updates.push({ key: 'grid_columns', value: columns.toString() });
+        updates.push({ key: 'grid_cols', value: columns.toString() });
     }
     if (rows !== undefined) {
         updates.push({ key: 'grid_rows', value: rows.toString() });

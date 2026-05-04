@@ -29,6 +29,40 @@ class NavIcon extends HTMLElement {
         const uuid = this.getAttribute('uuid') || '';
 
         const [width, height] = size.split('x').map(Number);
+        
+        // 获取标题最大长度设置
+        const titleMaxLength = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--title-max-length')) || 8;
+        const displayTitle = title.length > titleMaxLength ? title.substring(0, titleMaxLength) + '...' : title;
+        
+        // 获取标题位置设置
+        const titlePosition = getComputedStyle(document.documentElement).getPropertyValue('--title-position').trim() || 'bottom';
+        
+        // 根据位置计算样式
+        let titlePositionStyle = '';
+        switch(titlePosition) {
+            case 'top':
+                titlePositionStyle = `
+                    top: -1.5rem;
+                    bottom: auto;
+                `;
+                break;
+            case 'floating':
+                titlePositionStyle = `
+                    bottom: 0.5rem;
+                    background: rgba(0, 0, 0, 0.7);
+                    padding: 0.25rem 0.5rem;
+                    border-radius: 0.25rem;
+                    font-size: calc(var(--title-font-size, 12px) * 0.9);
+                `;
+                break;
+            case 'bottom':
+            default:
+                titlePositionStyle = `
+                    bottom: -1.5rem;
+                    top: auto;
+                `;
+                break;
+        }
 
         this.shadowRoot.innerHTML = `
             <style>
@@ -75,7 +109,6 @@ class NavIcon extends HTMLElement {
 
                 .icon-title {
                     position: absolute;
-                    bottom: -1.5rem;
                     left: 50%;
                     transform: translateX(-50%);
                     font-size: var(--title-font-size, 12px);
@@ -84,6 +117,7 @@ class NavIcon extends HTMLElement {
                     max-width: 100%;
                     overflow: hidden;
                     text-overflow: ellipsis;
+                    ${titlePositionStyle}
                 }
             </style>
             <div class="icon-container" data-uuid="${uuid}" data-url="${url}">
@@ -91,7 +125,7 @@ class NavIcon extends HTMLElement {
                     ? `<div class="icon-bg"></div>` 
                     : `<div class="icon-letter">${title.charAt(0).toUpperCase()}</div>`
                 }
-                <div class="icon-title">${title}</div>
+                <div class="icon-title">${displayTitle}</div>
             </div>
         `;
     }

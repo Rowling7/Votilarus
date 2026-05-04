@@ -152,7 +152,7 @@ router.post('/reset', (req, res) => {
     
     // 默认设置
     const defaultSettings = {
-        grid_columns: '13',
+        grid_cols: '13',
         grid_rows: '5',
         cell_gap: '2',
         sidebar_width: '6',

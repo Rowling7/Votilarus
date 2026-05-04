@@ -28,6 +28,9 @@ class App {
             // 初始化设置
             await settingsManager.init();
             
+            // 将 settingsManager 暴露到全局，供其他模块使用
+            window.settingsManager = settingsManager;
+            
             // 初始化分类和数据
             await categoryManager.init();
             

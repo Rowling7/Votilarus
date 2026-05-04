@@ -40,8 +40,17 @@ class SettingsModalHandler {
                 <h2>⚙️ 设置</h2>
                 <button class="modal-close-btn" aria-label="关闭">×</button>
             </div>
+            <div class="modal-tabs">
+                <button class="tab-btn active" data-tab="basic">📐 基础设置</button>
+                <button class="tab-btn" data-tab="advanced">⚙️ 高级设置</button>
+            </div>
             <div class="modal-body">
-                ${this.generateSettingsSections()}
+                <div class="tab-content active" id="tab-basic">
+                    ${this.generateBasicSettingsSections()}
+                </div>
+                <div class="tab-content" id="tab-advanced">
+                    ${this.generateAdvancedSettingsSections()}
+                </div>
             </div>
             <div class="modal-footer">
                 <button class="btn btn-danger" id="reset-settings-btn">恢复默认</button>
@@ -58,9 +67,19 @@ class SettingsModalHandler {
     }
 
     /**
-     * 生成所有设置分类
+     * 生成所有设置分类（保留用于兼容）
      */
     generateSettingsSections() {
+        return `
+            ${this.generateBasicSettingsSections()}
+            ${this.generateAdvancedSettingsSections()}
+        `;
+    }
+
+    /**
+     * 生成基础设置部分
+     */
+    generateBasicSettingsSections() {
         return `
             <!-- 1. 基础设置 -->
             <div class="settings-section">
@@ -278,8 +297,15 @@ class SettingsModalHandler {
                     </select>
                 </div>
             </div>
+        `;
+    }
 
-            <!-- 6. 交互行为 -->
+    /**
+     * 生成高级设置部分
+     */
+    generateAdvancedSettingsSections() {
+        return `
+            <!-- 1. 交互行为 -->
             <div class="settings-section">
                 <h3>🎯 交互行为</h3>
                 
@@ -304,7 +330,7 @@ class SettingsModalHandler {
                 </div>
             </div>
 
-            <!-- 7. 个人信息 -->
+            <!-- 2. 个人信息 -->
             <div class="settings-section">
                 <h3>👤 个人信息</h3>
                 
@@ -324,9 +350,9 @@ class SettingsModalHandler {
                 </div>
             </div>
 
-            <!-- 8. 高级设置 -->
+            <!-- 3. 高级功能 -->
             <div class="settings-section">
-                <h3>⚙️ 高级设置</h3>
+                <h3>⚙️ 高级功能</h3>
                 
                 <div class="setting-item">
                     <button class="btn btn-secondary" id="export-config-btn" style="width: 100%; margin-bottom: 0.5rem;">
@@ -376,6 +402,9 @@ class SettingsModalHandler {
         const resetBtn = document.getElementById('reset-settings-btn');
         resetBtn.addEventListener('click', () => this.resetToDefault());
         
+        // 页签切换
+        this.bindTabSwitching();
+        
         // 滑块值实时更新
         this.bindRangeInputs();
         
@@ -391,6 +420,40 @@ class SettingsModalHandler {
         const importFile = document.getElementById('import-config-file');
         importBtn.addEventListener('click', () => importFile.click());
         importFile.addEventListener('change', (e) => this.importConfig(e));
+    }
+
+    /**
+     * 绑定页签切换
+     */
+    bindTabSwitching() {
+        const tabBtns = this.modal.querySelectorAll('.tab-btn');
+        tabBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const targetTab = btn.dataset.tab;
+                this.switchTab(targetTab);
+            });
+        });
+    }
+
+    /**
+     * 切换页签
+     */
+    switchTab(tabName) {
+        // 移除所有 active 类
+        const tabBtns = this.modal.querySelectorAll('.tab-btn');
+        const tabContents = this.modal.querySelectorAll('.tab-content');
+        
+        tabBtns.forEach(btn => btn.classList.remove('active'));
+        tabContents.forEach(content => content.classList.remove('active'));
+        
+        // 激活目标页签
+        const targetBtn = this.modal.querySelector(`.tab-btn[data-tab="${tabName}"]`);
+        const targetContent = this.modal.querySelector(`#tab-${tabName}`);
+        
+        if (targetBtn && targetContent) {
+            targetBtn.classList.add('active');
+            targetContent.classList.add('active');
+        }
     }
 
     /**
@@ -643,16 +706,19 @@ class SettingsModalHandler {
         // 3. 应用图标圆角
         this.applyIconRadius(settings.iconRadius);
         
-        // 4. 应用搜索框位置
+        // 4. 应用标题设置
+        this.applyTitleSettings(settings);
+        
+        // 5. 应用搜索框位置
         this.applySearchBoxPosition(settings.searchBoxPosition);
         
-        // 5. 应用搜索框样式
+        // 6. 应用搜索框样式
         this.applySearchBoxStyle(settings.searchBoxStyle);
         
-        // 6. 应用网格设置
+        // 7. 应用网格设置
         this.applyGridSettings(settings);
         
-        // 7. 应用 Dock 设置
+        // 8. 应用 Dock 设置
         this.applyDockSettings(settings);
         
         console.log('✅ 所有设置已应用');
@@ -716,6 +782,49 @@ class SettingsModalHandler {
         const radiusValue = radius || 0.5;
         document.documentElement.style.setProperty('--icon-radius', `${radiusValue}rem`);
         console.log(`✅ 图标圆角已更新: ${radiusValue}rem`);
+    }
+    
+    /**
+     * 应用标题设置
+     */
+    applyTitleSettings(settings) {
+        // 1. 应用标题字体大小
+        const fontSize = settings.titleFontSize || 12;
+        document.documentElement.style.setProperty('--title-font-size', `${fontSize}px`);
+        console.log(`✅ 标题字体大小已更新: ${fontSize}px`);
+        
+        // 2. 应用标题字体颜色
+        const fontColor = settings.titleFontColor || '#ffffff';
+        document.documentElement.style.setProperty('--title-color', fontColor);
+        console.log(`✅ 标题字体颜色已更新: ${fontColor}`);
+        
+        // 3. 应用标题位置
+        const position = settings.titlePosition || 'bottom';
+        document.documentElement.style.setProperty('--title-position', position);
+        console.log(`✅ 标题位置已更新: ${position}`);
+        
+        // 4. 应用标题最大长度
+        const maxLength = settings.titleMaxLength || 8;
+        document.documentElement.style.setProperty('--title-max-length', maxLength);
+        console.log(`✅ 标题最大长度已更新: ${maxLength}`);
+        
+        // 5. 重新渲染所有图标以应用新设置
+        this.refreshAllIcons();
+    }
+    
+    /**
+     * 刷新所有图标以应用新设置
+     */
+    refreshAllIcons() {
+        const icons = document.querySelectorAll('nav-icon');
+        icons.forEach(icon => {
+            // 触发重新渲染
+            const title = icon.getAttribute('title');
+            if (title) {
+                icon.setAttribute('title', title);
+            }
+        });
+        console.log(`✅ 已刷新 ${icons.length} 个图标`);
     }
     
     /**
