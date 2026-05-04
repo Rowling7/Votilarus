@@ -1,5 +1,8 @@
 // ==================== 添加图标对话框处理器 ====================
 
+import ConfirmModal from '../components/confirm-modal.js';
+import toast from '../utils/toast.js';
+
 class AddIconDialogHandler {
     constructor() {
         this.dialog = null;
@@ -169,31 +172,31 @@ class AddIconDialogHandler {
         const bgimage = document.getElementById('add-icon-image').value.trim();
         
         if (!name) {
-            alert('请输入图标名称');
+            toast.warning('请输入图标名称');
             return;
         }
-        
+                
         if (!target) {
-            alert('请输入链接地址');
+            toast.warning('请输入链接地址');
             return;
         }
-        
+                
         try {
             const { createItem } = await import('./api.js');
-            
+                    
             const result = await createItem({
                 name,
                 target,
                 bgimage: bgimage || null,
                 category_id: this.currentCategoryId
             });
-            
+                    
             console.log('💾 图标创建成功:', result);
-            alert('图标创建成功！请刷新页面查看');
+            toast.success('图标创建成功！请刷新页面查看');
             this.close();
         } catch (error) {
             console.error('❌ 创建失败:', error);
-            alert('创建失败: ' + error.message);
+            toast.error('创建失败: ' + error.message);
         }
     }
 }

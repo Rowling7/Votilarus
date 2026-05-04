@@ -69,6 +69,12 @@ class DockRenderer {
             const dockItem = this.createDockItem(item);
             this.dockContainer.appendChild(dockItem);
         });
+        
+        // 在 Dock 容器上监听 mouseleave（而不是在每个图标上）
+        // 这样只有当鼠标完全离开 Dock 区域时才会重置效果
+        this.dockContainer.addEventListener('mouseleave', () => {
+            this.resetFisheyeEffect();
+        });
     }
 
     /**
@@ -137,11 +143,6 @@ class DockRenderer {
             this.fisheyeTimer = requestAnimationFrame(() => {
                 this.applyFisheyeEffect(dockItem);
             });
-        });
-        
-        // 鼠标离开 Dock 时重置
-        dockItem.addEventListener('mouseleave', () => {
-            this.resetFisheyeEffect();
         });
         
         return dockItem;

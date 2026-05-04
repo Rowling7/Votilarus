@@ -1,5 +1,8 @@
 // ==================== 右键菜单处理器 ====================
 
+import ConfirmModal from '../components/confirm-modal.js';
+import toast from '../utils/toast.js';
+
 class ContextMenuHandler {
     constructor() {
         this.menu = null;
@@ -242,13 +245,13 @@ class ContextMenuHandler {
         try {
             const dockRenderer = await import('./dock-renderer.js');
             await dockRenderer.default.addItem(itemUuid);
-            alert('已添加到 Dock');
+            toast.success('已添加到 Dock');
         } catch (error) {
             console.error('❌ 添加到 Dock 失败:', error);
             if (error.message.includes('已在 Dock 中')) {
-                alert('该图标已在 Dock 中');
+                toast.warning('该图标已在 Dock 中');
             } else {
-                alert('添加失败: ' + error.message);
+                toast.error('添加失败: ' + error.message);
             }
         }
     }
@@ -257,7 +260,15 @@ class ContextMenuHandler {
      * 删除图标
      */
     async deleteItem(itemUuid) {
-        if (!confirm('确定要删除这个图标吗？')) {
+        const confirmed = await ConfirmModal.show({
+            title: '删除图标',
+            message: '确定要删除这个图标吗？',
+            confirmText: '删除',
+            cancelText: '取消',
+            type: 'danger'
+        });
+        
+        if (!confirmed) {
             return;
         }
     
@@ -274,10 +285,10 @@ class ContextMenuHandler {
                 gridItem.remove();
             }
                 
-            alert('图标已删除');
+            toast.success('图标已删除');
         } catch (error) {
             console.error('❌ 删除失败:', error);
-            alert('删除失败: ' + error.message);
+            toast.error('删除失败: ' + error.message);
         }
     }
 
@@ -440,7 +451,7 @@ class ContextMenuHandler {
             }
         } catch (error) {
             console.error('❌ 从 Dock 移除失败:', error);
-            alert('移除失败: ' + error.message);
+            toast.error('移除失败: ' + error.message);
         }
     }
 }

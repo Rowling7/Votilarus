@@ -1,6 +1,8 @@
 // ==================== 设置 Modal 处理器 ====================
 
 import settingsManager from '../managers/settings-manager.js';
+import ConfirmModal from '../components/confirm-modal.js';
+import toast from '../utils/toast.js';
 
 class SettingsModalHandler {
     constructor() {
@@ -74,6 +76,12 @@ class SettingsModalHandler {
                     <label for="grid-cols">列数</label>
                     <input type="number" id="grid-cols" min="13" max="20" value="13">
                     <div class="setting-description">网格列数（13-20，PC 端最低值）</div>
+                </div>
+                
+                <div class="setting-item">
+                    <label for="grid-gap">网格间距</label>
+                    <input type="number" id="grid-gap" min="2" max="5" step="0.5" value="2">
+                    <div class="setting-description">网格间距（rem 单位，2-5）</div>
                 </div>
                 
                 <div class="setting-item">
@@ -471,6 +479,7 @@ class SettingsModalHandler {
         // 基础设置
         document.getElementById('grid-rows').value = settings.gridRows || 5;
         document.getElementById('grid-cols').value = settings.gridCols || 13;
+        document.getElementById('grid-gap').value = settings.gridGap || 2;
         document.getElementById('sidebar-width').value = settings.sidebarWidth || 6;
         
         // 外观主题
@@ -552,10 +561,10 @@ class SettingsModalHandler {
             this.close();
             
             // 显示成功提示
-            alert('设置已保存！');
+            toast.success('设置已保存！');
         } catch (error) {
-            console.error('❌ 保存设置失败:', error);
-            alert('保存设置失败，请重试');
+            console.error(' 保存设置失败:', error);
+            toast.error('保存设置失败，请重试');
         }
     }
 
@@ -567,6 +576,7 @@ class SettingsModalHandler {
             // 基础设置
             gridRows: parseInt(document.getElementById('grid-rows').value),
             gridCols: parseInt(document.getElementById('grid-cols').value),
+            gridGap: parseFloat(document.getElementById('grid-gap').value) || 2,
             sidebarWidth: parseInt(document.getElementById('sidebar-width').value),
             
             // 外观主题
@@ -623,9 +633,11 @@ class SettingsModalHandler {
         // 1. 更新主题色
         document.documentElement.style.setProperty('--theme-color', settings.themeColor);
         
-        // 2. 更新背景
+        // 2. 更新背景（默认为空）
         if (settings.bgImageUrl) {
             document.body.style.backgroundImage = `url(${settings.bgImageUrl})`;
+        } else {
+            document.body.style.backgroundImage = 'none';
         }
         
         // 3. 应用搜索框位置
@@ -704,6 +716,12 @@ class SettingsModalHandler {
         // 更新网格行列数
         contentArea.style.gridTemplateColumns = `repeat(${settings.gridCols || 13}, 1fr)`;
         contentArea.style.gridTemplateRows = `repeat(${settings.gridRows || 5}, 1fr)`;
+        
+        // 更新网格间距
+        const gapValue = settings.gridGap || 2;
+        document.documentElement.style.setProperty('--cell-gap', `${gapValue}rem`);
+        
+        console.log(`✅ 网格间距已更新: ${gapValue}rem`);
     }
     
     /**
@@ -747,7 +765,15 @@ class SettingsModalHandler {
      * 恢复默认设置
      */
     async resetToDefault() {
-        if (!confirm('确定要恢复所有设置为默认值吗？此操作不可撤销。')) {
+        const confirmed = await ConfirmModal.show({
+            title: '恢复默认设置',
+            message: '确定要恢复所有设置为默认值吗？\n此操作不可撤销。',
+            confirmText: '恢复默认',
+            cancelText: '取消',
+            type: 'danger'
+        });
+        
+        if (!confirmed) {
             return;
         }
         
@@ -758,10 +784,10 @@ class SettingsModalHandler {
             // 重新加载设置
             this.loadCurrentSettings();
             
-            alert('已恢复默认设置');
+            toast.success('已恢复默认设置');
         } catch (error) {
             console.error('❌ 恢复默认设置失败:', error);
-            alert('恢复默认设置失败，请重试');
+            toast.error('恢复默认设置失败，请重试');
         }
     }
 
@@ -782,7 +808,7 @@ class SettingsModalHandler {
         URL.revokeObjectURL(url);
         
         console.log('✅ 配置已导出');
-        alert('配置已导出');
+        toast.success('配置已导出');
     }
 
     /**
@@ -797,7 +823,15 @@ class SettingsModalHandler {
             try {
                 const settings = JSON.parse(e.target.result);
                 
-                if (!confirm('导入配置将覆盖当前设置，是否继续？')) {
+                const confirmed = await ConfirmModal.show({
+                    title: '导入配置',
+                    message: '导入配置将覆盖当前设置，是否继续？',
+                    confirmText: '继续导入',
+                    cancelText: '取消',
+                    type: 'warning'
+                });
+                        
+                if (!confirmed) {
                     return;
                 }
                 
@@ -807,10 +841,10 @@ class SettingsModalHandler {
                 // 重新加载设置
                 this.loadCurrentSettings();
                 
-                alert('配置导入成功');
+                toast.success('配置导入成功');
             } catch (error) {
                 console.error('❌ 导入配置失败:', error);
-                alert('导入配置失败，请检查文件格式');
+                toast.error('导入配置失败，请检查文件格式');
             }
         };
         reader.readAsText(file);

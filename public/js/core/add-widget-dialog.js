@@ -1,5 +1,7 @@
 // ==================== 添加小组件对话框处理器 ====================
 
+import toast from '../utils/toast.js';
+
 class AddWidgetDialogHandler {
     constructor() {
         this.dialog = null;
@@ -146,11 +148,11 @@ class AddWidgetDialogHandler {
             });
             
             console.log('💾 小组件创建成功:', result);
-            alert(`小组件 "${widgetId}" 添加成功！请刷新页面查看`);
+            toast.success(`小组件 "${widgetId}" 添加成功！请刷新页面查看`);
             this.close();
         } catch (error) {
             console.error('❌ 添加失败:', error);
-            alert('添加失败: ' + error.message);
+            toast.error('添加失败: ' + error.message);
         }
     }
 }

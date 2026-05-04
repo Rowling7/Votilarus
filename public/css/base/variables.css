@@ -38,7 +38,7 @@
     /* 布局尺寸 */
     --sidebar-width: 6%;
     --cell-base-size: 4rem;
-    --cell-gap: 1rem;
+    --cell-gap: 2rem;
     
     /* 动画 */
     --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);

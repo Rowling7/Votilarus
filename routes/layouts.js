@@ -51,7 +51,7 @@ router.get('/grid', (req, res) => {
             columns: parseInt(row?.columns) || 13,
             rows: parseInt(row?.rows) || 5,
             cell_base_size: parseFloat(row?.cell_base_size) || 4,
-            cell_gap: parseFloat(row?.cell_gap) || 1
+            cell_gap: parseFloat(row?.cell_gap) || 2
         };
         
         console.log('  - ✅ 网格配置:', config);
