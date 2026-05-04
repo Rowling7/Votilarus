@@ -30,19 +30,25 @@ function initDatabase() {
     });
 }
 
-// ==================== API 路由 ====================
-// 注册所有 API 路由
-registerRoutes(app, db);
-
-// SPA 路由回退
-app.get('/{*path}', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+// SPA 路由回退（必须在所有 API 路由之后）
+// 只匹配非 API 路径
+app.use((req, res, next) => {
+    if (!req.path.startsWith('/api/') && !req.path.startsWith('/api')) {
+        res.sendFile(path.join(__dirname, 'public', 'index.html'));
+    } else {
+        next();
+    }
 });
 
 // 启动服务器
 async function startServer() {
     try {
         await initDatabase();
+        
+        // ==================== API 路由 ====================
+        // 注册所有 API 路由（在数据库连接后）
+        registerRoutes(app, db);
+        
         app.listen(PORT, () => {
             console.log(`服务器运行在 http://localhost:${PORT}`);
         });
