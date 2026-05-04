@@ -41,12 +41,24 @@ class SettingsModalHandler {
                 <button class="modal-close-btn" aria-label="关闭">×</button>
             </div>
             <div class="modal-tabs">
-                <button class="tab-btn active" data-tab="basic">📐 基础设置</button>
+                <button class="tab-btn active" data-tab="appearance">🎨 外观主题</button>
+                <button class="tab-btn" data-tab="icon">🖼️ 图标设置</button>
+                <button class="tab-btn" data-tab="dock">⚓ Dock 设置</button>
+                <button class="tab-btn" data-tab="search">🔍 搜索设置</button>
                 <button class="tab-btn" data-tab="advanced">⚙️ 高级设置</button>
             </div>
             <div class="modal-body">
-                <div class="tab-content active" id="tab-basic">
-                    ${this.generateBasicSettingsSections()}
+                <div class="tab-content active" id="tab-appearance">
+                    ${this.generateAppearanceSection()}
+                </div>
+                <div class="tab-content" id="tab-icon">
+                    ${this.generateIconSettingsSection()}
+                </div>
+                <div class="tab-content" id="tab-dock">
+                    ${this.generateDockSection()}
+                </div>
+                <div class="tab-content" id="tab-search">
+                    ${this.generateSearchSection()}
                 </div>
                 <div class="tab-content" id="tab-advanced">
                     ${this.generateAdvancedSettingsSections()}
@@ -71,46 +83,20 @@ class SettingsModalHandler {
      */
     generateSettingsSections() {
         return `
-            ${this.generateBasicSettingsSections()}
+            ${this.generateAppearanceSection()}
+            ${this.generateIconSettingsSection()}
+            ${this.generateDockSection()}
+            ${this.generateSearchSection()}
             ${this.generateAdvancedSettingsSections()}
         `;
     }
 
     /**
-     * 生成基础设置部分
+     * 生成外观主题部分
      */
-    generateBasicSettingsSections() {
+    generateAppearanceSection() {
         return `
-            <!-- 1. 基础设置 -->
-            <div class="settings-section">
-                <h3>📐 基础设置</h3>
-                
-                <div class="setting-item">
-                    <label for="grid-rows">行数</label>
-                    <input type="number" id="grid-rows" min="5" max="9" value="5">
-                    <div class="setting-description">网格行数（5-9）</div>
-                </div>
-                
-                <div class="setting-item">
-                    <label for="grid-cols">列数</label>
-                    <input type="number" id="grid-cols" min="13" max="20" value="13">
-                    <div class="setting-description">网格列数（13-20，PC 端最低值）</div>
-                </div>
-                
-                <div class="setting-item">
-                    <label for="grid-gap">网格间距</label>
-                    <input type="number" id="grid-gap" min="2" max="5" step="0.5" value="2">
-                    <div class="setting-description">网格间距（rem 单位，2-5）</div>
-                </div>
-                
-                <div class="setting-item">
-                    <label for="sidebar-width">侧栏宽度</label>
-                    <input type="number" id="sidebar-width" min="4" max="15" value="6">
-                    <div class="setting-description">侧栏宽度百分比（4%-15%）</div>
-                </div>
-            </div>
-
-            <!-- 2. 外观主题 -->
+            <!-- 1. 外观主题 -->
             <div class="settings-section">
                 <h3>🎨 外观主题</h3>
                 
@@ -156,11 +142,44 @@ class SettingsModalHandler {
                     <span class="range-value" id="overlay-opacity-value">0.3</span>
                 </div>
             </div>
+        `;
+    }
 
-            <!-- 3. 图标样式 -->
+    /**
+     * 生成图标设置部分
+     */
+    generateIconSettingsSection() {
+        return `
+            <!-- 1. 图标设置 -->
             <div class="settings-section">
-                <h3>🖼️ 图标样式</h3>
+                <h3>🖼️ 图标设置</h3>
                 
+                <!-- 网格布局 -->
+                <div class="setting-item">
+                    <label for="grid-rows">行数</label>
+                    <input type="number" id="grid-rows" min="5" max="9" value="5">
+                    <div class="setting-description">网格行数（5-9）</div>
+                </div>
+                
+                <div class="setting-item">
+                    <label for="grid-cols">列数</label>
+                    <input type="number" id="grid-cols" min="13" max="20" value="13">
+                    <div class="setting-description">网格列数（13-20，PC 端最低值）</div>
+                </div>
+                
+                <div class="setting-item">
+                    <label for="grid-gap">网格间距</label>
+                    <input type="number" id="grid-gap" min="2" max="5" step="0.5" value="2">
+                    <div class="setting-description">网格间距（rem 单位，2-5）</div>
+                </div>
+                
+                <div class="setting-item">
+                    <label for="sidebar-width">侧栏宽度</label>
+                    <input type="number" id="sidebar-width" min="4" max="15" value="6">
+                    <div class="setting-description">侧栏宽度百分比（4%-15%）</div>
+                </div>
+                
+                <!-- 图标样式 -->
                 <div class="setting-item">
                     <label for="icon-radius">图标圆角</label>
                     <input type="number" id="icon-radius" min="0" max="2" step="0.1" value="0.5">
@@ -184,6 +203,7 @@ class SettingsModalHandler {
                     </select>
                 </div>
                 
+                <!-- 标题设置 -->
                 <div class="setting-item">
                     <label>显示图标标题</label>
                     <div class="switch-container">
@@ -224,8 +244,15 @@ class SettingsModalHandler {
                     <div class="setting-description">ms 单位</div>
                 </div>
             </div>
+        `;
+    }
 
-            <!-- 4. Dock 设置 -->
+    /**
+     * 生成 Dock 设置部分
+     */
+    generateDockSection() {
+        return `
+            <!-- 1. Dock 设置 -->
             <div class="settings-section">
                 <h3>⚓ Dock 设置</h3>
                 
@@ -266,8 +293,15 @@ class SettingsModalHandler {
                     <div class="setting-description">左右各几个图标</div>
                 </div>
             </div>
+        `;
+    }
 
-            <!-- 5. 搜索设置 -->
+    /**
+     * 生成搜索设置部分
+     */
+    generateSearchSection() {
+        return `
+            <!-- 1. 搜索设置 -->
             <div class="settings-section">
                 <h3>🔍 搜索设置</h3>
                 
