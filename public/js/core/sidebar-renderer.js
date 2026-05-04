@@ -13,7 +13,8 @@ class SidebarRenderer {
         categories.forEach(category => {
             const categoryDiv = document.createElement('div');
             categoryDiv.className = 'sidebar-category';
-            categoryDiv.textContent = category.name;
+            // 显示 aindex 字段
+            categoryDiv.textContent = category.aindex;
             categoryDiv.dataset.categoryId = category.uuid;
             
             if (category.uuid == categoryManager.getCurrentCategory()) {
@@ -29,7 +30,7 @@ class SidebarRenderer {
     }
 
     switchCategory(uuid) {
-        // 更新激活状态
+        // 更新侧边栏激活状态
         const allCategories = this.categoriesContainer.querySelectorAll('.sidebar-category');
         allCategories.forEach(cat => {
             cat.classList.remove('active');
@@ -38,15 +39,16 @@ class SidebarRenderer {
             }
         });
         
-        // 滚动到对应分类面板
-        const panel = document.getElementById(`category-${uuid}`);
-        if (panel) {
-            const contentArea = document.getElementById('contentArea');
-            const scrollLeft = panel.offsetLeft - contentArea.offsetLeft - 50;
-            contentArea.scrollTo({
-                left: scrollLeft,
-                behavior: 'smooth'
-            });
+        // 隐藏所有分类面板
+        const allPanels = document.querySelectorAll('.category-panel');
+        allPanels.forEach(panel => {
+            panel.classList.remove('active');
+        });
+        
+        // 显示目标分类面板
+        const targetPanel = document.getElementById(`category-${uuid}`);
+        if (targetPanel) {
+            targetPanel.classList.add('active');
         }
         
         // 更新当前分类

@@ -12,14 +12,21 @@ export async function fetchCategories() {
 
 export async function fetchItems(categoryUuid = null) {
     let url = `${API_BASE}/items`;
-    if (categoryUuid) {
+    // 使用 !== undefined 和 !== null 来判断，因为 uuid 可能是 0
+    if (categoryUuid !== undefined && categoryUuid !== null) {
         url += `?category_uuid=${categoryUuid}`;
+        console.log(`🌐 [API.fetchItems] 请求分类 ${categoryUuid} 的图标`);
+    } else {
+        console.log(' [API.fetchItems] 请求所有图标');
     }
+    
     const response = await fetch(url);
     if (!response.ok) {
         throw new Error('获取图标失败');
     }
-    return await response.json();
+    const data = await response.json();
+    console.log(`  - ✅ 接收到 ${data.length} 个图标`);
+    return data;
 }
 
 export async function fetchLayouts(itemUuid = null) {

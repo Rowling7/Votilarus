@@ -23,9 +23,21 @@ class CategoryManager {
     }
 
     async loadAllItems() {
+        console.log('📦 [CategoryManager] 开始加载所有图标');
+        console.log('  - 分类数量:', this.categories.length);
+        
         for (const category of this.categories) {
+            console.log(`\n [CategoryManager] 加载分类: ${category.name} (uuid: ${category.uuid})`);
             try {
                 const items = await fetchItems(category.uuid);
+                console.log(`  - ✅ 获取到 ${items.length} 个图标`);
+                if (items.length > 0) {
+                    console.log(`  - 第一个图标:`, {
+                        uuid: items[0].uuid,
+                        a70Id: items[0].a70Id,
+                        name: items[0].name
+                    });
+                }
                 this.items[category.uuid] = items;
                 
                 // 加载布局信息
@@ -34,9 +46,16 @@ class CategoryManager {
                     this.layouts[layout.item_uuid] = layout;
                 });
             } catch (error) {
+                console.error(`  - ❌ 加载失败:`, error);
                 this.items[category.uuid] = [];
             }
         }
+        
+        console.log('\n📊 [CategoryManager] 加载完成，总览:');
+        Object.keys(this.items).forEach(uuid => {
+            const category = this.categories.find(c => c.uuid == uuid);
+            console.log(`  - ${category ? category.name : uuid}: ${this.items[uuid].length} 个图标`);
+        });
     }
 
     getCategories() {
@@ -44,7 +63,10 @@ class CategoryManager {
     }
 
     getItems(categoryUuid) {
-        return this.items[categoryUuid] || [];
+        console.log(`📦 [CategoryManager.getItems] 请求分类 ${categoryUuid} 的图标`);
+        const items = this.items[categoryUuid] || [];
+        console.log(`  - 返回 ${items.length} 个图标`);
+        return items;
     }
 
     getLayout(itemUuid) {

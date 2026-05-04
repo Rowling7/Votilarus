@@ -8,14 +8,26 @@ class IconRenderer {
     }
 
     renderAllCategories() {
+        console.log('🎨 [IconRenderer] 开始渲染所有分类');
         const categories = categoryManager.getCategories();
+        console.log('  - 分类数量:', categories.length);
         
         this.contentArea.innerHTML = '';
         
         categories.forEach((category, index) => {
+            console.log(`\n🎨 渲染分类面板: ${category.name} (${category.uuid})`);
             const panel = this.createCategoryPanel(category, index);
             this.contentArea.appendChild(panel);
         });
+        
+        // 激活第一个分类
+        if (categories.length > 0) {
+            const firstPanel = document.getElementById(`category-${categories[0].uuid}`);
+            if (firstPanel) {
+                firstPanel.classList.add('active');
+                console.log(`  - ✅ 激活第一个分类: ${categories[0].name}`);
+            }
+        }
     }
 
     createCategoryPanel(category, index) {
@@ -24,27 +36,30 @@ class IconRenderer {
         panel.id = `category-${category.uuid}`;
         panel.dataset.categoryId = category.uuid;
         
-        // 创建标题
-        const title = document.createElement('h2');
-        title.textContent = category.name;
-        title.style.cssText = 'margin-bottom: 1.5rem; color: var(--text-primary); font-size: 1.5rem;';
-        panel.appendChild(title);
-        
         // 创建网格容器
         const gridContainer = document.createElement('div');
         gridContainer.className = 'grid-container';
-        gridContainer.style.position = 'relative';
-        gridContainer.style.width = '100%';
-        gridContainer.style.height = 'calc(100vh - 150px)';
         
         // 获取该分类下的图标
         const items = categoryManager.getItems(category.uuid);
-        items.forEach(item => {
+        console.log(`  - 获取到 ${items.length} 个图标`);
+        
+        // 按 sort_order 排序
+        const sortedItems = items.sort((a, b) => {
+            const layoutA = categoryManager.getLayout(a.uuid);
+            const layoutB = categoryManager.getLayout(b.uuid);
+            if (!layoutA || !layoutB) return 0;
+            return layoutA.sort_order - layoutB.sort_order;
+        });
+        
+        sortedItems.forEach(item => {
             const iconElement = this.createIcon(item);
             if (iconElement) {
                 gridContainer.appendChild(iconElement);
             }
         });
+        
+        console.log(`  - ✅ 网格容器创建完成，包含 ${gridContainer.children.length} 个图标元素`);
         
         panel.appendChild(gridContainer);
         
@@ -58,16 +73,8 @@ class IconRenderer {
             return null;
         }
         
-        // 获取 CSS 变量值
-        const cellBaseSize = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--cell-base-size'));
-        const cellGap = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--cell-gap'));
-        const cellSizePx = cellBaseSize * 16; // rem to px
-        const gapSizePx = cellGap * 16; // rem to px
-        
         const gridItem = document.createElement('div');
         gridItem.className = `grid-item size-${layout.width}x${layout.height}`;
-        gridItem.style.left = `${layout.pos_x * (cellSizePx + gapSizePx)}px`;
-        gridItem.style.top = `${layout.pos_y * (cellSizePx + gapSizePx)}px`;
         gridItem.dataset.itemUuid = item.uuid;
         gridItem.dataset.url = item.target;
         

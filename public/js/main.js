@@ -4,7 +4,7 @@ import settingsManager from './managers/settings-manager.js';
 import categoryManager from './managers/category-manager.js';
 import iconRenderer from './core/icon-renderer.js';
 import sidebarRenderer from './core/sidebar-renderer.js';
-import searchManager from './core/search-manager.js';
+import searchHandler from './core/search-handler.js';
 
 class App {
     constructor() {
@@ -40,55 +40,36 @@ class App {
     setupHorizontalScroll() {
         const contentArea = document.getElementById('contentArea');
         
-        // Shift + 滚轮横向滚动
-        contentArea.addEventListener('wheel', (e) => {
-            if (e.shiftKey) {
-                e.preventDefault();
-                contentArea.scrollLeft += e.deltaY;
-            }
-        });
-        
-        // 监听滚动事件，更新侧边栏激活状态
+        // 鼠标滚轮实现左右切换分类
         let scrollTimeout;
-        contentArea.addEventListener('scroll', () => {
+        contentArea.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            
+            // 防抖处理
             clearTimeout(scrollTimeout);
             scrollTimeout = setTimeout(() => {
-                this.updateActiveCategoryOnScroll();
-            }, 100);
+                const categories = categoryManager.getCategories();
+                const currentUuid = categoryManager.getCurrentCategory();
+                const currentIndex = categories.findIndex(c => c.uuid == currentUuid);
+                
+                let nextIndex;
+                if (e.deltaY > 0 || e.deltaX > 0) {
+                    // 向下或向右滚动 -> 下一个分类
+                    nextIndex = (currentIndex + 1) % categories.length;
+                } else {
+                    // 向上或向左滚动 -> 上一个分类
+                    nextIndex = (currentIndex - 1 + categories.length) % categories.length;
+                }
+                
+                // 切换分类
+                const nextCategory = categories[nextIndex];
+                sidebarRenderer.switchCategory(nextCategory.uuid);
+            }, 50);
         });
     }
 
     updateActiveCategoryOnScroll() {
-        const contentArea = document.getElementById('contentArea');
-        const panels = contentArea.querySelectorAll('.category-panel');
-        const scrollLeft = contentArea.scrollLeft;
-        
-        let activePanel = null;
-        let minDistance = Infinity;
-        
-        panels.forEach(panel => {
-            const panelLeft = panel.offsetLeft - contentArea.offsetLeft;
-            const distance = Math.abs(panelLeft - scrollLeft);
-            
-            if (distance < minDistance) {
-                minDistance = distance;
-                activePanel = panel;
-            }
-        });
-        
-        if (activePanel) {
-            const categoryId = activePanel.dataset.categoryId;
-            categoryManager.setCurrentCategory(categoryId);
-            
-            // 更新侧边栏激活状态
-            const sidebarCategories = document.querySelectorAll('.sidebar-category');
-            sidebarCategories.forEach(cat => {
-                cat.classList.remove('active');
-                if (cat.dataset.categoryId == categoryId) {
-                    cat.classList.add('active');
-                }
-            });
-        }
+        // 此方法不再需要，因为现在使用显示/隐藏切换
     }
 }
 
