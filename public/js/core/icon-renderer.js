@@ -73,8 +73,8 @@ class IconRenderer {
         const gridContainer = document.createElement('div');
         gridContainer.className = 'grid-container';
         
-        // 首页可以显示欢迎信息或常用图标
-        // 这里暂时留空，后续可以添加常用图标或小组件
+        // 在首页添加默认小组件
+        this.addDefaultWidgets(gridContainer);
         
         // 使用 requestAnimationFrame 优化渲染
         requestAnimationFrame(() => {
@@ -82,6 +82,27 @@ class IconRenderer {
         });
         
         return panel;
+    }
+    
+    /**
+     * 添加默认小组件到首页
+     */
+    addDefaultWidgets(container) {
+        // 添加时钟小组件
+        const clockWidget = document.createElement('nav-widget');
+        clockWidget.setAttribute('type', 'clock');
+        clockWidget.setAttribute('size', '2x2');
+        clockWidget.setAttribute('uuid', 'widget-clock');
+        container.appendChild(clockWidget);
+        
+        // 添加日历小组件
+        const calendarWidget = document.createElement('nav-widget');
+        calendarWidget.setAttribute('type', 'calendar');
+        calendarWidget.setAttribute('size', '2x2');
+        calendarWidget.setAttribute('uuid', 'widget-calendar');
+        container.appendChild(calendarWidget);
+        
+        console.log('✅ 已添加默认小组件到首页');
     }
 
     createCategoryPanel(category, index) {

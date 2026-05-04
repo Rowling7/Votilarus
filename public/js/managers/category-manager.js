@@ -13,9 +13,8 @@ class CategoryManager {
     async init() {
         try {
             this.categories = await fetchCategories();
-            if (this.categories.length > 0) {
-                this.currentCategory = this.categories[0].uuid;
-            }
+            // 默认选中首页（-1），而不是第一个分类
+            this.currentCategory = '-1';
             await this.loadAllItems();
         } catch (error) {
             // 处理错误
@@ -84,6 +83,15 @@ class CategoryManager {
     getCategoryName(uuid) {
         const category = this.categories.find(c => c.uuid == uuid);
         return category ? category.name : '';
+    }
+    
+    /**
+     * 获取所有可切换的分类列表（包含首页）
+     */
+    getAllSwitchableCategories() {
+        // 首页作为第一个分类
+        const homeCategory = { uuid: '-1', name: '首页', aindex: '🏠' };
+        return [homeCategory, ...this.categories];
     }
 }
 

@@ -83,21 +83,22 @@ class App {
             // 防抖处理
             clearTimeout(scrollTimeout);
             scrollTimeout = setTimeout(() => {
-                const categories = categoryManager.getCategories();
+                // 获取包含首页的所有可切换分类
+                const allCategories = categoryManager.getAllSwitchableCategories();
                 const currentUuid = categoryManager.getCurrentCategory();
-                const currentIndex = categories.findIndex(c => c.uuid == currentUuid);
+                const currentIndex = allCategories.findIndex(c => c.uuid == currentUuid);
                 
                 let nextIndex;
                 if (e.deltaY > 0 || e.deltaX > 0) {
                     // 向下或向右滚动 -> 下一个分类
-                    nextIndex = (currentIndex + 1) % categories.length;
+                    nextIndex = (currentIndex + 1) % allCategories.length;
                 } else {
                     // 向上或向左滚动 -> 上一个分类
-                    nextIndex = (currentIndex - 1 + categories.length) % categories.length;
+                    nextIndex = (currentIndex - 1 + allCategories.length) % allCategories.length;
                 }
                 
                 // 切换分类
-                const nextCategory = categories[nextIndex];
+                const nextCategory = allCategories[nextIndex];
                 sidebarRenderer.switchCategory(nextCategory.uuid);
             }, 50);
         });
