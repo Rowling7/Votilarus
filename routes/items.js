@@ -54,6 +54,98 @@ router.get('/', (req, res) => {
     });
 });
 
+// 创建新图标
+router.post('/', (req, res) => {
+    const { name, target, bgimage, category_id } = req.body;
+    
+    console.log('➕ [API] 创建新图标:', { name, target, category_id });
+    
+    if (!name || !target || !category_id) {
+        res.status(400).json({ error: '缺少必要参数' });
+        return;
+    }
+    
+    // 生成 UUID
+    const uuid = require('crypto').randomUUID();
+    
+    // 插入 A7001 表
+    const insertSql = 'INSERT INTO A7001 (uuid, a70Id, name, target, bgimage, isdel) VALUES (?, ?, ?, ?, ?, ?)';
+    db.run(insertSql, [uuid, parseInt(category_id), name, target, bgimage || null, '0'], function(err) {
+        if (err) {
+            console.error('  - ❌ 创建失败:', err.message);
+            res.status(500).json({ error: err.message });
+            return;
+        }
+        
+        console.log('  - ✅ 图标创建成功, UUID:', uuid);
+        
+        // 同时创建布局记录（默认位置）
+        const layoutSql = 'INSERT INTO item_layouts (item_uuid, category_id, pos_x, pos_y, width, height) VALUES (?, ?, 0, 0, 1, 1)';
+        db.run(layoutSql, [uuid, parseInt(category_id)], function(layoutErr) {
+            if (layoutErr) {
+                console.error('  - ⚠️ 布局记录创建失败:', layoutErr.message);
+            }
+            
+            res.json({ 
+                success: true, 
+                uuid,
+                message: '图标创建成功'
+            });
+        });
+    });
+});
+
+// 创建小组件（特殊类型的图标）
+router.post('/widget', (req, res) => {
+    const { widget_type, category_id } = req.body;
+    
+    console.log('🧩 [API] 创建小组件:', { widget_type, category_id });
+    
+    if (!widget_type || !category_id) {
+        res.status(400).json({ error: '缺少必要参数' });
+        return;
+    }
+    
+    // 生成 UUID
+    const uuid = require('crypto').randomUUID();
+    
+    // 小组件名称映射
+    const widgetNames = {
+        'clock': '时钟',
+        'calendar': '日历',
+        'weather': '天气'
+    };
+    
+    const name = widgetNames[widget_type] || widget_type;
+    
+    // 插入 A7001 表（小组件是特殊的图标，target 为空）
+    const insertSql = 'INSERT INTO A7001 (uuid, a70Id, name, target, bgimage, isdel) VALUES (?, ?, ?, ?, ?, ?)';
+    db.run(insertSql, [uuid, parseInt(category_id), name, null, null, '0'], function(err) {
+        if (err) {
+            console.error('  - ❌ 创建失败:', err.message);
+            res.status(500).json({ error: err.message });
+            return;
+        }
+        
+        console.log('  - ✅ 小组件创建成功, UUID:', uuid);
+        
+        // 创建布局记录（默认位置，大小为 2x2）
+        const layoutSql = 'INSERT INTO item_layouts (item_uuid, category_id, pos_x, pos_y, width, height) VALUES (?, ?, 0, 0, 2, 2)';
+        db.run(layoutSql, [uuid, parseInt(category_id)], function(layoutErr) {
+            if (layoutErr) {
+                console.error('  - ⚠️ 布局记录创建失败:', layoutErr.message);
+            }
+            
+            res.json({ 
+                success: true, 
+                uuid,
+                widget_type,
+                message: '小组件创建成功'
+            });
+        });
+    });
+});
+
 // 更新图标布局（位置和大小）
 router.put('/layout', (req, res) => {
     const { item_uuid, category_id, pos_x, pos_y, width, height } = req.body;
@@ -162,6 +254,57 @@ router.delete('/:uuid', (req, res) => {
         }
         
         console.log('  - ✅ 图标已软删除');
+        res.json({ success: true, changes: this.changes });
+    });
+});
+
+// 更新图标信息（名称、链接、图片）
+router.put('/:uuid', (req, res) => {
+    const { uuid } = req.params;
+    const { name, target, bgimage } = req.body;
+    
+    console.log('✏️ [API] 更新图标信息:', { uuid, name, target, bgimage });
+    
+    // 构建动态 SQL
+    const updates = [];
+    const params = [];
+    
+    if (name !== undefined) {
+        updates.push('name = ?');
+        params.push(name);
+    }
+    if (target !== undefined) {
+        updates.push('target = ?');
+        params.push(target);
+    }
+    if (bgimage !== undefined) {
+        updates.push('bgimage = ?');
+        params.push(bgimage);
+    }
+    
+    if (updates.length === 0) {
+        res.status(400).json({ error: '没有提供要更新的字段' });
+        return;
+    }
+    
+    updates.push('upDatetime = CURRENT_TIMESTAMP');
+    params.push(uuid);
+    
+    const sql = `UPDATE A7001 SET ${updates.join(', ')} WHERE uuid = ?`;
+    
+    db.run(sql, params, function(err) {
+        if (err) {
+            console.error('  - ❌ 更新失败:', err.message);
+            res.status(500).json({ error: err.message });
+            return;
+        }
+        
+        if (this.changes === 0) {
+            res.status(404).json({ error: '图标不存在' });
+            return;
+        }
+        
+        console.log('  - ✅ 图标信息已更新');
         res.json({ success: true, changes: this.changes });
     });
 });

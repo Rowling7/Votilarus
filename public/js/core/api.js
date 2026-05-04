@@ -168,3 +168,48 @@ export async function deleteItem(itemUuid) {
     }
     return await response.json();
 }
+
+// 更新图标信息
+export async function updateItem(itemUuid, data) {
+    const response = await fetch(`${API_BASE}/items/${itemUuid}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+    });
+    if (!response.ok) {
+        throw new Error('更新图标失败');
+    }
+    return await response.json();
+}
+
+// 创建新图标
+export async function createItem(itemData) {
+    const response = await fetch(`${API_BASE}/items`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(itemData),
+    });
+    if (!response.ok) {
+        throw new Error('创建图标失败');
+    }
+    return await response.json();
+}
+
+// 创建小组件
+export async function createWidget(widgetData) {
+    const response = await fetch(`${API_BASE}/items/widget`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(widgetData),
+    });
+    if (!response.ok) {
+        throw new Error('创建小组件失败');
+    }
+    return await response.json();
+}

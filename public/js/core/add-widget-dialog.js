@@ -1,0 +1,158 @@
+// ==================== 添加小组件对话框处理器 ====================
+
+class AddWidgetDialogHandler {
+    constructor() {
+        this.dialog = null;
+        this.overlay = null;
+        this.currentCategoryId = null;
+        
+        // 可用的小组件列表
+        this.availableWidgets = [
+            { id: 'clock', name: '时钟', icon: '⏰', description: '显示当前时间' },
+            { id: 'calendar', name: '日历', icon: '📅', description: '显示日期和月历' },
+            { id: 'weather', name: '天气', icon: '🌤️', description: '显示天气信息' }
+        ];
+    }
+
+    /**
+     * 初始化对话框
+     */
+    init() {
+        this.createDialog();
+    }
+
+    /**
+     * 创建对话框 DOM
+     */
+    createDialog() {
+        // 遮罩层
+        this.overlay = document.createElement('div');
+        this.overlay.className = 'modal-overlay';
+        
+        // 对话框
+        this.dialog = document.createElement('div');
+        this.dialog.className = 'icon-editor-dialog';
+        this.dialog.style.maxWidth = '600px';
+        
+        this.dialog.innerHTML = `
+            <div class="dialog-header">
+                <h3>🧩 添加小组件</h3>
+                <button class="dialog-close-btn" aria-label="关闭">×</button>
+            </div>
+            <div class="dialog-body">
+                <div class="widget-list" id="widget-list">
+                    ${this.generateWidgetList()}
+                </div>
+            </div>
+            <div class="dialog-footer">
+                <button class="btn btn-secondary" id="cancel-add-widget-btn">取消</button>
+            </div>
+        `;
+        
+        document.body.appendChild(this.overlay);
+        document.body.appendChild(this.dialog);
+        
+        this.bindEvents();
+    }
+
+    /**
+     * 生成小组件列表 HTML
+     */
+    generateWidgetList() {
+        return this.availableWidgets.map(widget => `
+            <div class="widget-item" data-widget-id="${widget.id}">
+                <div class="widget-icon">${widget.icon}</div>
+                <div class="widget-info">
+                    <div class="widget-name">${widget.name}</div>
+                    <div class="widget-description">${widget.description}</div>
+                </div>
+                <button class="btn btn-primary widget-add-btn">添加</button>
+            </div>
+        `).join('');
+    }
+
+    /**
+     * 绑定事件
+     */
+    bindEvents() {
+        // 关闭按钮
+        const closeBtn = this.dialog.querySelector('.dialog-close-btn');
+        closeBtn.addEventListener('click', () => this.close());
+        
+        // 点击遮罩层
+        this.overlay.addEventListener('click', () => this.close());
+        
+        // ESC 键
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && this.dialog.classList.contains('active')) {
+                this.close();
+            }
+        });
+        
+        // 取消按钮
+        const cancelBtn = document.getElementById('cancel-add-widget-btn');
+        cancelBtn.addEventListener('click', () => this.close());
+        
+        // 添加按钮点击
+        this.dialog.addEventListener('click', (e) => {
+            const addBtn = e.target.closest('.widget-add-btn');
+            if (addBtn) {
+                const widgetItem = addBtn.closest('.widget-item');
+                const widgetId = widgetItem.dataset.widgetId;
+                this.addWidget(widgetId);
+            }
+        });
+    }
+
+    /**
+     * 打开对话框
+     */
+    open(categoryId) {
+        this.currentCategoryId = categoryId;
+        
+        // 显示对话框
+        this.overlay.classList.add('active');
+        this.dialog.classList.add('active');
+        
+        console.log('✅ 添加小组件对话框已打开');
+    }
+
+    /**
+     * 关闭对话框
+     */
+    close() {
+        this.overlay.classList.remove('active');
+        this.dialog.classList.remove('active');
+        this.currentCategoryId = null;
+        
+        console.log('✅ 添加小组件对话框已关闭');
+    }
+
+    /**
+     * 添加小组件
+     */
+    async addWidget(widgetId) {
+        try {
+            const { createWidget } = await import('./api.js');
+            
+            console.log('🧩 添加小组件:', { 
+                widgetId,
+                category_id: this.currentCategoryId
+            });
+            
+            const result = await createWidget({
+                widget_type: widgetId,
+                category_id: this.currentCategoryId
+            });
+            
+            console.log('💾 小组件创建成功:', result);
+            alert(`小组件 "${widgetId}" 添加成功！请刷新页面查看`);
+            this.close();
+        } catch (error) {
+            console.error('❌ 添加失败:', error);
+            alert('添加失败: ' + error.message);
+        }
+    }
+}
+
+export default new AddWidgetDialogHandler();

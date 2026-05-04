@@ -268,9 +268,13 @@ class ContextMenuHandler {
     /**
      * 添加图标
      */
-    addIcon(categoryId) {
-        console.log(`➕ 添加图标到分类: ${categoryId}`);
-        console.log('️ 待实现：添加图标对话框');
+    async addIcon(categoryId) {
+        try {
+            const addIconDialog = await import('./add-icon-dialog.js');
+            addIconDialog.default.open(categoryId);
+        } catch (error) {
+            console.error('❌ 打开添加图标对话框失败:', error);
+        }
     }
 
     /**

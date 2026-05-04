@@ -1,14 +1,14 @@
-// ==================== 图标编辑对话框处理器 ====================
+// ==================== 添加图标对话框处理器 ====================
 
-class IconEditorHandler {
+class AddIconDialogHandler {
     constructor() {
         this.dialog = null;
         this.overlay = null;
-        this.currentItem = null;
+        this.currentCategoryId = null;
     }
 
     /**
-     * 初始化编辑器
+     * 初始化对话框
      */
     init() {
         this.createDialog();
@@ -28,37 +28,37 @@ class IconEditorHandler {
         
         this.dialog.innerHTML = `
             <div class="dialog-header">
-                <h3>✏️ 编辑图标</h3>
+                <h3>➕ 添加图标</h3>
                 <button class="dialog-close-btn" aria-label="关闭">×</button>
             </div>
             <div class="dialog-body">
                 <div class="form-group">
-                    <label for="edit-icon-name">名称</label>
-                    <input type="text" id="edit-icon-name" placeholder="输入图标名称">
+                    <label for="add-icon-name">名称 *</label>
+                    <input type="text" id="add-icon-name" placeholder="输入图标名称" required>
                 </div>
                 
                 <div class="form-group">
-                    <label for="edit-icon-url">链接地址</label>
-                    <input type="url" id="edit-icon-url" placeholder="https://example.com">
+                    <label for="add-icon-url">链接地址 *</label>
+                    <input type="url" id="add-icon-url" placeholder="https://example.com" required>
                 </div>
                 
                 <div class="form-group">
-                    <label for="edit-icon-image">图标图片 URL</label>
-                    <input type="url" id="edit-icon-image" placeholder="https://example.com/icon.png">
+                    <label for="add-icon-image">图标图片 URL（可选）</label>
+                    <input type="url" id="add-icon-image" placeholder="https://example.com/icon.png">
                     <div class="form-hint">留空则显示首字母</div>
                 </div>
                 
                 <div class="form-group">
                     <label>预览</label>
-                    <div class="icon-preview" id="icon-preview">
-                        <div class="preview-icon" id="preview-icon"></div>
-                        <div class="preview-name" id="preview-name">图标名称</div>
+                    <div class="icon-preview" id="add-icon-preview">
+                        <div class="preview-icon" id="add-preview-icon"></div>
+                        <div class="preview-name" id="add-preview-name">图标名称</div>
                     </div>
                 </div>
             </div>
             <div class="dialog-footer">
-                <button class="btn btn-secondary" id="cancel-edit-btn">取消</button>
-                <button class="btn btn-primary" id="save-edit-btn">保存</button>
+                <button class="btn btn-secondary" id="cancel-add-icon-btn">取消</button>
+                <button class="btn btn-primary" id="save-add-icon-btn">添加</button>
             </div>
         `;
         
@@ -87,31 +87,31 @@ class IconEditorHandler {
         });
         
         // 取消按钮
-        const cancelBtn = document.getElementById('cancel-edit-btn');
+        const cancelBtn = document.getElementById('cancel-add-icon-btn');
         cancelBtn.addEventListener('click', () => this.close());
         
         // 保存按钮
-        const saveBtn = document.getElementById('save-edit-btn');
+        const saveBtn = document.getElementById('save-add-icon-btn');
         saveBtn.addEventListener('click', () => this.save());
         
         // 实时预览
-        const nameInput = document.getElementById('edit-icon-name');
-        const imageInput = document.getElementById('edit-icon-image');
+        const nameInput = document.getElementById('add-icon-name');
+        const imageInput = document.getElementById('add-icon-image');
         
         nameInput.addEventListener('input', () => this.updatePreview());
         imageInput.addEventListener('input', () => this.updatePreview());
     }
 
     /**
-     * 打开编辑器
+     * 打开对话框
      */
-    open(itemData) {
-        this.currentItem = itemData;
+    open(categoryId) {
+        this.currentCategoryId = categoryId;
         
-        // 填充表单
-        document.getElementById('edit-icon-name').value = itemData.name || '';
-        document.getElementById('edit-icon-url').value = itemData.target || '';
-        document.getElementById('edit-icon-image').value = itemData.bgimage || '';
+        // 清空表单
+        document.getElementById('add-icon-name').value = '';
+        document.getElementById('add-icon-url').value = '';
+        document.getElementById('add-icon-image').value = '';
         
         // 更新预览
         this.updatePreview();
@@ -120,29 +120,34 @@ class IconEditorHandler {
         this.overlay.classList.add('active');
         this.dialog.classList.add('active');
         
-        console.log('✅ 图标编辑器已打开');
+        // 聚焦到名称输入框
+        setTimeout(() => {
+            document.getElementById('add-icon-name').focus();
+        }, 100);
+        
+        console.log('✅ 添加图标对话框已打开');
     }
 
     /**
-     * 关闭编辑器
+     * 关闭对话框
      */
     close() {
         this.overlay.classList.remove('active');
         this.dialog.classList.remove('active');
-        this.currentItem = null;
+        this.currentCategoryId = null;
         
-        console.log('✅ 图标编辑器已关闭');
+        console.log('✅ 添加图标对话框已关闭');
     }
 
     /**
      * 更新预览
      */
     updatePreview() {
-        const name = document.getElementById('edit-icon-name').value || '图标名称';
-        const imageUrl = document.getElementById('edit-icon-image').value;
+        const name = document.getElementById('add-icon-name').value || '图标名称';
+        const imageUrl = document.getElementById('add-icon-image').value;
         
-        const previewIcon = document.getElementById('preview-icon');
-        const previewName = document.getElementById('preview-name');
+        const previewIcon = document.getElementById('add-preview-icon');
+        const previewName = document.getElementById('add-preview-name');
         
         previewName.textContent = name;
         
@@ -156,37 +161,41 @@ class IconEditorHandler {
     }
 
     /**
-     * 保存修改
+     * 保存新图标
      */
     async save() {
-        if (!this.currentItem) return;
-        
-        const name = document.getElementById('edit-icon-name').value.trim();
-        const target = document.getElementById('edit-icon-url').value.trim();
-        const bgimage = document.getElementById('edit-icon-image').value.trim();
+        const name = document.getElementById('add-icon-name').value.trim();
+        const target = document.getElementById('add-icon-url').value.trim();
+        const bgimage = document.getElementById('add-icon-image').value.trim();
         
         if (!name) {
             alert('请输入图标名称');
             return;
         }
         
+        if (!target) {
+            alert('请输入链接地址');
+            return;
+        }
+        
         try {
-            const { updateItem } = await import('./api.js');
+            const { createItem } = await import('./api.js');
             
-            await updateItem(this.currentItem.uuid, {
+            const result = await createItem({
                 name,
                 target,
-                bgimage
+                bgimage: bgimage || null,
+                category_id: this.currentCategoryId
             });
             
-            console.log('💾 图标已保存');
-            alert('保存成功！请刷新页面查看效果');
+            console.log('💾 图标创建成功:', result);
+            alert('图标创建成功！请刷新页面查看');
             this.close();
         } catch (error) {
-            console.error('❌ 保存失败:', error);
-            alert('保存失败: ' + error.message);
+            console.error('❌ 创建失败:', error);
+            alert('创建失败: ' + error.message);
         }
     }
 }
 
-export default new IconEditorHandler();
+export default new AddIconDialogHandler();
