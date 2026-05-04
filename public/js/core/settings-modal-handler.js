@@ -618,15 +618,128 @@ class SettingsModalHandler {
      * 应用设置到页面
      */
     applySettings(settings) {
-        // TODO: 根据设置更新页面样式
         console.log('🔄 应用设置...', settings);
         
-        // 示例：更新主题色
+        // 1. 更新主题色
         document.documentElement.style.setProperty('--theme-color', settings.themeColor);
         
-        // 示例：更新背景
+        // 2. 更新背景
         if (settings.bgImageUrl) {
             document.body.style.backgroundImage = `url(${settings.bgImageUrl})`;
+        }
+        
+        // 3. 应用搜索框位置
+        this.applySearchBoxPosition(settings.searchBoxPosition);
+        
+        // 4. 应用搜索框样式
+        this.applySearchBoxStyle(settings.searchBoxStyle);
+        
+        // 5. 应用网格设置
+        this.applyGridSettings(settings);
+        
+        // 6. 应用 Dock 设置
+        this.applyDockSettings(settings);
+        
+        console.log('✅ 所有设置已应用');
+    }
+    
+    /**
+     * 应用搜索框位置
+     */
+    applySearchBoxPosition(position) {
+        const searchContainer = document.querySelector('.search-container');
+        if (!searchContainer) return;
+        
+        // 重置所有位置样式
+        searchContainer.style.top = '';
+        searchContainer.style.bottom = '';
+        searchContainer.style.left = '';
+        searchContainer.style.right = '';
+        searchContainer.style.transform = '';
+        
+        switch(position) {
+            case 'center':
+                searchContainer.style.top = '2rem';
+                searchContainer.style.left = '50%';
+                searchContainer.style.transform = 'translateX(-50%)';
+                break;
+            case 'left':
+                searchContainer.style.top = '2rem';
+                searchContainer.style.left = '2rem';
+                searchContainer.style.transform = 'none';
+                break;
+            case 'right':
+                searchContainer.style.top = '2rem';
+                searchContainer.style.right = '2rem';
+                searchContainer.style.left = 'auto';
+                searchContainer.style.transform = 'none';
+                break;
+        }
+    }
+    
+    /**
+     * 应用搜索框样式
+     */
+    applySearchBoxStyle(style) {
+        const searchBox = document.querySelector('.search-box');
+        if (!searchBox) return;
+        
+        switch(style) {
+            case 'rounded':
+                searchBox.style.borderRadius = '2rem';
+                break;
+            case 'square':
+                searchBox.style.borderRadius = '0.5rem';
+                break;
+        }
+    }
+    
+    /**
+     * 应用网格设置
+     */
+    applyGridSettings(settings) {
+        const contentArea = document.getElementById('contentArea');
+        if (!contentArea) return;
+        
+        // 更新网格行列数
+        contentArea.style.gridTemplateColumns = `repeat(${settings.gridCols || 13}, 1fr)`;
+        contentArea.style.gridTemplateRows = `repeat(${settings.gridRows || 5}, 1fr)`;
+    }
+    
+    /**
+     * 应用 Dock 设置
+     */
+    applyDockSettings(settings) {
+        const dock = document.getElementById('dock');
+        if (!dock) return;
+        
+        // 更新 Dock 位置
+        dock.style.bottom = '';
+        dock.style.left = '';
+        dock.style.right = '';
+        dock.style.top = '';
+        dock.style.transform = '';
+        dock.style.flexDirection = '';
+        
+        switch(settings.dockPosition) {
+            case 'bottom':
+                dock.style.bottom = '1rem';
+                dock.style.left = '50%';
+                dock.style.transform = 'translateX(-50%)';
+                dock.style.flexDirection = 'row';
+                break;
+            case 'left':
+                dock.style.left = '1rem';
+                dock.style.top = '50%';
+                dock.style.transform = 'translateY(-50%)';
+                dock.style.flexDirection = 'column';
+                break;
+            case 'right':
+                dock.style.right = '1rem';
+                dock.style.top = '50%';
+                dock.style.transform = 'translateY(-50%)';
+                dock.style.flexDirection = 'column';
+                break;
         }
     }
 
