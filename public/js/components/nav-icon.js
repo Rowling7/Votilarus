@@ -1,0 +1,146 @@
+// ==================== NavIcon Web Component ====================
+
+class NavIcon extends HTMLElement {
+    static get observedAttributes() {
+        return ['title', 'url', 'size', 'image', 'uuid'];
+    }
+
+    constructor() {
+        super();
+        this.attachShadow({ mode: 'open' });
+        this.render();
+    }
+
+    connectedCallback() {
+        this.bindEvents();
+    }
+
+    attributeChangedCallback(name, oldValue, newValue) {
+        if (oldValue !== newValue) {
+            this.render();
+        }
+    }
+
+    render() {
+        const title = this.getAttribute('title') || '';
+        const url = this.getAttribute('url') || '';
+        const size = this.getAttribute('size') || '1x1';
+        const image = this.getAttribute('image') || '';
+        const uuid = this.getAttribute('uuid') || '';
+
+        const [width, height] = size.split('x').map(Number);
+
+        this.shadowRoot.innerHTML = `
+            <style>
+                :host {
+                    display: block;
+                    position: absolute;
+                    cursor: pointer;
+                    user-select: none;
+                    transition: transform 0.2s ease;
+                }
+
+                :host(:hover) {
+                    transform: scale(1.05);
+                }
+
+                .icon-container {
+                    width: calc(var(--cell-base-size, 4rem) * ${width} - var(--cell-gap, 1rem));
+                    height: calc(var(--cell-base-size, 4rem) * ${height} - var(--cell-gap, 1rem));
+                    border-radius: var(--icon-radius, 0.5rem);
+                    overflow: hidden;
+                    position: relative;
+                    box-shadow: var(--icon-shadow, 0 2px 8px rgba(0, 0, 0, 0.2));
+                }
+
+                .icon-bg {
+                    width: 100%;
+                    height: 100%;
+                    background-size: cover;
+                    background-position: center;
+                    ${image ? `background-image: url(${image});` : ''}
+                }
+
+                .icon-letter {
+                    width: 100%;
+                    height: 100%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 2rem;
+                    font-weight: bold;
+                    color: white;
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                }
+
+                .icon-title {
+                    position: absolute;
+                    bottom: -1.5rem;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    font-size: var(--title-font-size, 12px);
+                    color: var(--title-color, #ffffff);
+                    white-space: nowrap;
+                    max-width: 100%;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
+            </style>
+            <div class="icon-container" data-uuid="${uuid}" data-url="${url}">
+                ${image 
+                    ? `<div class="icon-bg"></div>` 
+                    : `<div class="icon-letter">${title.charAt(0).toUpperCase()}</div>`
+                }
+                <div class="icon-title">${title}</div>
+            </div>
+        `;
+    }
+
+    bindEvents() {
+        const container = this.shadowRoot.querySelector('.icon-container');
+        
+        // 点击事件
+        container.addEventListener('click', (e) => {
+            const url = container.dataset.url;
+            if (url) {
+                window.open(url, '_blank');
+            }
+        });
+
+        // 拖拽事件
+        container.setAttribute('draggable', 'true');
+        container.addEventListener('dragstart', (e) => {
+            e.dataTransfer.setData('text/plain', container.dataset.uuid);
+            this.dispatchEvent(new CustomEvent('drag-start', {
+                bubbles: true,
+                detail: { uuid: container.dataset.uuid }
+            }));
+        });
+
+        // 右键菜单
+        container.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+            this.dispatchEvent(new CustomEvent('context-menu', {
+                bubbles: true,
+                detail: { 
+                    uuid: container.dataset.uuid,
+                    x: e.clientX,
+                    y: e.clientY
+                }
+            }));
+        });
+    }
+
+    // 公共方法：更新属性
+    update(props) {
+        if (props.title) this.setAttribute('title', props.title);
+        if (props.url) this.setAttribute('url', props.url);
+        if (props.size) this.setAttribute('size', props.size);
+        if (props.image !== undefined) this.setAttribute('image', props.image);
+    }
+}
+
+// 注册自定义元素
+customElements.define('nav-icon', NavIcon);
+
+export default NavIcon;

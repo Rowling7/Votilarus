@@ -213,3 +213,62 @@ export async function createWidget(widgetData) {
     }
     return await response.json();
 }
+
+// 获取网格配置
+export async function getGridConfig() {
+    const response = await fetch(`${API_BASE}/layout/grid`);
+    if (!response.ok) {
+        throw new Error('获取网格配置失败');
+    }
+    return await response.json();
+}
+
+// 更新网格配置
+export async function updateGridConfig(config) {
+    const response = await fetch(`${API_BASE}/layout/grid`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(config),
+    });
+    if (!response.ok) {
+        throw new Error('更新网格配置失败');
+    }
+    return await response.json();
+}
+
+// 导出设置
+export async function exportSettings() {
+    const response = await fetch(`${API_BASE}/settings/export`);
+    if (!response.ok) {
+        throw new Error('导出设置失败');
+    }
+    return await response.json();
+}
+
+// 导入设置
+export async function importSettings(settingsData) {
+    const response = await fetch(`${API_BASE}/settings/import`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(settingsData),
+    });
+    if (!response.ok) {
+        throw new Error('导入设置失败');
+    }
+    return await response.json();
+}
+
+// 恢复默认设置
+export async function resetSettings() {
+    const response = await fetch(`${API_BASE}/settings/reset`, {
+        method: 'POST',
+    });
+    if (!response.ok) {
+        throw new Error('恢复默认设置失败');
+    }
+    return await response.json();
+}
