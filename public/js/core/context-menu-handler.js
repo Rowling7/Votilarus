@@ -67,6 +67,10 @@ class ContextMenuHandler {
 
         const menuItems = [
             {
+                label: '编辑图标',
+                action: () => this.editItem(gridItem)
+            },
+            {
                 label: '设置大小',
                 action: () => this.showSizeSelector(gridItem, itemUuid)
             },
@@ -190,6 +194,28 @@ class ContextMenuHandler {
         const gridItem = document.querySelector(`[data-item-uuid="${itemUuid}"]`);
         if (gridItem) {
             gridItem.className = `grid-item size-${size}`;
+        }
+    }
+
+    /**
+     * 编辑图标
+     */
+    async editItem(gridItem) {
+        const itemUuid = gridItem.dataset.itemUuid;
+        
+        // 获取图标数据
+        const iconData = {
+            uuid: itemUuid,
+            name: gridItem.querySelector('.nav-icon-title')?.textContent || '',
+            target: gridItem.dataset.url || '',
+            bgimage: '' // TODO: 从数据库获取
+        };
+        
+        try {
+            const iconEditor = await import('./icon-editor-handler.js');
+            iconEditor.default.open(iconData);
+        } catch (error) {
+            console.error('❌ 打开编辑器失败:', error);
         }
     }
 

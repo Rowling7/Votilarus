@@ -1,0 +1,125 @@
+/* ==================== 小组件样式 ==================== */
+
+.widget {
+    background: var(--glass-bg);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 1rem;
+    padding: 1.5rem;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+    color: var(--text-primary);
+}
+
+/* 时钟小组件 */
+.clock-widget {
+    text-align: center;
+    min-width: 200px;
+}
+
+.widget-time {
+    font-size: 3rem;
+    font-weight: bold;
+    color: var(--theme-color);
+    margin-bottom: 0.5rem;
+}
+
+.widget-date {
+    font-size: 1.2rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.25rem;
+}
+
+.widget-weekday {
+    font-size: 1rem;
+    color: var(--text-secondary);
+}
+
+/* 日历小组件 */
+.calendar-widget {
+    min-width: 280px;
+}
+
+.calendar-header {
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+.calendar-month {
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: var(--theme-color);
+}
+
+.calendar-weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.weekday {
+    text-align: center;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    font-weight: 600;
+}
+
+.calendar-days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 0.5rem;
+}
+
+.calendar-day {
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.95rem;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.calendar-day:hover {
+    background: var(--bg-hover);
+}
+
+.calendar-day.today {
+    background: var(--theme-color);
+    color: white;
+    font-weight: bold;
+}
+
+.calendar-day.empty {
+    cursor: default;
+}
+
+/* 天气小组件 */
+.weather-widget {
+    text-align: center;
+    min-width: 180px;
+}
+
+.weather-icon {
+    font-size: 4rem;
+    margin-bottom: 0.5rem;
+}
+
+.weather-temp {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: var(--theme-color);
+    margin-bottom: 0.25rem;
+}
+
+.weather-desc {
+    font-size: 1.1rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.25rem;
+}
+
+.weather-location {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}

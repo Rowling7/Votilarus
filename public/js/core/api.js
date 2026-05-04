@@ -142,3 +142,18 @@ export async function reorderItems(items) {
     }
     return await response.json();
 }
+
+// 移动图标到另一个分类
+export async function moveItemToCategory(itemUuid, newCategoryId) {
+    const response = await fetch(`${API_BASE}/items/move`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ item_uuid: itemUuid, new_category_id: newCategoryId }),
+    });
+    if (!response.ok) {
+        throw new Error('移动图标失败');
+    }
+    return await response.json();
+}

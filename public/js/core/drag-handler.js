@@ -1,6 +1,6 @@
 // ==================== 拖拽功能处理器 ====================
 
-import { updateItemLayout, reorderItems } from './api.js';
+import { updateItemLayout, reorderItems, moveItemToCategory } from './api.js';
 
 class DragHandler {
     constructor() {
@@ -14,18 +14,32 @@ class DragHandler {
      * 初始化拖拽功能
      */
     init() {
-        // 监听图标的拖拽开始事件（事件委托）
-        document.addEventListener('dragstart', (e) => {
-            const gridItem = e.target.closest('.grid-item');
-            if (gridItem) {
-                this.handleDragStart(e, gridItem);
-            }
-        });
+        // 使用事件委托，减少事件监听器数量
+        const contentArea = document.getElementById('contentArea');
+        
+        if (contentArea) {
+            // 监听图标的拖拽开始事件（事件委托）
+            contentArea.addEventListener('dragstart', (e) => {
+                const gridItem = e.target.closest('.grid-item');
+                if (gridItem) {
+                    this.handleDragStart(e, gridItem);
+                }
+            });
 
-        // 监听拖拽结束事件
-        document.addEventListener('dragend', (e) => {
-            this.handleDragEnd(e);
-        });
+            // 监听拖拽结束事件
+            contentArea.addEventListener('dragend', (e) => {
+                this.handleDragEnd(e);
+            });
+            
+            // 监听网格内的拖拽排序
+            contentArea.addEventListener('dragenter', (e) => {
+                const gridItem = e.target.closest('.grid-item');
+                if (gridItem && this.draggedElement && gridItem !== this.draggedElement) {
+                    e.preventDefault();
+                    this.handleDragEnter(e, gridItem);
+                }
+            }, true); // 使用捕获阶段
+        }
 
         // 监听放置区域的拖拽事件（事件委托）
         document.addEventListener('dragover', (e) => {
@@ -41,17 +55,8 @@ class DragHandler {
                 this.handleDrop(e, dropZone);
             }
         });
-        
-        // 监听网格内的拖拽排序
-        document.addEventListener('dragenter', (e) => {
-            const gridItem = e.target.closest('.grid-item');
-            if (gridItem && this.draggedElement && gridItem !== this.draggedElement) {
-                e.preventDefault();
-                this.handleDragEnter(e, gridItem);
-            }
-        });
 
-        console.log('✅ 拖拽功能已初始化');
+        console.log('✅ 拖拽功能已初始化（使用事件委托优化）');
     }
 
     /**
@@ -133,11 +138,11 @@ class DragHandler {
 
         try {
             // 更新图标的分类归属
-            // TODO: 需要后端 API 支持更新 a70Id
-            console.log('✅ 拖拽分类移动功能待实现：需要后端 API 支持更新 a70Id');
+            await moveItemToCategory(this.draggedData.itemUuid, targetPanelId);
+            console.log('✅ 图标已移动到分类:', targetPanelId);
             
-            // 暂时只做视觉反馈
-            alert('分类移动功能暂未实现');
+            // TODO: 需要重新渲染网格
+            alert('图标已移动，请刷新页面查看');
         } catch (error) {
             console.error('❌ 拖拽移动失败:', error);
             alert('移动失败: ' + error.message);

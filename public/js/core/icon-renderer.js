@@ -6,6 +6,32 @@ import dragHandler from './drag-handler.js';
 class IconRenderer {
     constructor() {
         this.contentArea = document.getElementById('contentArea');
+        this.imageObserver = null; // 图片懒加载观察器
+        this.initLazyLoad();
+    }
+    
+    /**
+     * 初始化图片懒加载
+     */
+    initLazyLoad() {
+        if ('IntersectionObserver' in window) {
+            this.imageObserver = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const img = entry.target;
+                        const src = img.dataset.lazySrc;
+                        if (src) {
+                            img.style.backgroundImage = `url(${src})`;
+                            img.removeAttribute('data-lazy-src');
+                            observer.unobserve(img);
+                        }
+                    }
+                });
+            }, {
+                rootMargin: '50px 0px', // 提前 50px 开始加载
+                threshold: 0.01
+            });
+        }
     }
 
     renderAllCategories() {
@@ -62,7 +88,10 @@ class IconRenderer {
         
         console.log(`  - ✅ 网格容器创建完成，包含 ${gridContainer.children.length} 个图标元素`);
         
-        panel.appendChild(gridContainer);
+        // 使用 requestAnimationFrame 优化渲染
+        requestAnimationFrame(() => {
+            panel.appendChild(gridContainer);
+        });
         
         return panel;
     }
@@ -82,12 +111,17 @@ class IconRenderer {
         const iconDiv = document.createElement('div');
         iconDiv.className = 'nav-icon';
         
-        // 如果有背景图，显示图片
+        // 如果有背景图，显示图片（使用懒加载）
         if (item.bgimage) {
             const bgDiv = document.createElement('div');
             bgDiv.className = 'nav-icon-bg';
-            bgDiv.style.backgroundImage = `url(${item.bgimage})`;
+            bgDiv.dataset.lazySrc = item.bgimage; // 标记为懒加载
             iconDiv.appendChild(bgDiv);
+            
+            // 注册到观察器
+            if (this.imageObserver) {
+                this.imageObserver.observe(bgDiv);
+            }
         } else {
             // 否则显示首字母
             const letterDiv = document.createElement('div');

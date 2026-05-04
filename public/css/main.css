@@ -13,9 +13,11 @@
 @import 'components/context-menu.css';
 @import 'components/settings-modal.css';
 @import 'components/dock.css';
+@import 'components/widgets.css';
 
 /* Effects */
 @import 'effects/glassmorphism.css';
+@import 'effects/animations.css';
 
 /* Responsive */
 @import 'responsive/mobile.css';

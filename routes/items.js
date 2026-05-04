@@ -123,6 +123,24 @@ router.put('/reorder', (req, res) => {
         });
 });
 
+// 移动图标到另一个分类（更新 a70Id）
+router.put('/move', (req, res) => {
+    const { item_uuid, new_category_id } = req.body;
+    
+    console.log('🔄 [API] 移动图标:', { item_uuid, new_category_id });
+    
+    const sql = 'UPDATE A7001 SET a70Id = ? WHERE uuid = ?';
+    db.run(sql, [new_category_id, item_uuid], function(err) {
+        if (err) {
+            console.error('  - ❌ 移动失败:', err.message);
+            res.status(500).json({ error: err.message });
+            return;
+        }
+        console.log('  - ✅ 图标移动成功');
+        res.json({ success: true, changes: this.changes });
+    });
+});
+
 module.exports = {
     router,
     setDatabase

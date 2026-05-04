@@ -1,12 +1,15 @@
 // ==================== Dock 栏渲染器 ====================
 
-import { fetchDockItems, removeFromDock } from '../core/api.js';
+import { fetchDockItems, removeFromDock, reorderDock } from '../core/api.js';
 
 class DockRenderer {
     constructor() {
         this.dockContainer = null;
         this.dockItems = [];
         this.maxItems = 10;
+        this.fisheyeScale = 1.5; // 鱼眼放大倍数
+        this.fisheyeRange = 2;   // 鱼眼影响范围
+        this.fisheyeTimer = null; // 鱼眼效果定时器
     }
 
     /**
@@ -109,10 +112,42 @@ class DockRenderer {
             e.dataTransfer.setData('text/plain', item.item_uuid);
             e.dataTransfer.effectAllowed = 'move';
             dockItem.classList.add('dragging');
+            this.draggedDockItem = dockItem;
         });
         
         dockItem.addEventListener('dragend', () => {
             dockItem.classList.remove('dragging');
+            this.draggedDockItem = null;
+        });
+        
+        // 监听 Dock 内的拖拽排序
+        dockItem.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            if (this.draggedDockItem && dockItem !== this.draggedDockItem) {
+                this.handleDockDragOver(e, dockItem);
+            }
+        });
+        
+        dockItem.addEventListener('drop', (e) => {
+            e.preventDefault();
+            if (this.draggedDockItem && dockItem !== this.draggedDockItem) {
+                this.handleDockDrop(dockItem);
+            }
+        });
+        
+        // 鱼眼效果 - 鼠标移动时放大（使用 requestAnimationFrame 优化）
+        dockItem.addEventListener('mousemove', (e) => {
+            if (this.fisheyeTimer) {
+                cancelAnimationFrame(this.fisheyeTimer);
+            }
+            this.fisheyeTimer = requestAnimationFrame(() => {
+                this.applyFisheyeEffect(dockItem);
+            });
+        });
+        
+        // 鼠标离开 Dock 时重置
+        dockItem.addEventListener('mouseleave', () => {
+            this.resetFisheyeEffect();
         });
         
         return dockItem;
@@ -185,6 +220,74 @@ class DockRenderer {
     setMaxItems(max) {
         this.maxItems = max;
         this.render();
+    }
+    
+    /**
+     * 处理 Dock 拖拽经过
+     */
+    handleDockDragOver(e, targetItem) {
+        const allItems = Array.from(this.dockContainer.querySelectorAll('.dock-item'));
+        const draggedIndex = allItems.indexOf(this.draggedDockItem);
+        const targetIndex = allItems.indexOf(targetItem);
+        
+        if (draggedIndex < targetIndex) {
+            this.dockContainer.insertBefore(this.draggedDockItem, targetItem.nextSibling);
+        } else {
+            this.dockContainer.insertBefore(this.draggedDockItem, targetItem);
+        }
+    }
+    
+    /**
+     * 处理 Dock 放置并保存排序
+     */
+    async handleDockDrop(targetItem) {
+        try {
+            const items = Array.from(this.dockContainer.querySelectorAll('.dock-item'));
+            const reorderData = items.map((item, index) => ({
+                item_uuid: item.dataset.itemUuid,
+                sort_order: index
+            }));
+            
+            await reorderDock(reorderData);
+            console.log('✅ Dock 排序已保存');
+        } catch (error) {
+            console.error('❌ 保存 Dock 排序失败:', error);
+        }
+    }
+    
+    /**
+     * 应用鱼眼效果
+     */
+    applyFisheyeEffect(hoveredItem) {
+        const allItems = Array.from(this.dockContainer.querySelectorAll('.dock-item'));
+        const hoveredIndex = allItems.indexOf(hoveredItem);
+        
+        if (hoveredIndex === -1) return;
+        
+        // 使用 DocumentFragment 批量更新 DOM
+        allItems.forEach((item, index) => {
+            const distance = Math.abs(index - hoveredIndex);
+            
+            if (distance <= this.fisheyeRange) {
+                // 计算缩放比例：距离越近，放大越多
+                const scale = 1 + (this.fisheyeScale - 1) * (1 - distance / (this.fisheyeRange + 1));
+                const translateY = (scale - 1) * -20; // 向上移动
+                
+                item.style.transform = `scale(${scale}) translateY(${translateY}px)`;
+            } else {
+                item.style.transform = 'scale(1) translateY(0)';
+            }
+        });
+    }
+    
+    /**
+     * 重置鱼眼效果
+     */
+    resetFisheyeEffect() {
+        const allItems = Array.from(this.dockContainer.querySelectorAll('.dock-item'));
+        allItems.forEach(item => {
+            item.style.transform = 'scale(1) translateY(0)';
+        });
     }
 }
 
