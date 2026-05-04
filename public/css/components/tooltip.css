@@ -1,0 +1,67 @@
+/* ==================== Tooltip 气泡提示样式 ==================== */
+
+.tooltip {
+    position: fixed;
+    z-index: 10001;
+    padding: 0.5rem 1rem;
+    background: rgba(0, 0, 0, 0.85);
+    color: white;
+    font-size: 0.9rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    pointer-events: none;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s ease, visibility 0.2s ease;
+    max-width: 300px;
+    word-wrap: break-word;
+}
+
+.tooltip.visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+.tooltip::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 0;
+    border-style: solid;
+}
+
+/* 箭头朝上 */
+.tooltip.position-bottom::after {
+    top: -6px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 0 6px 6px 6px;
+    border-color: transparent transparent rgba(0, 0, 0, 0.85) transparent;
+}
+
+/* 箭头朝下 */
+.tooltip.position-top::after {
+    bottom: -6px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 6px 6px 0 6px;
+    border-color: rgba(0, 0, 0, 0.85) transparent transparent transparent;
+}
+
+/* 箭头朝左 */
+.tooltip.position-right::after {
+    left: -6px;
+    top: 50%;
+    transform: translateY(-50%);
+    border-width: 6px 6px 6px 0;
+    border-color: transparent rgba(0, 0, 0, 0.85) transparent transparent;
+}
+
+/* 箭头朝右 */
+.tooltip.position-left::after {
+    right: -6px;
+    top: 50%;
+    transform: translateY(-50%);
+    border-width: 6px 0 6px 6px;
+    border-color: transparent transparent transparent rgba(0, 0, 0, 0.85);
+}

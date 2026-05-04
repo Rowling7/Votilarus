@@ -141,6 +141,31 @@ router.put('/move', (req, res) => {
     });
 });
 
+// 删除图标（软删除）
+router.delete('/:uuid', (req, res) => {
+    const { uuid } = req.params;
+    
+    console.log('🗑️ [API] 删除图标:', uuid);
+    
+    // 软删除：更新 isdel 字段
+    const sql = 'UPDATE A7001 SET isdel = ?, delDatetime = CURRENT_TIMESTAMP WHERE uuid = ?';
+    db.run(sql, ['1', uuid], function(err) {
+        if (err) {
+            console.error('  - ❌ 删除失败:', err.message);
+            res.status(500).json({ error: err.message });
+            return;
+        }
+        
+        if (this.changes === 0) {
+            res.status(404).json({ error: '图标不存在' });
+            return;
+        }
+        
+        console.log('  - ✅ 图标已软删除');
+        res.json({ success: true, changes: this.changes });
+    });
+});
+
 module.exports = {
     router,
     setDatabase

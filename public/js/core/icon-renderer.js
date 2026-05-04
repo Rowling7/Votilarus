@@ -107,6 +107,7 @@ class IconRenderer {
         gridItem.className = `grid-item size-${layout.width}x${layout.height}`;
         gridItem.dataset.itemUuid = item.uuid;
         gridItem.dataset.url = item.target;
+        gridItem.dataset.tooltip = item.name; // 添加 tooltip
         
         const iconDiv = document.createElement('div');
         iconDiv.className = 'nav-icon';

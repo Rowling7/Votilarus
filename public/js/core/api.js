@@ -157,3 +157,14 @@ export async function moveItemToCategory(itemUuid, newCategoryId) {
     }
     return await response.json();
 }
+
+// 删除图标（软删除）
+export async function deleteItem(itemUuid) {
+    const response = await fetch(`${API_BASE}/items/${itemUuid}`, {
+        method: 'DELETE',
+    });
+    if (!response.ok) {
+        throw new Error('删除图标失败');
+    }
+    return await response.json();
+}

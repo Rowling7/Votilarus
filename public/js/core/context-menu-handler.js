@@ -244,16 +244,24 @@ class ContextMenuHandler {
         if (!confirm('确定要删除这个图标吗？')) {
             return;
         }
-
-        console.log(` 删除图标: ${itemUuid}`);
-        
-        // TODO: 调用 API 删除
-        console.log('️ 待实现：删除图标 API');
-        
-        // 暂时只移除 DOM
-        const gridItem = document.querySelector(`[data-item-uuid="${itemUuid}"]`);
-        if (gridItem) {
-            gridItem.remove();
+    
+        console.log(`🗑️ 删除图标: ${itemUuid}`);
+            
+        try {
+            const { deleteItem } = await import('./api.js');
+            await deleteItem(itemUuid);
+            console.log('✅ 图标已删除');
+                
+            // 从 DOM 中移除
+            const gridItem = document.querySelector(`[data-item-uuid="${itemUuid}"]`);
+            if (gridItem) {
+                gridItem.remove();
+            }
+                
+            alert('图标已删除');
+        } catch (error) {
+            console.error('❌ 删除失败:', error);
+            alert('删除失败: ' + error.message);
         }
     }
 
