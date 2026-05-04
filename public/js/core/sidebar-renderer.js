@@ -10,6 +10,9 @@ class SidebarRenderer {
     render(categories) {
         this.categoriesContainer.innerHTML = '';
         
+        // 获取当前选中的分类
+        const currentCategory = categoryManager.getCurrentCategory();
+        
         // 添加“首页”分类（data-category-id = -1）
         const homeCategoryDiv = document.createElement('div');
         homeCategoryDiv.className = 'sidebar-category';
@@ -17,8 +20,8 @@ class SidebarRenderer {
         homeCategoryDiv.dataset.categoryId = '-1';
         homeCategoryDiv.title = '首页';
         
-        // 如果当前没有选中任何分类，默认选中首页
-        if (!categoryManager.getCurrentCategory()) {
+        // 如果当前选中首页，添加 active 样式
+        if (currentCategory === '-1') {
             homeCategoryDiv.classList.add('active');
         }
         
@@ -36,7 +39,8 @@ class SidebarRenderer {
             categoryDiv.textContent = category.aindex;
             categoryDiv.dataset.categoryId = category.uuid;
             
-            if (category.uuid == categoryManager.getCurrentCategory()) {
+            // 如果当前选中该分类，添加 active 样式
+            if (category.uuid == currentCategory) {
                 categoryDiv.classList.add('active');
             }
             
