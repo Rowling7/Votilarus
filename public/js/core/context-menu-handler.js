@@ -71,6 +71,10 @@ class ContextMenuHandler {
                 action: () => this.showSizeSelector(gridItem, itemUuid)
             },
             {
+                label: '添加到 Dock',
+                action: () => this.addToDock(itemUuid)
+            },
+            {
                 label: '删除',
                 action: () => this.deleteItem(itemUuid),
                 className: 'danger'
@@ -186,6 +190,24 @@ class ContextMenuHandler {
         const gridItem = document.querySelector(`[data-item-uuid="${itemUuid}"]`);
         if (gridItem) {
             gridItem.className = `grid-item size-${size}`;
+        }
+    }
+
+    /**
+     * 添加到 Dock
+     */
+    async addToDock(itemUuid) {
+        try {
+            const dockRenderer = await import('./dock-renderer.js');
+            await dockRenderer.default.addItem(itemUuid);
+            alert('已添加到 Dock');
+        } catch (error) {
+            console.error('❌ 添加到 Dock 失败:', error);
+            if (error.message.includes('已在 Dock 中')) {
+                alert('该图标已在 Dock 中');
+            } else {
+                alert('添加失败: ' + error.message);
+            }
         }
     }
 

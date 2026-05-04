@@ -8,6 +8,7 @@ import searchHandler from './core/search-handler.js';
 import dragHandler from './core/drag-handler.js';
 import contextMenuHandler from './core/context-menu-handler.js';
 import settingsModalHandler from './core/settings-modal-handler.js';
+import dockRenderer from './core/dock-renderer.js';
 
 class App {
     constructor() {
@@ -37,6 +38,9 @@ class App {
             
             // 初始化设置 Modal
             settingsModalHandler.init();
+            
+            // 初始化 Dock 栏
+            await dockRenderer.init();
             
             // 绑定头像点击事件（打开设置）
             this.bindAvatarClick();

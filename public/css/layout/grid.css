@@ -49,6 +49,18 @@
     cursor: grabbing;
 }
 
+.grid-item.dragging {
+    opacity: 0.5;
+    transform: scale(0.95);
+    z-index: 1000;
+}
+
+.category-panel.drag-over {
+    background: rgba(var(--theme-color-rgb), 0.05);
+    border: 2px dashed var(--theme-color);
+    border-radius: 1rem;
+}
+
 /* 图标基础样式 */
 .nav-icon {
     width: 100%;

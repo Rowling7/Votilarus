@@ -49,6 +49,48 @@ export async function fetchDockItems() {
     return await response.json();
 }
 
+// 添加图标到 Dock
+export async function addToDock(itemUuid) {
+    const response = await fetch(`${API_BASE}/dock`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ item_uuid: itemUuid }),
+    });
+    if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || '添加到 Dock 失败');
+    }
+    return await response.json();
+}
+
+// 从 Dock 移除图标
+export async function removeFromDock(itemUuid) {
+    const response = await fetch(`${API_BASE}/dock/${itemUuid}`, {
+        method: 'DELETE',
+    });
+    if (!response.ok) {
+        throw new Error('从 Dock 移除失败');
+    }
+    return await response.json();
+}
+
+// 更新 Dock 排序
+export async function reorderDock(items) {
+    const response = await fetch(`${API_BASE}/dock/reorder`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ items }),
+    });
+    if (!response.ok) {
+        throw new Error('更新 Dock 排序失败');
+    }
+    return await response.json();
+}
+
 export async function fetchSettings() {
     const response = await fetch(`${API_BASE}/settings`);
     if (!response.ok) {
@@ -67,6 +109,36 @@ export async function updateSettings(settings) {
     });
     if (!response.ok) {
         throw new Error('更新设置失败');
+    }
+    return await response.json();
+}
+
+// 更新图标布局
+export async function updateItemLayout(layoutData) {
+    const response = await fetch(`${API_BASE}/items/layout`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(layoutData),
+    });
+    if (!response.ok) {
+        throw new Error('更新图标布局失败');
+    }
+    return await response.json();
+}
+
+// 批量更新图标排序
+export async function reorderItems(items) {
+    const response = await fetch(`${API_BASE}/items/reorder`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ items }),
+    });
+    if (!response.ok) {
+        throw new Error('更新图标排序失败');
     }
     return await response.json();
 }

@@ -1,10 +1,13 @@
 // ==================== 拖拽功能处理器 ====================
 
+import { updateItemLayout, reorderItems } from './api.js';
+
 class DragHandler {
     constructor() {
         this.draggedElement = null;
         this.draggedData = null;
         this.dropZone = null;
+        this.gridContainer = null;
     }
 
     /**
@@ -36,6 +39,15 @@ class DragHandler {
             const dropZone = e.target.closest('.category-panel');
             if (dropZone) {
                 this.handleDrop(e, dropZone);
+            }
+        });
+        
+        // 监听网格内的拖拽排序
+        document.addEventListener('dragenter', (e) => {
+            const gridItem = e.target.closest('.grid-item');
+            if (gridItem && this.draggedElement && gridItem !== this.draggedElement) {
+                e.preventDefault();
+                this.handleDragEnter(e, gridItem);
             }
         });
 
@@ -102,23 +114,82 @@ class DragHandler {
     /**
      * 处理放置
      */
-    handleDrop(e, panel) {
+    async handleDrop(e, panel) {
         e.preventDefault();
         panel.classList.remove('drag-over');
 
         if (!this.draggedData) return;
 
         const targetPanelId = panel.dataset.categoryId;
+        const sourcePanelId = this.draggedData.sourcePanel;
         
         console.log('📍 放置到分类:', targetPanelId);
 
-        // TODO: 这里后续会处理：
-        // 1. 更新图标的分类归属
-        // 2. 保存到数据库
-        // 3. 重新渲染网格
+        // 如果是同一个分类，不做处理（排序由 dragenter 处理）
+        if (targetPanelId === sourcePanelId) {
+            console.log('⚠️ 同一分类内移动，跳过');
+            return;
+        }
 
-        // 暂时只做视觉反馈
-        console.log('️ 拖拽分类移动功能待实现：需要后端 API 支持');
+        try {
+            // 更新图标的分类归属
+            // TODO: 需要后端 API 支持更新 a70Id
+            console.log('✅ 拖拽分类移动功能待实现：需要后端 API 支持更新 a70Id');
+            
+            // 暂时只做视觉反馈
+            alert('分类移动功能暂未实现');
+        } catch (error) {
+            console.error('❌ 拖拽移动失败:', error);
+            alert('移动失败: ' + error.message);
+        }
+    }
+    
+    /**
+     * 处理拖拽进入另一个图标上方
+     */
+    async handleDragEnter(e, targetItem) {
+        if (!this.draggedElement || !targetItem) return;
+        
+        const gridContainer = this.draggedElement.closest('.grid-container');
+        if (!gridContainer) return;
+        
+        // 获取所有网格项
+        const allItems = Array.from(gridContainer.querySelectorAll('.grid-item'));
+        const draggedIndex = allItems.indexOf(this.draggedElement);
+        const targetIndex = allItems.indexOf(targetItem);
+        
+        if (draggedIndex === -1 || targetIndex === -1) return;
+        
+        // 交换位置
+        if (draggedIndex < targetIndex) {
+            gridContainer.insertBefore(this.draggedElement, targetItem.nextSibling);
+        } else {
+            gridContainer.insertBefore(this.draggedElement, targetItem);
+        }
+        
+        // 保存排序到数据库
+        await this.saveSortOrder(gridContainer);
+    }
+    
+    /**
+     * 保存排序到数据库
+     */
+    async saveSortOrder(gridContainer) {
+        try {
+            const categoryId = gridContainer.closest('.category-panel').dataset.categoryId;
+            const items = Array.from(gridContainer.querySelectorAll('.grid-item'));
+            
+            const layoutUpdates = items.map((item, index) => ({
+                item_uuid: item.dataset.itemUuid,
+                category_id: categoryId,
+                sort_order: index
+            }));
+            
+            await reorderItems(layoutUpdates);
+            console.log('✅ 排序已保存到数据库');
+        } catch (error) {
+            console.error('❌ 保存排序失败:', error);
+        }
     }
 
     /**
