@@ -1,5 +1,6 @@
 // ==================== 应用主入口 ====================
 
+import { registerAllComponents } from './components/index.js';
 import settingsManager from './managers/settings-manager.js';
 import categoryManager from './managers/category-manager.js';
 import iconRenderer from './core/icon-renderer.js';
@@ -20,6 +21,9 @@ class App {
 
     async init() {
         try {
+            // 注册 Web Components
+            registerAllComponents();
+            
             // 初始化设置
             await settingsManager.init();
             
