@@ -88,7 +88,7 @@ INSERT INTO "stettings" VALUES (9926, 'username', 'User', 'personal', '用户名
 INSERT INTO "stettings" VALUES (9927, 'user_bio', '', 'personal', '个人简介', '1', '0');
 
 -- 图标样式配置
-INSERT INTO "stettings" VALUES (9928, 'icon_border_radius', '0.5', 'personal', '图标圆角大小 (rem)', '1', '0');
+INSERT INTO "stettings" VALUES (9928, 'icon_radius', '0.5', 'personal', '图标圆角半径（rem单位，0-2）', '1', '0');
 INSERT INTO "stettings" VALUES (9929, 'icon_shadow', '1', 'personal', '图标阴影效果: 0/1', '1', '0');
 INSERT INTO "stettings" VALUES (9930, 'icon_hover_effect', 'scale', 'personal', '图标悬停效果: scale/glow/none', '1', '0');
 INSERT INTO "stettings" VALUES (9931, 'show_icon_title', '1', 'personal', '显示图标标题', '1', '0');
