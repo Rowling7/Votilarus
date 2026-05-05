@@ -114,7 +114,6 @@ class NavDock extends HTMLElement {
         const maxItems = parseInt(this.getAttribute('max-items')) || 10;
         
         if (container.children.length >= maxItems) {
-            console.warn('Dock 已达到最大图标数量');
             return false;
         }
 

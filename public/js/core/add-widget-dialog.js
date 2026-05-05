@@ -115,8 +115,6 @@ class AddWidgetDialogHandler {
         // 显示对话框
         this.overlay.classList.add('active');
         this.dialog.classList.add('active');
-        
-        console.log('✅ 添加小组件对话框已打开');
     }
 
     /**
@@ -126,8 +124,6 @@ class AddWidgetDialogHandler {
         this.overlay.classList.remove('active');
         this.dialog.classList.remove('active');
         this.currentCategoryId = null;
-        
-        console.log('✅ 添加小组件对话框已关闭');
     }
 
     /**
@@ -137,21 +133,14 @@ class AddWidgetDialogHandler {
         try {
             const { createWidget } = await import('./api.js');
             
-            console.log('🧩 添加小组件:', { 
-                widgetId,
-                category_id: this.currentCategoryId
-            });
-            
             const result = await createWidget({
                 widget_type: widgetId,
                 category_id: this.currentCategoryId
             });
             
-            console.log('💾 小组件创建成功:', result);
             toast.success(`小组件 "${widgetId}" 添加成功！请刷新页面查看`);
             this.close();
         } catch (error) {
-            console.error('❌ 添加失败:', error);
             toast.error('添加失败: ' + error.message);
         }
     }

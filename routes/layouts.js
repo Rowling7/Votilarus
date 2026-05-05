@@ -15,7 +15,6 @@ router.get('/', (req, res) => {
     
     db.all(sql, ['1'], (err, rows) => {
         if (err) {
-            console.error('❌ [API] 查询布局失败:', err.message);
             res.status(500).json({ error: err.message });
             return;
         }
@@ -25,8 +24,6 @@ router.get('/', (req, res) => {
 
 // 获取网格配置
 router.get('/grid', (req, res) => {
-    console.log('🔍 [API] 获取网格配置');
-    
     const sql = `
         SELECT 
             (SELECT value FROM stettings WHERE key = 'grid_cols' AND isdel = '0') as columns,
@@ -37,7 +34,6 @@ router.get('/grid', (req, res) => {
     
     db.get(sql, [], (err, row) => {
         if (err) {
-            console.error('  - ❌ 查询错误:', err.message);
             res.status(500).json({ error: err.message });
             return;
         }
@@ -50,7 +46,6 @@ router.get('/grid', (req, res) => {
             cell_gap: parseFloat(row?.cell_gap) || 2
         };
         
-        console.log('  - ✅ 网格配置:', config);
         res.json(config);
     });
 });
@@ -58,8 +53,6 @@ router.get('/grid', (req, res) => {
 // 更新网格配置
 router.put('/grid', (req, res) => {
     const { columns, rows, cell_base_size, cell_gap } = req.body;
-    
-    console.log('🔄 [API] 更新网格配置:', { columns, rows, cell_base_size, cell_gap });
     
     const updates = [];
     
@@ -118,11 +111,9 @@ router.put('/grid', (req, res) => {
     
     Promise.all(promises)
         .then(results => {
-            console.log('  - ✅ 网格配置更新成功');
             res.json({ success: true, results });
         })
         .catch(err => {
-            console.error('  - ❌ 更新失败:', err.message);
             res.status(500).json({ error: err.message });
         });
 });
@@ -131,8 +122,6 @@ router.put('/grid', (req, res) => {
 router.get('/item/:uuid', (req, res) => {
     const { uuid } = req.params;
     const categoryId = req.query.category_id;
-    
-    console.log('🔍 [API] 获取图标布局:', { uuid, category_id: categoryId });
     
     let sql = 'SELECT * FROM item_layouts WHERE item_uuid = ?';
     const params = [uuid];
@@ -144,7 +133,6 @@ router.get('/item/:uuid', (req, res) => {
     
     db.get(sql, params, (err, row) => {
         if (err) {
-            console.error('  - ❌ 查询错误:', err.message);
             res.status(500).json({ error: err.message });
             return;
         }
@@ -161,7 +149,6 @@ router.get('/item/:uuid', (req, res) => {
             return;
         }
         
-        console.log('  - ✅ 布局信息:', row);
         res.json(row);
     });
 });
@@ -169,8 +156,6 @@ router.get('/item/:uuid', (req, res) => {
 // 批量获取分类下所有图标的布局
 router.get('/category/:categoryId', (req, res) => {
     const { categoryId } = req.params;
-    
-    console.log('🔍 [API] 获取分类布局:', categoryId);
     
     const sql = `
         SELECT il.*, a.name, a.target, a.bgimage
@@ -182,12 +167,10 @@ router.get('/category/:categoryId', (req, res) => {
     
     db.all(sql, [parseInt(categoryId)], (err, rows) => {
         if (err) {
-            console.error('  - ❌ 查询错误:', err.message);
             res.status(500).json({ error: err.message });
             return;
         }
         
-        console.log(`  - ✅ 查询到 ${rows.length} 个布局`);
         res.json(rows);
     });
 });

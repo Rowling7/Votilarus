@@ -25,7 +25,6 @@ router.get('/', (req, res) => {
     
     db.all(sql, params, (err, rows) => {
         if (err) {
-            console.error('❌ [API] 查询图标失败:', err.message);
             res.status(500).json({ error: err.message });
             return;
         }
@@ -36,8 +35,6 @@ router.get('/', (req, res) => {
 // 创建新图标
 router.post('/', (req, res) => {
     const { name, target, bgimage, category_id } = req.body;
-    
-    console.log('➕ [API] 创建新图标:', { name, target, category_id });
     
     if (!name || !target || !category_id) {
         res.status(400).json({ error: '缺少必要参数' });
@@ -51,18 +48,15 @@ router.post('/', (req, res) => {
     const insertSql = 'INSERT INTO A7001 (uuid, a70Id, name, target, bgimage, isdel) VALUES (?, ?, ?, ?, ?, ?)';
     db.run(insertSql, [uuid, parseInt(category_id), name, target, bgimage || null, '0'], function(err) {
         if (err) {
-            console.error('  - ❌ 创建失败:', err.message);
             res.status(500).json({ error: err.message });
             return;
         }
-        
-        console.log('  - ✅ 图标创建成功, UUID:', uuid);
         
         // 同时创建布局记录（默认位置）
         const layoutSql = 'INSERT INTO item_layouts (item_uuid, category_id, pos_x, pos_y, width, height) VALUES (?, ?, 0, 0, 1, 1)';
         db.run(layoutSql, [uuid, parseInt(category_id)], function(layoutErr) {
             if (layoutErr) {
-                console.error('  - ⚠️ 布局记录创建失败:', layoutErr.message);
+                // 静默处理布局记录创建失败
             }
             
             res.json({ 
@@ -77,8 +71,6 @@ router.post('/', (req, res) => {
 // 创建小组件（特殊类型的图标）
 router.post('/widget', (req, res) => {
     const { widget_type, category_id } = req.body;
-    
-    console.log('🧩 [API] 创建小组件:', { widget_type, category_id });
     
     if (!widget_type || !category_id) {
         res.status(400).json({ error: '缺少必要参数' });
@@ -101,18 +93,15 @@ router.post('/widget', (req, res) => {
     const insertSql = 'INSERT INTO A7001 (uuid, a70Id, name, target, bgimage, isdel) VALUES (?, ?, ?, ?, ?, ?)';
     db.run(insertSql, [uuid, parseInt(category_id), name, null, null, '0'], function(err) {
         if (err) {
-            console.error('  - ❌ 创建失败:', err.message);
             res.status(500).json({ error: err.message });
             return;
         }
-        
-        console.log('  - ✅ 小组件创建成功, UUID:', uuid);
         
         // 创建布局记录（默认位置，大小为 2x2）
         const layoutSql = 'INSERT INTO item_layouts (item_uuid, category_id, pos_x, pos_y, width, height) VALUES (?, ?, 0, 0, 2, 2)';
         db.run(layoutSql, [uuid, parseInt(category_id)], function(layoutErr) {
             if (layoutErr) {
-                console.error('  - ⚠️ 布局记录创建失败:', layoutErr.message);
+                // 静默处理布局记录创建失败
             }
             
             res.json({ 
@@ -129,13 +118,10 @@ router.post('/widget', (req, res) => {
 router.put('/layout', (req, res) => {
     const { item_uuid, category_id, pos_x, pos_y, width, height } = req.body;
     
-    console.log('🔄 [API] 更新图标布局:', { item_uuid, category_id, pos_x, pos_y, width, height });
-    
     // 先检查是否已存在布局记录
     const checkSql = 'SELECT * FROM item_layouts WHERE item_uuid = ? AND category_id = ?';
     db.get(checkSql, [item_uuid, category_id], (err, row) => {
         if (err) {
-            console.error('  - ❌ 查询错误:', err.message);
             res.status(500).json({ error: err.message });
             return;
         }
@@ -155,11 +141,9 @@ router.put('/layout', (req, res) => {
         
         db.run(sql, params, function(err) {
             if (err) {
-                console.error('  - ❌ 更新错误:', err.message);
                 res.status(500).json({ error: err.message });
                 return;
             }
-            console.log('  - ✅ 布局更新成功');
             res.json({ success: true, id: this.lastID });
         });
     });
@@ -169,8 +153,6 @@ router.put('/layout', (req, res) => {
 router.put('/reorder', (req, res) => {
     const { items } = req.body; // [{ item_uuid, category_id, sort_order }, ...]
     const promises = [];
-    
-    console.log('🔄 [API] 批量更新图标排序:', items.length, '个图标');
     
     items.forEach(item => {
         const promise = new Promise((resolve, reject) => {
@@ -185,11 +167,9 @@ router.put('/reorder', (req, res) => {
     
     Promise.all(promises)
         .then(() => {
-            console.log('  - ✅ 排序更新成功');
             res.json({ success: true });
         })
         .catch(err => {
-            console.error('  - ❌ 排序更新失败:', err.message);
             res.status(500).json({ error: err.message });
         });
 });
@@ -198,16 +178,12 @@ router.put('/reorder', (req, res) => {
 router.put('/move', (req, res) => {
     const { item_uuid, new_category_id } = req.body;
     
-    console.log('🔄 [API] 移动图标:', { item_uuid, new_category_id });
-    
     const sql = 'UPDATE A7001 SET a70Id = ? WHERE uuid = ?';
     db.run(sql, [new_category_id, item_uuid], function(err) {
         if (err) {
-            console.error('  - ❌ 移动失败:', err.message);
             res.status(500).json({ error: err.message });
             return;
         }
-        console.log('  - ✅ 图标移动成功');
         res.json({ success: true, changes: this.changes });
     });
 });
@@ -216,13 +192,10 @@ router.put('/move', (req, res) => {
 router.delete('/:uuid', (req, res) => {
     const { uuid } = req.params;
     
-    console.log('🗑️ [API] 删除图标:', uuid);
-    
     // 软删除：更新 isdel 字段
     const sql = 'UPDATE A7001 SET isdel = ?, delDatetime = CURRENT_TIMESTAMP WHERE uuid = ?';
     db.run(sql, ['1', uuid], function(err) {
         if (err) {
-            console.error('  - ❌ 删除失败:', err.message);
             res.status(500).json({ error: err.message });
             return;
         }
@@ -232,7 +205,6 @@ router.delete('/:uuid', (req, res) => {
             return;
         }
         
-        console.log('  - ✅ 图标已软删除');
         res.json({ success: true, changes: this.changes });
     });
 });
@@ -241,8 +213,6 @@ router.delete('/:uuid', (req, res) => {
 router.put('/:uuid', (req, res) => {
     const { uuid } = req.params;
     const { name, target, bgimage } = req.body;
-    
-    console.log('✏️ [API] 更新图标信息:', { uuid, name, target, bgimage });
     
     // 构建动态 SQL
     const updates = [];
@@ -273,7 +243,6 @@ router.put('/:uuid', (req, res) => {
     
     db.run(sql, params, function(err) {
         if (err) {
-            console.error('  - ❌ 更新失败:', err.message);
             res.status(500).json({ error: err.message });
             return;
         }
@@ -283,7 +252,6 @@ router.put('/:uuid', (req, res) => {
             return;
         }
         
-        console.log('  - ✅ 图标信息已更新');
         res.json({ success: true, changes: this.changes });
     });
 });

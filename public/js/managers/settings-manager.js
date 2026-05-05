@@ -20,15 +20,9 @@ class SettingsManager {
 
     async init() {
         try {
-            console.log('📥 [SettingsManager] 开始加载设置...');
             this.settings = await fetchSettings();
-            console.log('✅ [SettingsManager] 设置加载成功:', this.settings);
-            console.log('   - grid_rows:', this.settings.grid_rows);
-            console.log('   - grid_cols:', this.settings.grid_cols);
-            console.log('   - cell_gap:', this.settings.cell_gap);
             this.applySettings();
         } catch (error) {
-            console.error('❌ [SettingsManager] 加载设置失败:', error);
             // 使用默认设置
             this.settings = { ...this.defaultSettings };
             this.applySettings();
@@ -88,21 +82,16 @@ class SettingsManager {
      * 应用网格行列数
      */
     applyGridDimensions(cols, rows) {
-        console.log(`🔧 [SettingsManager] 准备应用网格尺寸: ${cols}列 x ${rows}行`);
-        
         // 等待 DOM 加载完成后应用
         setTimeout(() => {
             const gridContainers = document.querySelectorAll('.grid-container');
-            console.log(`   - 找到 ${gridContainers.length} 个网格容器`);
             
             gridContainers.forEach((container, index) => {
                 // 设置固定的列数
                 container.style.gridTemplateColumns = `repeat(${cols}, var(--cell-base-size))`;
-                console.log(`   - 容器 ${index + 1} (${container.id}): gridTemplateColumns = repeat(${cols}, var(--cell-base-size))`);
                 // 如果需要，也可以设置行数
                 // container.style.gridTemplateRows = `repeat(${rows}, var(--cell-base-size))`;
             });
-            console.log(`✅ [SettingsManager] 网格尺寸已应用: ${cols}列 x ${rows}行`);
         }, 100);
     }
 

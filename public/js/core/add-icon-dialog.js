@@ -127,8 +127,6 @@ class AddIconDialogHandler {
         setTimeout(() => {
             document.getElementById('add-icon-name').focus();
         }, 100);
-        
-        console.log('✅ 添加图标对话框已打开');
     }
 
     /**
@@ -138,8 +136,6 @@ class AddIconDialogHandler {
         this.overlay.classList.remove('active');
         this.dialog.classList.remove('active');
         this.currentCategoryId = null;
-        
-        console.log('✅ 添加图标对话框已关闭');
     }
 
     /**
@@ -191,11 +187,9 @@ class AddIconDialogHandler {
                 category_id: this.currentCategoryId
             });
                     
-            console.log('💾 图标创建成功:', result);
             toast.success('图标创建成功！请刷新页面查看');
             this.close();
         } catch (error) {
-            console.error('❌ 创建失败:', error);
             toast.error('创建失败: ' + error.message);
         }
     }

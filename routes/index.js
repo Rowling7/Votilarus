@@ -23,8 +23,6 @@ function registerRoutes(app, db) {
     app.use('/api/layout', layoutsRoute.router);
     app.use('/api/dock', dockRoute.router);
     app.use('/api/settings', settingsRoute.router);
-    
-    console.log('✅ 所有 API 路由已注册');
 }
 
 module.exports = registerRoutes;

@@ -38,10 +38,8 @@ class IconRenderer {
     }
 
     renderAllCategories() {
-        console.log('🎨 [IconRenderer] 开始渲染所有分类');
         const startTime = performance.now();
         const categories = categoryManager.getCategories();
-        console.log('  - 分类数量:', categories.length);
         
         this.contentArea.innerHTML = '';
         
@@ -64,14 +62,12 @@ class IconRenderer {
         const homePanelElement = document.getElementById('category--1');
         if (homePanelElement) {
             homePanelElement.classList.add('active');
-            console.log('  - ✅ 激活首页面板');
         }
         
         // 渲染完成后应用网格设置
         this.applyGridSettingsAfterRender();
         
         const endTime = performance.now();
-        console.log(`✅ [IconRenderer] 渲染完成，耗时: ${(endTime - startTime).toFixed(0)}ms`);
     }
     
     /**
@@ -85,19 +81,12 @@ class IconRenderer {
                 const gridCols = parseInt(settingsManager.settings.grid_cols) || 13;
                 const gridRows = parseInt(settingsManager.settings.grid_rows) || 5;
                 
-                console.log(`🔧 [IconRenderer] 渲染后应用网格尺寸: ${gridCols}列 x ${gridRows}行`);
-                
                 const gridContainers = document.querySelectorAll('.grid-container');
-                console.log(`   - 找到 ${gridContainers.length} 个网格容器`);
                 
                 gridContainers.forEach((container, index) => {
                     container.style.gridTemplateColumns = `repeat(${gridCols}, var(--cell-base-size))`;
-                    console.log(`   - 容器 ${index + 1} (${container.id}): gridTemplateColumns = repeat(${gridCols}, var(--cell-base-size))`);
                 });
-                
-                console.log(`✅ [IconRenderer] 网格尺寸已应用`);
             } else {
-                console.warn('⚠️ [IconRenderer] settingsManager 未就绪，稍后重试');
                 // 如果 settingsManager 还没准备好，稍后重试
                 setTimeout(() => this.applyGridSettingsAfterRender(), 200);
             }
@@ -145,8 +134,6 @@ class IconRenderer {
         calendarWidget.setAttribute('size', '2x2');
         calendarWidget.setAttribute('uuid', 'widget-calendar');
         container.appendChild(calendarWidget);
-        
-        console.log('✅ 已添加默认小组件到首页');
     }
 
     /**
@@ -177,9 +164,6 @@ class IconRenderer {
             return; // 已经加载过
         }
         
-        console.log(`📦 [IconRenderer] 懒加载分类 ${categoryUuid} 的内容`);
-        const startTime = performance.now();
-        
         const gridContainer = document.getElementById(`grid-${categoryUuid}`);
         if (!gridContainer) return;
         
@@ -205,9 +189,6 @@ class IconRenderer {
         
         gridContainer.appendChild(iconFragment);
         panel.dataset.loaded = 'true'; // 标记为已加载
-        
-        const endTime = performance.now();
-        console.log(`✅ [IconRenderer] 分类 ${categoryUuid} 加载完成，耗时: ${(endTime - startTime).toFixed(0)}ms`);
     }
 
     createCategoryPanel(category, index) {

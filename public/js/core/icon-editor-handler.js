@@ -119,8 +119,6 @@ class IconEditorHandler {
         // 显示对话框
         this.overlay.classList.add('active');
         this.dialog.classList.add('active');
-        
-        console.log('✅ 图标编辑器已打开');
     }
 
     /**
@@ -130,8 +128,6 @@ class IconEditorHandler {
         this.overlay.classList.remove('active');
         this.dialog.classList.remove('active');
         this.currentItem = null;
-        
-        console.log('✅ 图标编辑器已关闭');
     }
 
     /**
@@ -179,11 +175,9 @@ class IconEditorHandler {
                 bgimage
             });
             
-            console.log('💾 图标已保存');
             alert('保存成功！请刷新页面查看效果');
             this.close();
         } catch (error) {
-            console.error('❌ 保存失败:', error);
             alert('保存失败: ' + error.message);
         }
     }

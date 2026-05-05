@@ -542,8 +542,6 @@ class SettingsModalHandler {
         // 显示 Modal
         this.overlay.classList.add('active');
         this.modal.classList.add('active');
-        
-        console.log('✅ 设置 Modal 已打开');
     }
 
     /**
@@ -552,8 +550,6 @@ class SettingsModalHandler {
     close() {
         this.overlay.classList.remove('active');
         this.modal.classList.remove('active');
-        
-        console.log('✅ 设置 Modal 已关闭');
     }
 
     /**
@@ -649,7 +645,6 @@ class SettingsModalHandler {
         
         try {
             await settingsManager.saveAllSettings(newSettings);
-            console.log('✅ 设置已保存', newSettings);
             
             // 应用设置
             this.applySettings(newSettings);
@@ -660,7 +655,6 @@ class SettingsModalHandler {
             // 显示成功提示
             toast.success('设置已保存！');
         } catch (error) {
-            console.error(' 保存设置失败:', error);
             toast.error('保存设置失败，请重试');
         }
     }
@@ -725,8 +719,6 @@ class SettingsModalHandler {
      * 应用设置到页面
      */
     applySettings(settings) {
-        console.log('🔄 应用设置...', settings);
-        
         // 1. 更新主题色
         document.documentElement.style.setProperty('--theme-color', settings.themeColor);
         
@@ -754,8 +746,6 @@ class SettingsModalHandler {
         
         // 8. 应用 Dock 设置
         this.applyDockSettings(settings);
-        
-        console.log('✅ 所有设置已应用');
     }
     
     /**
@@ -815,7 +805,6 @@ class SettingsModalHandler {
     applyIconRadius(radius) {
         const radiusValue = radius || 0.5;
         document.documentElement.style.setProperty('--icon-radius', `${radiusValue}rem`);
-        console.log(`✅ 图标圆角已更新: ${radiusValue}rem`);
     }
     
     /**
@@ -825,22 +814,18 @@ class SettingsModalHandler {
         // 1. 应用标题字体大小
         const fontSize = settings.titleFontSize || 12;
         document.documentElement.style.setProperty('--title-font-size', `${fontSize}px`);
-        console.log(`✅ 标题字体大小已更新: ${fontSize}px`);
         
         // 2. 应用标题字体颜色
         const fontColor = settings.titleFontColor || '#ffffff';
         document.documentElement.style.setProperty('--title-color', fontColor);
-        console.log(`✅ 标题字体颜色已更新: ${fontColor}`);
         
         // 3. 应用标题位置
         const position = settings.titlePosition || 'bottom';
         document.documentElement.style.setProperty('--title-position', position);
-        console.log(`✅ 标题位置已更新: ${position}`);
         
         // 4. 应用标题最大长度
         const maxLength = settings.titleMaxLength || 8;
         document.documentElement.style.setProperty('--title-max-length', maxLength);
-        console.log(`✅ 标题最大长度已更新: ${maxLength}`);
         
         // 5. 重新渲染所有图标以应用新设置
         this.refreshAllIcons();
@@ -858,7 +843,6 @@ class SettingsModalHandler {
                 icon.setAttribute('title', title);
             }
         });
-        console.log(`✅ 已刷新 ${icons.length} 个图标`);
     }
     
     /**
@@ -868,7 +852,6 @@ class SettingsModalHandler {
         // 更新网格间距 CSS 变量
         const gapValue = settings.gridGap || 2;
         document.documentElement.style.setProperty('--cell-gap', `${gapValue}rem`);
-        console.log(`✅ 网格间距已更新: ${gapValue}rem`);
         
         // 更新所有网格容器的行列数
         const gridContainers = document.querySelectorAll('.grid-container');
@@ -878,8 +861,6 @@ class SettingsModalHandler {
             // 设置固定的行数（如果需要）
             // container.style.gridTemplateRows = `repeat(${settings.gridRows || 5}, var(--cell-base-size))`;
         });
-        
-        console.log(`✅ 网格列数已更新: ${settings.gridCols || 13}`);
     }
     
     /**
@@ -937,14 +918,12 @@ class SettingsModalHandler {
         
         try {
             await settingsManager.resetToDefault();
-            console.log('✅ 已恢复默认设置');
             
             // 重新加载设置
             this.loadCurrentSettings();
             
             toast.success('已恢复默认设置');
         } catch (error) {
-            console.error('❌ 恢复默认设置失败:', error);
             toast.error('恢复默认设置失败，请重试');
         }
     }
@@ -965,7 +944,6 @@ class SettingsModalHandler {
         
         URL.revokeObjectURL(url);
         
-        console.log('✅ 配置已导出');
         toast.success('配置已导出');
     }
 
@@ -994,14 +972,12 @@ class SettingsModalHandler {
                 }
                 
                 await settingsManager.saveAllSettings(settings);
-                console.log('✅ 配置已导入', settings);
                 
                 // 重新加载设置
                 this.loadCurrentSettings();
                 
                 toast.success('配置导入成功');
             } catch (error) {
-                console.error('❌ 导入配置失败:', error);
                 toast.error('导入配置失败，请检查文件格式');
             }
         };

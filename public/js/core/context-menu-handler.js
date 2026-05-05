@@ -63,8 +63,6 @@ class ContextMenuHandler {
                 this.hideMenu();
             }
         });
-
-        console.log(' 右键菜单已初始化');
     }
 
     /**
@@ -278,8 +276,6 @@ class ContextMenuHandler {
      * 更改图标尺寸
      */
     async changeSize(itemUuid, size) {
-        console.log(`📐 更改图标 ${itemUuid} 尺寸为 ${size}`);
-        
         const [width, height] = size.split('x').map(Number);
         
         // 从 CategoryManager 获取布局信息（包含 category_id）
@@ -298,7 +294,6 @@ class ContextMenuHandler {
                 width: width,
                 height: height
             });
-            console.log('✅ 布局尺寸已更新到数据库');
             
             // 更新 UI
             const gridItem = document.querySelector(`[data-item-uuid="${itemUuid}"]`);
@@ -309,13 +304,11 @@ class ContextMenuHandler {
                 if (window.categoryManager && window.categoryManager.layouts[itemUuid]) {
                     window.categoryManager.layouts[itemUuid].width = width;
                     window.categoryManager.layouts[itemUuid].height = height;
-                    console.log('✅ CategoryManager 缓存已更新');
                 }
                 
                 toast.success(`图标尺寸已更改为 ${size}`);
             }
         } catch (error) {
-            console.error('❌ 更新尺寸失败:', error);
             toast.error('更新尺寸失败: ' + error.message);
         }
     }
@@ -338,7 +331,6 @@ class ContextMenuHandler {
             const iconEditor = await import('./icon-editor-handler.js');
             iconEditor.default.open(iconData);
         } catch (error) {
-            console.error('❌ 打开编辑器失败:', error);
         }
     }
 
@@ -351,7 +343,6 @@ class ContextMenuHandler {
             await dockRenderer.default.addItem(itemUuid);
             toast.success('已添加到 Dock');
         } catch (error) {
-            console.error('❌ 添加到 Dock 失败:', error);
             if (error.message.includes('已在 Dock 中')) {
                 toast.warning('该图标已在 Dock 中');
             } else {
@@ -376,12 +367,9 @@ class ContextMenuHandler {
             return;
         }
     
-        console.log(`🗑️ 删除图标: ${itemUuid}`);
-            
         try {
             const { deleteItem } = await import('./api.js');
             await deleteItem(itemUuid);
-            console.log('✅ 图标已删除');
                 
             // 从 DOM 中移除
             const gridItem = document.querySelector(`[data-item-uuid="${itemUuid}"]`);
@@ -391,7 +379,6 @@ class ContextMenuHandler {
                 
             toast.success('图标已删除');
         } catch (error) {
-            console.error('❌ 删除失败:', error);
             toast.error('删除失败: ' + error.message);
         }
     }
@@ -404,7 +391,6 @@ class ContextMenuHandler {
             const addIconDialog = await import('./add-icon-dialog.js');
             addIconDialog.default.open(categoryId);
         } catch (error) {
-            console.error('❌ 打开添加图标对话框失败:', error);
         }
     }
 
@@ -412,13 +398,10 @@ class ContextMenuHandler {
      * 添加小组件
      */
     async addWidget(categoryId) {
-        console.log(`🧩 添加小组件到分类: ${categoryId}`);
-        
         try {
             const addWidgetDialog = await import('./add-widget-dialog.js');
             addWidgetDialog.default.open(categoryId);
         } catch (error) {
-            console.error('❌ 打开添加小组件对话框失败:', error);
             toast.error('打开对话框失败');
         }
     }
@@ -469,9 +452,7 @@ class ContextMenuHandler {
                 action: () => {
                     const url = dockItem.dataset.url;
                     if (url) {
-                        navigator.clipboard.writeText(url).then(() => {
-                            console.log('✅ 链接已复制');
-                        });
+                        navigator.clipboard.writeText(url);
                     }
                 }
             },
@@ -561,7 +542,6 @@ class ContextMenuHandler {
         try {
             const { removeFromDock } = await import('./api.js');
             await removeFromDock(itemUuid);
-            console.log('✅ 已从 Dock 移除');
             
             // 从 DOM 中移除
             const dockItem = document.querySelector(`.dock-item[data-item-uuid="${itemUuid}"]`);
@@ -569,7 +549,6 @@ class ContextMenuHandler {
                 dockItem.remove();
             }
         } catch (error) {
-            console.error('❌ 从 Dock 移除失败:', error);
             toast.error('移除失败: ' + error.message);
         }
     }

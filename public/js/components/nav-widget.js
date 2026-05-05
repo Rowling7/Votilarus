@@ -82,7 +82,6 @@ class NavWidget extends HTMLElement {
                 this.widgetInstance = this.createWeatherWidget(container);
                 break;
             default:
-                console.warn(`Unknown widget type: ${type}`);
         }
     }
 

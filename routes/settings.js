@@ -69,12 +69,9 @@ router.put('/', (req, res) => {
 
 // 导出所有设置（JSON格式）
 router.get('/export', (req, res) => {
-    console.log('📤 [API] 导出设置');
-    
     const sql = 'SELECT * FROM stettings WHERE isdel = ?';
     db.all(sql, ['0'], (err, rows) => {
         if (err) {
-            console.error('  - ❌ 导出失败:', err.message);
             res.status(500).json({ error: err.message });
             return;
         }
@@ -92,7 +89,6 @@ router.get('/export', (req, res) => {
             settings: settings
         };
         
-        console.log('  - ✅ 设置导出成功');
         res.json(exportData);
     });
 });
@@ -100,8 +96,6 @@ router.get('/export', (req, res) => {
 // 导入设置（JSON格式）
 router.post('/import', (req, res) => {
     const importData = req.body;
-    
-    console.log('📥 [API] 导入设置');
     
     if (!importData.settings || typeof importData.settings !== 'object') {
         res.status(400).json({ error: '无效的设置数据' });
@@ -137,19 +131,15 @@ router.post('/import', (req, res) => {
     
     Promise.all(promises)
         .then(results => {
-            console.log(`  - ✅ 设置导入成功，更新了 ${results.length} 项`);
             res.json({ success: true, count: results.length });
         })
         .catch(err => {
-            console.error('  - ❌ 导入失败:', err.message);
             res.status(500).json({ error: err.message });
         });
 });
 
 // 恢复默认设置
 router.post('/reset', (req, res) => {
-    console.log('🔄 [API] 恢复默认设置');
-    
     // 默认设置
     const defaultSettings = {
         grid_cols: '13',
@@ -183,7 +173,8 @@ router.post('/reset', (req, res) => {
         search_style: 'rounded',
         scroll_speed: '300',
         drag_sensitivity: '5',
-        enable_context_menu: '1'
+        enable_context_menu: '1',
+        darkmode: '1'
     };
     
     const promises = [];
@@ -213,11 +204,9 @@ router.post('/reset', (req, res) => {
     
     Promise.all(promises)
         .then(results => {
-            console.log('  - ✅ 默认设置恢复成功');
             res.json({ success: true, count: results.length });
         })
         .catch(err => {
-            console.error('  - ❌ 恢复失败:', err.message);
             res.status(500).json({ error: err.message });
         });
 });

@@ -293,7 +293,6 @@ class SettingsModal extends HTMLElement {
     // 渲染设置表单（由子类或外部实现）
     renderSettingsForm() {
         // 这个方法应该被覆盖，或者通过 slot 传入内容
-        console.log('Settings loaded:', this.settings);
     }
 
     // 保存设置

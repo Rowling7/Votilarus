@@ -55,8 +55,6 @@ class DragHandler {
                 this.handleDrop(e, dropZone);
             }
         });
-
-        console.log('✅ 拖拽功能已初始化（使用事件委托优化）');
     }
 
     /**
@@ -78,8 +76,6 @@ class DragHandler {
         setTimeout(() => {
             element.classList.add('dragging');
         }, 0);
-
-        console.log(' 开始拖拽:', this.draggedData);
     }
 
     /**
@@ -98,8 +94,6 @@ class DragHandler {
         this.draggedElement = null;
         this.draggedData = null;
         this.dropZone = null;
-
-        console.log('✅ 拖拽结束');
     }
 
     /**
@@ -127,24 +121,19 @@ class DragHandler {
 
         const targetPanelId = panel.dataset.categoryId;
         const sourcePanelId = this.draggedData.sourcePanel;
-        
-        console.log('📍 放置到分类:', targetPanelId);
 
         // 如果是同一个分类，不做处理（排序由 dragenter 处理）
         if (targetPanelId === sourcePanelId) {
-            console.log('⚠️ 同一分类内移动，跳过');
             return;
         }
 
         try {
             // 更新图标的分类归属
             await moveItemToCategory(this.draggedData.itemUuid, targetPanelId);
-            console.log('✅ 图标已移动到分类:', targetPanelId);
             
             // TODO: 需要重新渲染网格
             alert('图标已移动，请刷新页面查看');
         } catch (error) {
-            console.error('❌ 拖拽移动失败:', error);
             alert('移动失败: ' + error.message);
         }
     }
@@ -191,9 +180,7 @@ class DragHandler {
             }));
             
             await reorderItems(layoutUpdates);
-            console.log('✅ 排序已保存到数据库');
         } catch (error) {
-            console.error('❌ 保存排序失败:', error);
         }
     }
 

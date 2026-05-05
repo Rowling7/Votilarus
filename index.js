@@ -19,10 +19,8 @@ function initDatabase() {
     return new Promise((resolve, reject) => {
         db = new sqlite3.Database(DB_PATH, (err) => {
             if (err) {
-                console.error('数据库连接失败:', err.message);
                 reject(err);
             } else {
-                console.log('已连接到 SQLite 数据库');
                 resolve();
             }
         });
@@ -42,18 +40,15 @@ async function startServer() {
             const fs = require('fs');
             // req.path 已经去掉了 /data 前缀，例如: /category/network.svg
             const filePath = path.join(__dirname, 'data', req.path);
-            console.log(`📁 静态文件请求: ${req.originalUrl} -> ${filePath}`);
             
             // 检查文件是否存在
             if (!fs.existsSync(filePath)) {
-                console.log(`  ❌ 文件不存在`);
                 return next();
             }
             
             // 为 SVG 文件设置正确的 MIME 类型
             if (filePath.endsWith('.svg')) {
                 res.set('Content-Type', 'image/svg+xml');
-                console.log(`  ✅ SVG 文件，设置 Content-Type: image/svg+xml`);
             }
             
             res.sendFile(filePath);
@@ -64,15 +59,17 @@ async function startServer() {
         
         // SPA 路由回退（必须在最后）
         app.use((req, res, next) => {
-            console.log(`  ↳ SPA 回退: ${req.path}`);
+            // 忽略 favicon.ico 等常见浏览器请求
+            if (req.path === '/favicon.ico' || req.path.endsWith('.ico')) {
+                return res.status(204).end();
+            }
             res.sendFile(path.join(__dirname, 'public', 'index.html'));
         });
         
         app.listen(PORT, () => {
-            console.log(`服务器运行在 http://localhost:${PORT}`);
+            // 服务器启动成功
         });
     } catch (err) {
-        console.error('服务器启动失败:', err);
         process.exit(1);
     }
 }

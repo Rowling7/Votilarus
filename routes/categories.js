@@ -15,7 +15,6 @@ router.get('/', (req, res) => {
     
     db.all(sql, ['0'], (err, rows) => {
         if (err) {
-            console.error('❌ [API] 查询分类失败:', err.message);
             res.status(500).json({ error: err.message });
             return;
         }

@@ -21,8 +21,6 @@ class DockRenderer {
         
         // 加载 Dock 数据
         await this.loadDockItems();
-        
-        console.log('✅ Dock 栏已初始化');
     }
 
     /**
@@ -45,7 +43,7 @@ class DockRenderer {
             this.dockItems = await fetchDockItems();
             this.render();
         } catch (error) {
-            console.error('❌ 加载 Dock 项失败:', error);
+            // 静默处理错误
         }
     }
 
@@ -157,9 +155,7 @@ class DockRenderer {
             const { addToDock } = await import('../core/api.js');
             await addToDock(itemUuid);
             await this.loadDockItems();
-            console.log('✅ 已添加到 Dock');
         } catch (error) {
-            console.error('❌ 添加到 Dock 失败:', error);
             throw error;
         }
     }
@@ -199,9 +195,7 @@ class DockRenderer {
             }));
             
             await reorderDock(reorderData);
-            console.log('✅ Dock 排序已保存');
         } catch (error) {
-            console.error('❌ 保存 Dock 排序失败:', error);
         }
     }
     

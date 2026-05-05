@@ -12,8 +12,6 @@ import ConfirmModal from './confirm-modal.js';
  * 注册所有 Web Components
  */
 export function registerAllComponents() {
-    console.log('🧩 注册 Web Components...');
-    
     const components = [
         { name: 'nav-icon', class: NavIcon },
         { name: 'nav-dock', class: NavDock },
@@ -27,13 +25,8 @@ export function registerAllComponents() {
     components.forEach(component => {
         if (!customElements.get(component.name)) {
             customElements.define(component.name, component.class);
-            console.log(`  ✅ ${component.name} 已注册`);
-        } else {
-            console.log(`  ⚠️ ${component.name} 已存在，跳过`);
         }
     });
-
-    console.log('✅ 所有 Web Components 注册完成');
 }
 
 /**
@@ -54,7 +47,6 @@ export function registerComponent(name) {
     
     if (ComponentClass && !customElements.get(name)) {
         customElements.define(name, ComponentClass);
-        console.log(`✅ ${name} 已注册`);
         return true;
     }
     

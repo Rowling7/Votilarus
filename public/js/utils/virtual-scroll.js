@@ -15,7 +15,6 @@ class VirtualScrollManager {
     
     init() {
         if (!this.container) {
-            console.error('VirtualScrollManager: container is required');
             return;
         }
         
