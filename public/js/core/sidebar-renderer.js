@@ -87,6 +87,14 @@ class SidebarRenderer {
         const targetPanel = document.getElementById(`category-${uuid}`);
         if (targetPanel) {
             targetPanel.classList.add('active');
+            
+            // 懒加载：如果是第一次访问该分类，加载其内容
+            if (targetPanel.dataset.loaded === 'false' && uuid !== '-1') {
+                // 动态导入 iconRenderer
+                import('./icon-renderer.js').then(module => {
+                    module.default.loadCategoryContent(uuid);
+                });
+            }
         }
         
         // 更新当前分类

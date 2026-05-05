@@ -21,15 +21,18 @@ class IconRenderer {
                         const img = entry.target;
                         const src = img.dataset.lazySrc;
                         if (src) {
-                            img.style.backgroundImage = `url(${src})`;
-                            img.removeAttribute('data-lazy-src');
-                            observer.unobserve(img);
+                            // 使用 requestAnimationFrame 延迟加载，避免阻塞主线程
+                            requestAnimationFrame(() => {
+                                img.style.backgroundImage = `url(${src})`;
+                                img.removeAttribute('data-lazy-src');
+                                observer.unobserve(img);
+                            });
                         }
                     }
                 });
             }, {
-                rootMargin: '50px 0px', // 提前 50px 开始加载
-                threshold: 0.01
+                rootMargin: '100px 0px', // 提前 100px 开始加载
+                threshold: 0
             });
         }
     }
@@ -46,12 +49,11 @@ class IconRenderer {
         const homePanel = this.createHomePanel();
         this.contentArea.appendChild(homePanel);
         
-        // 优化：使用文档片段批量渲染其他分类
+        // 优化：其他分类使用懒渲染，只创建空面板，切换时再填充内容
         const fragment = document.createDocumentFragment();
         
-        // 渲染其他分类
         categories.forEach((category, index) => {
-            const panel = this.createCategoryPanel(category, index);
+            const panel = this.createLazyCategoryPanel(category, index);
             fragment.appendChild(panel);
         });
         
@@ -145,6 +147,67 @@ class IconRenderer {
         container.appendChild(calendarWidget);
         
         console.log('✅ 已添加默认小组件到首页');
+    }
+
+    /**
+     * 创建懒加载分类面板（只创建容器，不渲染图标）
+     */
+    createLazyCategoryPanel(category, index) {
+        const panel = document.createElement('div');
+        panel.className = 'category-panel';
+        panel.id = `category-${category.uuid}`;
+        panel.dataset.categoryId = category.uuid;
+        panel.dataset.loaded = 'false'; // 标记为未加载
+        
+        // 创建一个空的网格容器，稍后填充
+        const gridContainer = document.createElement('div');
+        gridContainer.className = 'grid-container';
+        gridContainer.id = `grid-${category.uuid}`;
+        panel.appendChild(gridContainer);
+        
+        return panel;
+    }
+    
+    /**
+     * 按需加载分类的图标内容
+     */
+    loadCategoryContent(categoryUuid) {
+        const panel = document.getElementById(`category-${categoryUuid}`);
+        if (!panel || panel.dataset.loaded === 'true') {
+            return; // 已经加载过
+        }
+        
+        console.log(`📦 [IconRenderer] 懒加载分类 ${categoryUuid} 的内容`);
+        const startTime = performance.now();
+        
+        const gridContainer = document.getElementById(`grid-${categoryUuid}`);
+        if (!gridContainer) return;
+        
+        // 获取该分类下的图标
+        const items = categoryManager.getItems(categoryUuid);
+        
+        // 按 sort_order 排序
+        const sortedItems = items.sort((a, b) => {
+            const layoutA = categoryManager.getLayout(a.uuid);
+            const layoutB = categoryManager.getLayout(b.uuid);
+            if (!layoutA || !layoutB) return 0;
+            return layoutA.sort_order - layoutB.sort_order;
+        });
+        
+        // 使用文档片段批量添加图标
+        const iconFragment = document.createDocumentFragment();
+        sortedItems.forEach(item => {
+            const iconElement = this.createIcon(item);
+            if (iconElement) {
+                iconFragment.appendChild(iconElement);
+            }
+        });
+        
+        gridContainer.appendChild(iconFragment);
+        panel.dataset.loaded = 'true'; // 标记为已加载
+        
+        const endTime = performance.now();
+        console.log(`✅ [IconRenderer] 分类 ${categoryUuid} 加载完成，耗时: ${(endTime - startTime).toFixed(0)}ms`);
     }
 
     createCategoryPanel(category, index) {
