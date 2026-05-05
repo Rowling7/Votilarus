@@ -19,6 +19,11 @@
         min-width: 100%;
         margin-right: 0;
     }
+    
+    .grid-container {
+        /* 在小屏幕上减小单元格最小宽度，增加列数 */
+        grid-template-columns: repeat(auto-fit, minmax(calc(var(--cell-base-size) * 0.8), 1fr));
+    }
 }
 
 /* 平板端适配 */
@@ -34,5 +39,14 @@
     
     .category-panel {
         min-width: 600px;
+    }
+}
+
+/* 大屏端适配 */
+@media (min-width: 1920px) {
+    .grid-container {
+        /* 在大屏幕上可以显示更多列 */
+        max-width: 1800px;
+        margin: 0 auto;
     }
 }

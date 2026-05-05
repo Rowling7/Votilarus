@@ -157,14 +157,14 @@ class SettingsModalHandler {
                 <!-- 网格布局 -->
                 <div class="setting-item">
                     <label for="grid-rows">行数</label>
-                    <input type="number" id="grid-rows" min="5" max="9" value="5">
-                    <div class="setting-description">网格行数（5-9）</div>
+                    <input type="number" id="grid-rows" min="4" max="9" value="5">
+                    <div class="setting-description">网格行数（4-9）</div>
                 </div>
                 
                 <div class="setting-item">
                     <label for="grid-cols">列数</label>
-                    <input type="number" id="grid-cols" min="13" max="20" value="13">
-                    <div class="setting-description">网格列数（13-20，PC 端最低值）</div>
+                    <input type="number" id="grid-cols" min="4" max="20" value="13">
+                    <div class="setting-description">网格列数（4-20，PC 端最低值）</div>
                 </div>
                 
                 <div class="setting-item">
@@ -175,14 +175,14 @@ class SettingsModalHandler {
                 
                 <div class="setting-item">
                     <label for="sidebar-width">侧栏宽度</label>
-                    <input type="number" id="sidebar-width" min="4" max="15" value="6">
+                    <input type="number" id="sidebar-width" min="4" max="15" value="4">
                     <div class="setting-description">侧栏宽度百分比（4%-15%）</div>
                 </div>
                 
                 <!-- 图标样式 -->
                 <div class="setting-item">
                     <label for="icon-radius">图标圆角</label>
-                    <input type="number" id="icon-radius" min="0" max="2" step="0.1" value="0.5">
+                    <input type="number" id="icon-radius" min="0" max="2" step="0.1" value="1">
                     <div class="setting-description">rem 单位</div>
                 </div>
                 
@@ -855,11 +855,29 @@ class SettingsModalHandler {
         
         // 更新所有网格容器的行列数
         const gridContainers = document.querySelectorAll('.grid-container');
-        gridContainers.forEach(container => {
-            // 设置固定的列数
-            container.style.gridTemplateColumns = `repeat(${settings.gridCols || 13}, var(--cell-base-size))`;
-            // 设置固定的行数（如果需要）
-            // container.style.gridTemplateRows = `repeat(${settings.gridRows || 5}, var(--cell-base-size))`;
+        gridContainers.forEach((container) => {
+            const categoryPanel = container.closest('.category-panel');
+            if (!categoryPanel) return;
+            
+            // 计算容器可用宽度
+            const panelStyle = window.getComputedStyle(categoryPanel);
+            const panelPadding = parseFloat(panelStyle.paddingLeft) + parseFloat(panelStyle.paddingRight);
+            const availableWidth = categoryPanel.clientWidth - panelPadding;
+            
+            // 计算网格所需宽度
+            const cellSize = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--cell-base-size')) || 64;
+            const cellGap = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--cell-gap')) || 32;
+            const gridCols = settings.gridCols || 13;
+            const gridWidth = gridCols * cellSize + (gridCols - 1) * cellGap;
+            
+            // 如果网格宽度大于可用宽度，自动调整列数
+            if (gridWidth > availableWidth) {
+                const maxCols = Math.floor((availableWidth + cellGap) / (cellSize + cellGap));
+                const actualCols = Math.max(maxCols, 1);
+                container.style.gridTemplateColumns = `repeat(${actualCols}, var(--cell-base-size))`;
+            } else {
+                container.style.gridTemplateColumns = `repeat(${gridCols}, var(--cell-base-size))`;
+            }
         });
     }
     

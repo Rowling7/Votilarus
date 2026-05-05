@@ -23,6 +23,8 @@
     display: flex;
     justify-content: center;
     align-items: flex-start;
+    /* 确保子元素不超出 */
+    box-sizing: border-box;
 }
 
 .category-panel.active {
@@ -35,11 +37,13 @@
     position: relative;
     display: grid;
     gap: var(--cell-gap);
-    grid-template-columns: repeat(auto-fill, minmax(var(--cell-base-size), 1fr));
+    /* 默认使用手动设置的列数 */
     width: fit-content;
     max-width: 100%;
     justify-content: center;
     align-content: start;
+    /* 确保不超出父容器 */
+    box-sizing: border-box;
 }
 
 .grid-item {

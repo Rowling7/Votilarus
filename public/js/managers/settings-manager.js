@@ -86,11 +86,30 @@ class SettingsManager {
         setTimeout(() => {
             const gridContainers = document.querySelectorAll('.grid-container');
             
-            gridContainers.forEach((container, index) => {
-                // 设置固定的列数
-                container.style.gridTemplateColumns = `repeat(${cols}, var(--cell-base-size))`;
-                // 如果需要，也可以设置行数
-                // container.style.gridTemplateRows = `repeat(${rows}, var(--cell-base-size))`;
+            gridContainers.forEach((container) => {
+                const categoryPanel = container.closest('.category-panel');
+                if (!categoryPanel) return;
+                
+                // 计算容器可用宽度（减去 padding）
+                const panelStyle = window.getComputedStyle(categoryPanel);
+                const panelPadding = parseFloat(panelStyle.paddingLeft) + parseFloat(panelStyle.paddingRight);
+                const availableWidth = categoryPanel.clientWidth - panelPadding;
+                
+                // 计算网格所需宽度
+                const cellSize = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--cell-base-size')) || 64;
+                const cellGap = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--cell-gap')) || 32;
+                const gridWidth = cols * cellSize + (cols - 1) * cellGap;
+                
+                // 如果网格宽度大于可用宽度，自动调整列数
+                if (gridWidth > availableWidth) {
+                    // 计算最大可容纳列数
+                    const maxCols = Math.floor((availableWidth + cellGap) / (cellSize + cellGap));
+                    const actualCols = Math.max(maxCols, 1); // 至少 1 列
+                    container.style.gridTemplateColumns = `repeat(${actualCols}, var(--cell-base-size))`;
+                } else {
+                    // 使用设置的列数
+                    container.style.gridTemplateColumns = `repeat(${cols}, var(--cell-base-size))`;
+                }
             });
         }, 100);
     }

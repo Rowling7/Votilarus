@@ -83,8 +83,28 @@ class IconRenderer {
                 
                 const gridContainers = document.querySelectorAll('.grid-container');
                 
-                gridContainers.forEach((container, index) => {
-                    container.style.gridTemplateColumns = `repeat(${gridCols}, var(--cell-base-size))`;
+                gridContainers.forEach((container) => {
+                    const categoryPanel = container.closest('.category-panel');
+                    if (!categoryPanel) return;
+                    
+                    // 计算容器可用宽度
+                    const panelStyle = window.getComputedStyle(categoryPanel);
+                    const panelPadding = parseFloat(panelStyle.paddingLeft) + parseFloat(panelStyle.paddingRight);
+                    const availableWidth = categoryPanel.clientWidth - panelPadding;
+                    
+                    // 计算网格所需宽度
+                    const cellSize = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--cell-base-size')) || 64;
+                    const cellGap = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--cell-gap')) || 32;
+                    const gridWidth = gridCols * cellSize + (gridCols - 1) * cellGap;
+                    
+                    // 如果网格宽度大于可用宽度，自动调整列数
+                    if (gridWidth > availableWidth) {
+                        const maxCols = Math.floor((availableWidth + cellGap) / (cellSize + cellGap));
+                        const actualCols = Math.max(maxCols, 1);
+                        container.style.gridTemplateColumns = `repeat(${actualCols}, var(--cell-base-size))`;
+                    } else {
+                        container.style.gridTemplateColumns = `repeat(${gridCols}, var(--cell-base-size))`;
+                    }
                 });
             } else {
                 // 如果 settingsManager 还没准备好，稍后重试
