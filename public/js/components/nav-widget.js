@@ -39,12 +39,14 @@ class NavWidget extends HTMLElement {
             <style>
                 :host {
                     display: block;
-                    position: absolute;
+                    position: relative;
+                    width: 100%;
+                    height: 100%;
                 }
 
                 .widget-container {
-                    width: calc(var(--cell-base-size, 4rem) * ${width} - var(--cell-gap, 1rem));
-                    height: calc(var(--cell-base-size, 4rem) * ${height} - var(--cell-gap, 1rem));
+                    width: 100%;
+                    height: 100%;
                     background: rgba(255, 255, 255, 0.1);
                     backdrop-filter: blur(10px);
                     border-radius: 1rem;
@@ -215,42 +217,50 @@ class NavWidget extends HTMLElement {
                 flex-direction: column;
                 height: 100%;
                 color: white;
+                padding: 0.5rem;
+                box-sizing: border-box;
             }
 
             .calendar-header {
                 text-align: center;
-                font-size: 1.2rem;
+                font-size: 1.1rem;
                 font-weight: bold;
                 margin-bottom: 0.5rem;
                 color: var(--theme-color, #667eea);
+                flex-shrink: 0;
             }
 
             .calendar-days-header {
                 display: grid;
                 grid-template-columns: repeat(7, 1fr);
-                gap: 0.25rem;
-                margin-bottom: 0.5rem;
-                font-size: 0.8rem;
-                opacity: 0.6;
+                gap: 0.2rem;
+                margin-bottom: 0.3rem;
+                font-size: 0.75rem;
+                opacity: 0.7;
+                flex-shrink: 0;
             }
 
             .calendar-days-header div {
                 text-align: center;
+                padding: 0.1rem 0;
             }
 
             .calendar-days {
                 display: grid;
                 grid-template-columns: repeat(7, 1fr);
-                gap: 0.25rem;
+                gap: 0.2rem;
                 flex: 1;
+                min-height: 0;
             }
 
             .calendar-day {
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                font-size: 0.9rem;
+                font-size: 0.85rem;
                 border-radius: 0.25rem;
+                padding: 0.15rem 0;
+                min-height: 0;
             }
 
             .calendar-day.empty {
