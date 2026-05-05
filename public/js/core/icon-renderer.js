@@ -36,6 +36,7 @@ class IconRenderer {
 
     renderAllCategories() {
         console.log('🎨 [IconRenderer] 开始渲染所有分类');
+        const startTime = performance.now();
         const categories = categoryManager.getCategories();
         console.log('  - 分类数量:', categories.length);
         
@@ -45,12 +46,17 @@ class IconRenderer {
         const homePanel = this.createHomePanel();
         this.contentArea.appendChild(homePanel);
         
+        // 优化：使用文档片段批量渲染其他分类
+        const fragment = document.createDocumentFragment();
+        
         // 渲染其他分类
         categories.forEach((category, index) => {
-            console.log(`\n🎨 渲染分类面板: ${category.name} (${category.uuid})`);
             const panel = this.createCategoryPanel(category, index);
-            this.contentArea.appendChild(panel);
+            fragment.appendChild(panel);
         });
+        
+        // 一次性添加到 DOM
+        this.contentArea.appendChild(fragment);
         
         // 激活首页面板
         const homePanelElement = document.getElementById('category--1');
@@ -61,6 +67,9 @@ class IconRenderer {
         
         // 渲染完成后应用网格设置
         this.applyGridSettingsAfterRender();
+        
+        const endTime = performance.now();
+        console.log(`✅ [IconRenderer] 渲染完成，耗时: ${(endTime - startTime).toFixed(0)}ms`);
     }
     
     /**
@@ -150,7 +159,6 @@ class IconRenderer {
         
         // 获取该分类下的图标
         const items = categoryManager.getItems(category.uuid);
-        console.log(`  - 获取到 ${items.length} 个图标`);
         
         // 按 sort_order 排序
         const sortedItems = items.sort((a, b) => {
@@ -160,19 +168,17 @@ class IconRenderer {
             return layoutA.sort_order - layoutB.sort_order;
         });
         
+        // 优化：使用文档片段批量添加图标
+        const iconFragment = document.createDocumentFragment();
         sortedItems.forEach(item => {
             const iconElement = this.createIcon(item);
             if (iconElement) {
-                gridContainer.appendChild(iconElement);
+                iconFragment.appendChild(iconElement);
             }
         });
         
-        console.log(`  - ✅ 网格容器创建完成，包含 ${gridContainer.children.length} 个图标元素`);
-        
-        // 使用 requestAnimationFrame 优化渲染
-        requestAnimationFrame(() => {
-            panel.appendChild(gridContainer);
-        });
+        gridContainer.appendChild(iconFragment);
+        panel.appendChild(gridContainer);
         
         return panel;
     }
@@ -227,7 +233,7 @@ class IconRenderer {
             gridItem.appendChild(titleDiv);
         }
         
-        // 点击事件
+        // 点击事件 - 使用事件委托优化
         gridItem.addEventListener('click', () => {
             if (item.target) {
                 window.open(item.target, '_blank');

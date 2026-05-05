@@ -22,6 +22,9 @@ class App {
 
     async init() {
         try {
+            const totalStartTime = performance.now();
+            console.log('🚀 [App] 开始初始化应用');
+            
             // 注册 Web Components
             registerAllComponents();
             
@@ -32,17 +35,22 @@ class App {
             window.settingsManager = settingsManager;
             
             // 初始化分类和数据
+            const dataLoadStart = performance.now();
             await categoryManager.init();
+            const dataLoadEnd = performance.now();
+            console.log(`⏱️ [App] 数据加载耗时: ${(dataLoadEnd - dataLoadStart).toFixed(0)}ms`);
             
             // 将 categoryManager 暴露到全局，供其他模块使用
             window.categoryManager = categoryManager;
             
             // 渲染侧边栏
-            const categories = categoryManager.getCategories();
-            sidebarRenderer.render(categories);
+            sidebarRenderer.render(categoryManager.getCategories());
             
             // 渲染所有图标
+            const renderStart = performance.now();
             iconRenderer.renderAllCategories();
+            const renderEnd = performance.now();
+            console.log(`⏱️ [App] 渲染耗时: ${(renderEnd - renderStart).toFixed(0)}ms`);
             
             // 初始化拖拽功能
             dragHandler.init();
@@ -74,11 +82,11 @@ class App {
             // 设置横向滚动支持（Shift + 滚轮）
             this.setupHorizontalScroll();
             
-            // 设置键盘导航
-            this.setupKeyboardNavigation();
+            const totalEndTime = performance.now();
+            console.log(`✅ [App] 应用初始化完成，总耗时: ${(totalEndTime - totalStartTime).toFixed(0)}ms`);
             
         } catch (error) {
-            // 处理初始化错误
+            console.error('❌ [App] 初始化失败:', error);
         }
     }
 

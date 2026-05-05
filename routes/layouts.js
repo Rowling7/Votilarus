@@ -11,18 +11,14 @@ function setDatabase(database) {
 
 // 获取所有布局（默认路由）
 router.get('/', (req, res) => {
-    console.log('🔍 [API] 获取所有布局');
-    
     const sql = 'SELECT * FROM item_layouts WHERE is_active = ? ORDER BY category_id, sort_order';
     
     db.all(sql, ['1'], (err, rows) => {
         if (err) {
-            console.error('  - ❌ 查询错误:', err.message);
+            console.error('❌ [API] 查询布局失败:', err.message);
             res.status(500).json({ error: err.message });
             return;
         }
-        
-        console.log(`  - ✅ 查询到 ${rows.length} 个布局`);
         res.json(rows);
     });
 });

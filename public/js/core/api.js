@@ -2,12 +2,42 @@
 
 const API_BASE = '/api';
 
+// 简单的内存缓存
+const cache = new Map();
+const CACHE_TTL = 5000; // 缓存有效期 5 秒
+
+function getCacheKey(url) {
+    return url;
+}
+
+function getCachedData(key) {
+    const cached = cache.get(key);
+    if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
+        return cached.data;
+    }
+    cache.delete(key);
+    return null;
+}
+
+function setCacheData(key, data) {
+    cache.set(key, {
+        data,
+        timestamp: Date.now()
+    });
+}
+
 export async function fetchCategories() {
+    const cacheKey = getCacheKey(`${API_BASE}/categories`);
+    const cached = getCachedData(cacheKey);
+    if (cached) return cached;
+    
     const response = await fetch(`${API_BASE}/categories`);
     if (!response.ok) {
         throw new Error('获取分类失败');
     }
-    return await response.json();
+    const data = await response.json();
+    setCacheData(cacheKey, data);
+    return data;
 }
 
 export async function fetchItems(categoryUuid = null) {
@@ -15,17 +45,18 @@ export async function fetchItems(categoryUuid = null) {
     // 使用 !== undefined 和 !== null 来判断，因为 uuid 可能是 0
     if (categoryUuid !== undefined && categoryUuid !== null) {
         url += `?category_uuid=${categoryUuid}`;
-        console.log(`🌐 [API.fetchItems] 请求分类 ${categoryUuid} 的图标`);
-    } else {
-        console.log(' [API.fetchItems] 请求所有图标');
     }
+    
+    const cacheKey = getCacheKey(url);
+    const cached = getCachedData(cacheKey);
+    if (cached) return cached;
     
     const response = await fetch(url);
     if (!response.ok) {
         throw new Error('获取图标失败');
     }
     const data = await response.json();
-    console.log(`  - ✅ 接收到 ${data.length} 个图标`);
+    setCacheData(cacheKey, data);
     return data;
 }
 
@@ -34,11 +65,18 @@ export async function fetchLayouts(itemUuid = null) {
     if (itemUuid) {
         url += `?item_uuid=${itemUuid}`;
     }
+    
+    const cacheKey = getCacheKey(url);
+    const cached = getCachedData(cacheKey);
+    if (cached) return cached;
+    
     const response = await fetch(url);
     if (!response.ok) {
         throw new Error('获取布局失败');
     }
-    return await response.json();
+    const data = await response.json();
+    setCacheData(cacheKey, data);
+    return data;
 }
 
 export async function fetchDockItems() {

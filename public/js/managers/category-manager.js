@@ -25,7 +25,9 @@ class CategoryManager {
         console.log('📦 [CategoryManager] 开始加载所有图标');
         console.log('  - 分类数量:', this.categories.length);
         
-        // 优化：先一次性加载所有布局信息（只调用一次 API）
+        const startTime = performance.now();
+        
+        // 优化1：先一次性加载所有布局信息（只调用一次 API）
         try {
             const allLayouts = await fetchLayouts();
             allLayouts.forEach(layout => {
@@ -36,7 +38,7 @@ class CategoryManager {
             console.error('  - ❌ 加载布局失败:', error);
         }
         
-        // 并行加载所有分类的图标
+        // 优化2：并行加载所有分类的图标
         const loadPromises = this.categories.map(async (category) => {
             try {
                 const items = await fetchItems(category.uuid);
@@ -55,7 +57,8 @@ class CategoryManager {
             this.items[result.uuid] = result.items;
         });
         
-        console.log('✅ [CategoryManager] 加载完成');
+        const endTime = performance.now();
+        console.log(`✅ [CategoryManager] 加载完成，耗时: ${(endTime - startTime).toFixed(0)}ms`);
     }
 
     getCategories() {
