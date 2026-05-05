@@ -6,6 +6,7 @@ import toast from '../utils/toast.js';
 class ContextMenuHandler {
     constructor() {
         this.menu = null;
+        this.submenu = null; // 子菜单
         this.targetElement = null;
     }
 
@@ -74,6 +75,12 @@ class ContextMenuHandler {
         this.menu.className = 'context-menu';
         this.menu.style.display = 'none';
         document.body.appendChild(this.menu);
+        
+        // 创建子菜单
+        this.submenu = document.createElement('div');
+        this.submenu.className = 'context-menu submenu';
+        this.submenu.style.display = 'none';
+        document.body.appendChild(this.submenu);
     }
 
     /**
@@ -90,8 +97,9 @@ class ContextMenuHandler {
                 action: () => this.editItem(gridItem)
             },
             {
-                label: '设置大小',
-                action: () => this.showSizeSelector(gridItem, itemUuid)
+                label: '设置大小 ',
+                action: () => this.showSizeSelector(gridItem, itemUuid),
+                hasSubmenu: true
             },
             {
                 label: '添加到 Dock',
@@ -143,10 +151,21 @@ class ContextMenuHandler {
             menuItem.className = `context-menu-item ${item.className || ''}`;
             menuItem.textContent = item.label;
             
+            // 如果有子菜单标记，添加样式
+            if (item.hasSubmenu) {
+                menuItem.classList.add('has-submenu');
+            }
+            
             menuItem.addEventListener('click', (e) => {
                 e.stopPropagation();
-                item.action();
-                this.hideMenu();
+                
+                // 如果有子菜单，不隐藏主菜单
+                if (item.hasSubmenu) {
+                    item.action();
+                } else {
+                    item.action();
+                    this.hideMenu();
+                }
             });
 
             this.menu.appendChild(menuItem);
@@ -173,8 +192,18 @@ class ContextMenuHandler {
      * 隐藏菜单
      */
     hideMenu() {
+        this.hideAllMenus();
+    }
+
+    /**
+     * 隐藏所有菜单
+     */
+    hideAllMenus() {
         if (this.menu) {
             this.menu.style.display = 'none';
+        }
+        if (this.submenu) {
+            this.submenu.style.display = 'none';
         }
         this.targetElement = null;
     }
@@ -188,14 +217,61 @@ class ContextMenuHandler {
             '2x1', '2x2', '2x3', '2x4'
         ];
 
+        // 优先从 DOM 获取当前实际尺寸（确保实时更新）
+        let currentSize = '1x1';
+        const className = gridItem.className;
+        const match = className.match(/size-(\d+)x(\d+)/);
+        if (match) {
+            currentSize = `${match[1]}x${match[2]}`;
+        }
+
         const menuItems = sizes.map(size => ({
-            label: size,
+            label: size === currentSize ? `✓ ${size}` : size,
             action: () => this.changeSize(itemUuid, size)
         }));
 
-        // 获取当前鼠标位置
+        // 获取主菜单位置，在它右侧显示子菜单
         const rect = this.menu.getBoundingClientRect();
-        this.renderMenu(menuItems, rect.right, rect.top);
+        this.renderSubmenu(menuItems, rect.right + 5, rect.top);
+    }
+
+    /**
+     * 渲染子菜单
+     */
+    renderSubmenu(items, x, y) {
+        this.submenu.innerHTML = '';
+
+        items.forEach(item => {
+            const menuItem = document.createElement('div');
+            menuItem.className = `context-menu-item ${item.className || ''}`;
+            menuItem.textContent = item.label;
+            
+            menuItem.addEventListener('click', (e) => {
+                e.stopPropagation();
+                item.action();
+                this.hideAllMenus();
+            });
+
+            this.submenu.appendChild(menuItem);
+        });
+
+        // 定位子菜单
+        this.submenu.style.display = 'block';
+        this.submenu.style.left = x + 'px';
+        this.submenu.style.top = y + 'px';
+
+        // 确保子菜单不超出视口
+        setTimeout(() => {
+            const rect = this.submenu.getBoundingClientRect();
+            if (rect.right > window.innerWidth) {
+                // 如果右侧超出，显示在主菜单左侧
+                const mainRect = this.menu.getBoundingClientRect();
+                this.submenu.style.left = (mainRect.left - rect.width - 5) + 'px';
+            }
+            if (rect.bottom > window.innerHeight) {
+                this.submenu.style.top = (y - rect.height) + 'px';
+            }
+        }, 0);
     }
 
     /**
@@ -206,13 +282,41 @@ class ContextMenuHandler {
         
         const [width, height] = size.split('x').map(Number);
         
-        // TODO: 调用 API 更新数据库
-        console.log(' 待实现：更新布局尺寸到数据库');
+        // 从 CategoryManager 获取布局信息（包含 category_id）
+        const layout = this.getItemLayout(itemUuid);
+        if (!layout || !layout.category_id) {
+            toast.error('无法获取图标布局信息');
+            return;
+        }
         
-        // 暂时只更新 UI
-        const gridItem = document.querySelector(`[data-item-uuid="${itemUuid}"]`);
-        if (gridItem) {
-            gridItem.className = `grid-item size-${size}`;
+        try {
+            // 调用 API 更新数据库
+            const { updateItemLayout } = await import('./api.js');
+            await updateItemLayout({
+                item_uuid: itemUuid,
+                category_id: layout.category_id,
+                width: width,
+                height: height
+            });
+            console.log('✅ 布局尺寸已更新到数据库');
+            
+            // 更新 UI
+            const gridItem = document.querySelector(`[data-item-uuid="${itemUuid}"]`);
+            if (gridItem) {
+                gridItem.className = `grid-item size-${size}`;
+                
+                // 同步更新 CategoryManager 缓存
+                if (window.categoryManager && window.categoryManager.layouts[itemUuid]) {
+                    window.categoryManager.layouts[itemUuid].width = width;
+                    window.categoryManager.layouts[itemUuid].height = height;
+                    console.log('✅ CategoryManager 缓存已更新');
+                }
+                
+                toast.success(`图标尺寸已更改为 ${size}`);
+            }
+        } catch (error) {
+            console.error('❌ 更新尺寸失败:', error);
+            toast.error('更新尺寸失败: ' + error.message);
         }
     }
 
@@ -323,7 +427,15 @@ class ContextMenuHandler {
      * 获取图标布局信息
      */
     getItemLayout(itemUuid) {
-        // 从 DOM 中获取当前尺寸
+        // 优先从 CategoryManager 获取布局信息
+        if (window.categoryManager) {
+            const layout = window.categoryManager.getLayout(itemUuid);
+            if (layout) {
+                return layout; // 包含 { pos_x, pos_y, width, height, sort_order, category_id }
+            }
+        }
+        
+        // 降级方案：从 DOM 中获取当前尺寸
         const gridItem = document.querySelector(`[data-item-uuid="${itemUuid}"]`);
         if (!gridItem) return { width: 1, height: 1 };
 

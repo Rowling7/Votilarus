@@ -48,6 +48,41 @@
     color: var(--error-color);
 }
 
+/* 有子菜单的项 */
+.context-menu-item.has-submenu {
+    position: relative;
+}
+
+.context-menu-item.has-submenu::after {
+    content: '▶';
+    position: absolute;
+    right: 1rem;
+    font-size: 0.7rem;
+    opacity: 0.6;
+    color: var(--text-primary);
+}
+
+.context-menu-item.has-submenu:hover::after {
+    opacity: 1;
+    color: var(--theme-color);
+}
+
+/* 子菜单样式 */
+.context-menu.submenu {
+    animation: menuSlideIn 0.15s ease;
+}
+
+@keyframes menuSlideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
 /* 拖拽样式 */
 .grid-item.dragging {
     opacity: 0.5;

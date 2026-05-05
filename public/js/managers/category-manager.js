@@ -25,36 +25,37 @@ class CategoryManager {
         console.log('📦 [CategoryManager] 开始加载所有图标');
         console.log('  - 分类数量:', this.categories.length);
         
-        for (const category of this.categories) {
-            console.log(`\n [CategoryManager] 加载分类: ${category.name} (uuid: ${category.uuid})`);
-            try {
-                const items = await fetchItems(category.uuid);
-                console.log(`  - ✅ 获取到 ${items.length} 个图标`);
-                if (items.length > 0) {
-                    console.log(`  - 第一个图标:`, {
-                        uuid: items[0].uuid,
-                        a70Id: items[0].a70Id,
-                        name: items[0].name
-                    });
-                }
-                this.items[category.uuid] = items;
-                
-                // 加载布局信息
-                const layouts = await fetchLayouts();
-                layouts.forEach(layout => {
-                    this.layouts[layout.item_uuid] = layout;
-                });
-            } catch (error) {
-                console.error(`  - ❌ 加载失败:`, error);
-                this.items[category.uuid] = [];
-            }
+        // 优化：先一次性加载所有布局信息（只调用一次 API）
+        try {
+            const allLayouts = await fetchLayouts();
+            allLayouts.forEach(layout => {
+                this.layouts[layout.item_uuid] = layout;
+            });
+            console.log(`  - ✅ 加载了 ${allLayouts.length} 个布局`);
+        } catch (error) {
+            console.error('  - ❌ 加载布局失败:', error);
         }
         
-        console.log('\n📊 [CategoryManager] 加载完成，总览:');
-        Object.keys(this.items).forEach(uuid => {
-            const category = this.categories.find(c => c.uuid == uuid);
-            console.log(`  - ${category ? category.name : uuid}: ${this.items[uuid].length} 个图标`);
+        // 并行加载所有分类的图标
+        const loadPromises = this.categories.map(async (category) => {
+            try {
+                const items = await fetchItems(category.uuid);
+                return { uuid: category.uuid, items };
+            } catch (error) {
+                console.error(`  - ❌ ${category.name} 加载失败:`, error);
+                return { uuid: category.uuid, items: [] };
+            }
         });
+        
+        // 等待所有请求完成
+        const results = await Promise.all(loadPromises);
+        
+        // 存储结果
+        results.forEach(result => {
+            this.items[result.uuid] = result.items;
+        });
+        
+        console.log('✅ [CategoryManager] 加载完成');
     }
 
     getCategories() {
@@ -62,10 +63,7 @@ class CategoryManager {
     }
 
     getItems(categoryUuid) {
-        console.log(`📦 [CategoryManager.getItems] 请求分类 ${categoryUuid} 的图标`);
-        const items = this.items[categoryUuid] || [];
-        console.log(`  - 返回 ${items.length} 个图标`);
-        return items;
+        return this.items[categoryUuid] || [];
     }
 
     getLayout(itemUuid) {

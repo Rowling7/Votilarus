@@ -34,6 +34,9 @@ class App {
             // 初始化分类和数据
             await categoryManager.init();
             
+            // 将 categoryManager 暴露到全局，供其他模块使用
+            window.categoryManager = categoryManager;
+            
             // 渲染侧边栏
             const categories = categoryManager.getCategories();
             sidebarRenderer.render(categories);
