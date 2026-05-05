@@ -11,8 +11,8 @@ function setDatabase(database) {
 
 // 获取所有设置
 router.get('/', (req, res) => {
-    const sql = 'SELECT * FROM stettings WHERE isdel = ?';
-    db.all(sql, ['0'], (err, rows) => {
+    const sql = 'SELECT * FROM stettings WHERE isdel = ? and type = ?';
+    db.all(sql, ['0', 'personal'], (err, rows) => {
         if (err) {
             res.status(500).json({ error: err.message });
             return;

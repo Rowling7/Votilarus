@@ -266,7 +266,9 @@ class IconRenderer {
         if (item.bgimage) {
             const bgDiv = document.createElement('div');
             bgDiv.className = 'nav-icon-bg';
-            bgDiv.dataset.lazySrc = item.bgimage; // 标记为懒加载
+            // 将 Windows 路径分隔符 \ 转换为 URL 友好的 /
+            const imageUrl = item.bgimage.replace(/\\/g, '/');
+            bgDiv.dataset.lazySrc = imageUrl; // 标记为懒加载
             iconDiv.appendChild(bgDiv);
             
             // 注册到观察器
