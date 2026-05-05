@@ -58,6 +58,38 @@
     border-radius: 0.5rem;
     transition: all var(--transition-fast);
     font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* 侧栏 SVG 图标容器 */
+.sidebar-icon {
+    width: 1.5rem;
+    height: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    filter: brightness(0) invert(1); /* 白色图标 */
+    opacity: 0.8;
+    transition: all var(--transition-fast);
+}
+
+/* SVG 元素本身 */
+.sidebar-icon svg {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.sidebar-category:hover .sidebar-icon {
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+.sidebar-category.active .sidebar-icon {
+    filter: brightness(0) invert(1); /* 保持白色 */
+    opacity: 1;
 }
 
 .sidebar-category:hover {
