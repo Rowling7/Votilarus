@@ -91,7 +91,8 @@ class DockRenderer {
         icon.className = 'dock-item-icon';
         
         if (item.bgimage) {
-            icon.style.backgroundImage = `url(${item.bgimage})`;
+            const imageUrl = item.bgimage.replace(/\\/g, '/');
+            icon.style.backgroundImage = `url(${imageUrl})`;
         } else {
             // 使用默认图标或首字母
             icon.textContent = item.name.charAt(0).toUpperCase();
