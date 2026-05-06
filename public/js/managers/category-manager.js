@@ -23,7 +23,7 @@ class CategoryManager {
 
     async loadAllItems() {
         const startTime = performance.now();
-        
+
         // 优化1：先一次性加载所有布局信息（只调用一次 API）
         try {
             const allLayouts = await fetchLayouts();
@@ -32,7 +32,7 @@ class CategoryManager {
             });
         } catch (error) {
         }
-        
+
         // 优化2：并行加载所有分类的图标
         const loadPromises = this.categories.map(async (category) => {
             try {
@@ -42,14 +42,36 @@ class CategoryManager {
                 return { uuid: category.uuid, items: [] };
             }
         });
-        
+
         // 等待所有请求完成
         const results = await Promise.all(loadPromises);
-        
+
         // 存储结果
         results.forEach(result => {
             this.items[result.uuid] = result.items;
         });
+    }
+
+    /**
+     * 重新加载单个分类的图标数据
+     */
+    async reloadCategoryItems(categoryUuid) {
+        try {
+            // 重新获取该分类的图标
+            const items = await fetchItems(categoryUuid);
+            this.items[categoryUuid] = items;
+
+            // 重新获取布局信息
+            const allLayouts = await fetchLayouts();
+            allLayouts.forEach(layout => {
+                this.layouts[layout.item_uuid] = layout;
+            });
+
+            return items;
+        } catch (error) {
+            console.error('重新加载分类数据失败:', error);
+            throw error;
+        }
     }
 
     getCategories() {
@@ -76,7 +98,7 @@ class CategoryManager {
         const category = this.categories.find(c => c.uuid == uuid);
         return category ? category.name : '';
     }
-    
+
     /**
      * 获取所有可切换的分类列表（包含首页）
      */

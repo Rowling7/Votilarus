@@ -145,7 +145,7 @@ router.post('/reset', (req, res) => {
         grid_cols: '13',
         grid_rows: '5',
         cell_gap: '2',
-        sidebar_width: '6',
+        sidebar_width: '4',
         theme_mode: 'light',
         theme_color: '#3b82f6',
         bg_image_enabled: '0',

@@ -8,7 +8,7 @@ class SettingsManager {
         this.defaultSettings = {
             theme_mode: 'light',
             theme_color: '#3b82f6',
-            sidebar_width: '6',
+            sidebar_width: '4',
             cell_base_size: '4',
             cell_gap: '2',
             grid_rows: '5',
@@ -77,7 +77,7 @@ class SettingsManager {
         document.documentElement.style.setProperty('--theme-color', themeColor);
 
         // 应用侧栏宽度
-        const sidebarWidth = this.settings.sidebar_width || '6';
+        const sidebarWidth = this.settings.sidebar_width || '4';
         document.documentElement.style.setProperty('--sidebar-width', `${sidebarWidth}%`);
 
         // 应用单元格尺寸
@@ -259,7 +259,7 @@ class SettingsManager {
             gridRows: parseInt(this.settings.grid_rows) || 5,
             gridCols: parseInt(this.settings.grid_cols) || 13,
             gridGap: parseFloat(this.settings.cell_gap) || 2,
-            sidebarWidth: parseInt(this.settings.sidebar_width) || 6,
+            sidebarWidth: parseInt(this.settings.sidebar_width) || 4,
 
             // 外观主题
             themeMode: this.settings.theme_mode || 'light',

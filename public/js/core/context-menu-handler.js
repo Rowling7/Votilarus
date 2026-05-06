@@ -73,7 +73,7 @@ class ContextMenuHandler {
         this.menu.className = 'context-menu';
         this.menu.style.display = 'none';
         document.body.appendChild(this.menu);
-        
+
         // 创建子菜单
         this.submenu = document.createElement('div');
         this.submenu.className = 'context-menu submenu';
@@ -148,15 +148,15 @@ class ContextMenuHandler {
             const menuItem = document.createElement('div');
             menuItem.className = `context-menu-item ${item.className || ''}`;
             menuItem.textContent = item.label;
-            
+
             // 如果有子菜单标记，添加样式
             if (item.hasSubmenu) {
                 menuItem.classList.add('has-submenu');
             }
-            
+
             menuItem.addEventListener('click', (e) => {
                 e.stopPropagation();
-                
+
                 // 如果有子菜单，不隐藏主菜单
                 if (item.hasSubmenu) {
                     item.action();
@@ -243,7 +243,7 @@ class ContextMenuHandler {
             const menuItem = document.createElement('div');
             menuItem.className = `context-menu-item ${item.className || ''}`;
             menuItem.textContent = item.label;
-            
+
             menuItem.addEventListener('click', (e) => {
                 e.stopPropagation();
                 item.action();
@@ -277,14 +277,14 @@ class ContextMenuHandler {
      */
     async changeSize(itemUuid, size) {
         const [width, height] = size.split('x').map(Number);
-        
+
         // 从 CategoryManager 获取布局信息（包含 category_id）
         const layout = this.getItemLayout(itemUuid);
         if (!layout || !layout.category_id) {
             toast.error('无法获取图标布局信息');
             return;
         }
-        
+
         try {
             // 调用 API 更新数据库
             const { updateItemLayout } = await import('./api.js');
@@ -294,18 +294,18 @@ class ContextMenuHandler {
                 width: width,
                 height: height
             });
-            
+
             // 更新 UI
             const gridItem = document.querySelector(`[data-item-uuid="${itemUuid}"]`);
             if (gridItem) {
                 gridItem.className = `grid-item size-${size}`;
-                
+
                 // 同步更新 CategoryManager 缓存
                 if (window.categoryManager && window.categoryManager.layouts[itemUuid]) {
                     window.categoryManager.layouts[itemUuid].width = width;
                     window.categoryManager.layouts[itemUuid].height = height;
                 }
-                
+
                 toast.success(`图标尺寸已更改为 ${size}`);
             }
         } catch (error) {
@@ -318,19 +318,45 @@ class ContextMenuHandler {
      */
     async editItem(gridItem) {
         const itemUuid = gridItem.dataset.itemUuid;
-        
-        // 获取图标数据
-        const iconData = {
-            uuid: itemUuid,
-            name: gridItem.querySelector('.nav-icon-title')?.textContent || '',
-            target: gridItem.dataset.url || '',
-            bgimage: '' // TODO: 从数据库获取
-        };
-        
+
+        // 从 categoryManager 获取完整的图标数据
+        const categoryManagerModule = await import('../managers/category-manager.js');
+        const categoryManager = categoryManagerModule.default;
+
+        // 查找图标所属的分类
+        let iconData = null;
+        const categories = categoryManager.getCategories();
+
+        for (const category of categories) {
+            const items = categoryManager.getItems(category.uuid);
+            const item = items.find(i => i.uuid === itemUuid);
+            if (item) {
+                iconData = {
+                    uuid: item.uuid,
+                    name: item.name,
+                    target: item.target,
+                    bgimage: item.bgimage || '',
+                    category_id: category.uuid
+                };
+                break;
+            }
+        }
+
+        // 如果没找到，使用 DOM 中的数据作为后备
+        if (!iconData) {
+            iconData = {
+                uuid: itemUuid,
+                name: gridItem.querySelector('.nav-icon-title')?.textContent || '',
+                target: gridItem.dataset.url || '',
+                bgimage: ''
+            };
+        }
+
         try {
             const iconEditor = await import('./icon-editor-handler.js');
             iconEditor.default.open(iconData);
         } catch (error) {
+            console.error('打开编辑器失败:', error);
         }
     }
 
@@ -362,21 +388,21 @@ class ContextMenuHandler {
             cancelText: '取消',
             type: 'danger'
         });
-        
+
         if (!confirmed) {
             return;
         }
-    
+
         try {
             const { deleteItem } = await import('./api.js');
             await deleteItem(itemUuid);
-                
+
             // 从 DOM 中移除
             const gridItem = document.querySelector(`[data-item-uuid="${itemUuid}"]`);
             if (gridItem) {
                 gridItem.remove();
             }
-                
+
             toast.success('图标已删除');
         } catch (error) {
             toast.error('删除失败: ' + error.message);
@@ -417,7 +443,7 @@ class ContextMenuHandler {
                 return layout; // 包含 { pos_x, pos_y, width, height, sort_order, category_id }
             }
         }
-        
+
         // 降级方案：从 DOM 中获取当前尺寸
         const gridItem = document.querySelector(`[data-item-uuid="${itemUuid}"]`);
         if (!gridItem) return { width: 1, height: 1 };
@@ -542,7 +568,7 @@ class ContextMenuHandler {
         try {
             const { removeFromDock } = await import('./api.js');
             await removeFromDock(itemUuid);
-            
+
             // 从 DOM 中移除
             const dockItem = document.querySelector(`.dock-item[data-item-uuid="${itemUuid}"]`);
             if (dockItem) {
