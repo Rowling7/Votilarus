@@ -11,19 +11,19 @@ function setDatabase(database) {
 
 // 获取所有设置
 router.get('/', (req, res) => {
-    const sql = 'SELECT * FROM stettings WHERE isdel = ? and type = ?';
+    const sql = 'SELECT * FROM settings WHERE isdel = ? and type = ?';
     db.all(sql, ['0', 'personal'], (err, rows) => {
         if (err) {
             res.status(500).json({ error: err.message });
             return;
         }
-        
+
         // 转换为键值对格式
         const settings = {};
         rows.forEach(row => {
             settings[row.key] = row.value;
         });
-        
+
         res.json(settings);
     });
 });
@@ -32,21 +32,21 @@ router.get('/', (req, res) => {
 router.put('/', (req, res) => {
     const updates = req.body;
     const promises = [];
-    
+
     for (const [key, value] of Object.entries(updates)) {
         const promise = new Promise((resolve, reject) => {
             // 先尝试更新，如果没有影响行数，则插入
-            const updateSql = 'UPDATE stettings SET value = ? WHERE key = ?';
-            db.run(updateSql, [value, key], function(err) {
+            const updateSql = 'UPDATE settings SET value = ? WHERE key = ?';
+            db.run(updateSql, [value, key], function (err) {
                 if (err) {
                     reject(err);
                     return;
                 }
-                
+
                 // 如果没有更新任何行，说明 key 不存在，需要插入
                 if (this.changes === 0) {
-                    const insertSql = 'INSERT INTO stettings (key, value, type, isdisplay, isdel) VALUES (?, ?, ?, ?, ?)';
-                    db.run(insertSql, [key, value, 'personal', '1', '0'], function(insertErr) {
+                    const insertSql = 'INSERT INTO settings (key, value, type, isdisplay, isdel) VALUES (?, ?, ?, ?, ?)';
+                    db.run(insertSql, [key, value, 'personal', '1', '0'], function (insertErr) {
                         if (insertErr) reject(insertErr);
                         else resolve({ changes: 1, inserted: true });
                     });
@@ -57,7 +57,7 @@ router.put('/', (req, res) => {
         });
         promises.push(promise);
     }
-    
+
     Promise.all(promises)
         .then(() => {
             res.json({ success: true });
@@ -69,26 +69,26 @@ router.put('/', (req, res) => {
 
 // 导出所有设置（JSON格式）
 router.get('/export', (req, res) => {
-    const sql = 'SELECT * FROM stettings WHERE isdel = ?';
+    const sql = 'SELECT * FROM settings WHERE isdel = ?';
     db.all(sql, ['0'], (err, rows) => {
         if (err) {
             res.status(500).json({ error: err.message });
             return;
         }
-        
+
         // 转换为键值对格式
         const settings = {};
         rows.forEach(row => {
             settings[row.key] = row.value;
         });
-        
+
         // 添加元数据
         const exportData = {
             version: '1.0',
             exportTime: new Date().toISOString(),
             settings: settings
         };
-        
+
         res.json(exportData);
     });
 });
@@ -96,28 +96,28 @@ router.get('/export', (req, res) => {
 // 导入设置（JSON格式）
 router.post('/import', (req, res) => {
     const importData = req.body;
-    
+
     if (!importData.settings || typeof importData.settings !== 'object') {
         res.status(400).json({ error: '无效的设置数据' });
         return;
     }
-    
+
     const settings = importData.settings;
     const promises = [];
-    
+
     for (const [key, value] of Object.entries(settings)) {
         const promise = new Promise((resolve, reject) => {
-            const updateSql = 'UPDATE stettings SET value = ? WHERE key = ?';
-            db.run(updateSql, [value.toString(), key], function(err) {
+            const updateSql = 'UPDATE settings SET value = ? WHERE key = ?';
+            db.run(updateSql, [value.toString(), key], function (err) {
                 if (err) {
                     reject(err);
                     return;
                 }
-                
+
                 // 如果没有更新任何行，说明 key 不存在，需要插入
                 if (this.changes === 0) {
-                    const insertSql = 'INSERT INTO stettings (key, value, type, isdisplay, isdel) VALUES (?, ?, ?, ?, ?)';
-                    db.run(insertSql, [key, value.toString(), 'personal', '1', '0'], function(insertErr) {
+                    const insertSql = 'INSERT INTO settings (key, value, type, isdisplay, isdel) VALUES (?, ?, ?, ?, ?)';
+                    db.run(insertSql, [key, value.toString(), 'personal', '1', '0'], function (insertErr) {
                         if (insertErr) reject(insertErr);
                         else resolve({ changes: 1, inserted: true });
                     });
@@ -128,7 +128,7 @@ router.post('/import', (req, res) => {
         });
         promises.push(promise);
     }
-    
+
     Promise.all(promises)
         .then(results => {
             res.json({ success: true, count: results.length });
@@ -176,21 +176,21 @@ router.post('/reset', (req, res) => {
         enable_context_menu: '1',
         darkmode: '1'
     };
-    
+
     const promises = [];
-    
+
     for (const [key, value] of Object.entries(defaultSettings)) {
         const promise = new Promise((resolve, reject) => {
-            const updateSql = 'UPDATE stettings SET value = ? WHERE key = ?';
-            db.run(updateSql, [value, key], function(err) {
+            const updateSql = 'UPDATE settings SET value = ? WHERE key = ?';
+            db.run(updateSql, [value, key], function (err) {
                 if (err) {
                     reject(err);
                     return;
                 }
-                
+
                 if (this.changes === 0) {
-                    const insertSql = 'INSERT INTO stettings (key, value, type, isdisplay, isdel) VALUES (?, ?, ?, ?, ?)';
-                    db.run(insertSql, [key, value, 'personal', '1', '0'], function(insertErr) {
+                    const insertSql = 'INSERT INTO settings (key, value, type, isdisplay, isdel) VALUES (?, ?, ?, ?, ?)';
+                    db.run(insertSql, [key, value, 'personal', '1', '0'], function (insertErr) {
                         if (insertErr) reject(insertErr);
                         else resolve({ changes: 1, inserted: true });
                     });
@@ -201,7 +201,7 @@ router.post('/reset', (req, res) => {
         });
         promises.push(promise);
     }
-    
+
     Promise.all(promises)
         .then(results => {
             res.json({ success: true, count: results.length });
@@ -214,14 +214,14 @@ router.post('/reset', (req, res) => {
 // 获取单个设置项
 router.get('/:key', (req, res) => {
     const key = req.params.key;
-    const sql = 'SELECT value FROM stettings WHERE key = ? AND isdel = ?';
-    
+    const sql = 'SELECT value FROM settings WHERE key = ? AND isdel = ?';
+
     db.get(sql, [key, '0'], (err, row) => {
         if (err) {
             res.status(500).json({ error: err.message });
             return;
         }
-        
+
         if (row) {
             res.json({ value: row.value });
         } else {
@@ -236,22 +236,22 @@ router.post('/batch', (req, res) => {
     if (!Array.isArray(keys) || keys.length === 0) {
         return res.status(400).json({ error: 'Keys array is required' });
     }
-    
+
     const placeholders = keys.map(() => '?').join(',');
-    const sql = `SELECT key, value FROM stettings WHERE key IN (${placeholders}) AND isdel = ?`;
+    const sql = `SELECT key, value FROM settings WHERE key IN (${placeholders}) AND isdel = ?`;
     const params = [...keys, '0'];
-    
+
     db.all(sql, params, (err, rows) => {
         if (err) {
             res.status(500).json({ error: err.message });
             return;
         }
-        
+
         const settings = {};
         rows.forEach(row => {
             settings[row.key] = row.value;
         });
-        
+
         res.json(settings);
     });
 });
