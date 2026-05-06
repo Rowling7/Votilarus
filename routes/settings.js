@@ -140,18 +140,23 @@ router.post('/import', (req, res) => {
 
 // 恢复默认设置
 router.post('/reset', (req, res) => {
-    // 默认设置 - 使用数据库中已存在的字段名
+    // 默认设置（基于 settings.sql 中 type 为 personal 的配置）
     const defaultSettings = {
         grid_cols: '13',
         grid_rows: '5',
         cell_gap: '2',
-        sidebar_width: '4',
-        theme_mode: 'dark',
-        theme_color: '#667eea',
+        sidebar_width: '6',
+        theme_mode: 'light',
+        theme_color: '#3b82f6',
+        bg_image_enabled: '0',
         bg_image_url: 'static/background/image061.png',
+        bg_blur_enabled: '0',
         bg_blur: '5',
-        bg_opacity: '0',
+        bg_opacity_enabled: '0',
+        bg_opacity: '0.8',
+        overlay_color_enabled: '0',
         overlay_color: '#ffffff',
+        overlay_opacity_enabled: '0',
         overlay_opacity: '0.3',
         icon_radius: '0.5',
         icon_shadow: '1',
@@ -167,14 +172,16 @@ router.post('/reset', (req, res) => {
         dock_blur: '10',
         dock_opacity: '0.3',
         fisheye_scale: '1.5',
-        fisheye_range: '2',
+        fisheye_range: '1',
         search_engine: 'baidu',
         search_box_position: 'center',
         search_box_style: 'rounded',
         scroll_animation_speed: '300',
         drag_sensitivity: '5',
         enable_context_menu: '1',
-        darkmode: '1'
+        avatar_url: 'static/ico/loading2.gif\n',
+        username: 'Votilarus',
+        bio: 'Everything will be OK!'
     };
 
     const promises = [];

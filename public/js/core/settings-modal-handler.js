@@ -671,37 +671,37 @@ class SettingsModalHandler {
         document.getElementById('sidebar-width').value = settings.sidebarWidth || 6;
 
         // 外观主题
-        document.getElementById('theme-mode').value = settings.themeMode || 'dark';
-        document.getElementById('theme-color').value = settings.themeColor || '#3B82F6';
+        document.getElementById('theme-mode').value = settings.themeMode || 'light';
+        document.getElementById('theme-color').value = settings.themeColor || '#3b82f6';
 
         // 背景图片开关和值
-        const bgImageEnabled = settings.bgImageEnabled !== false; // 默认开启
+        const bgImageEnabled = settings.bgImageEnabled === true; // 默认关闭（根据SQL）
         this.setSwitchState('bg-image-switch', bgImageEnabled);
         document.getElementById('bg-image-url').value = settings.bgImageUrl || '';
         document.getElementById('bg-image-url').disabled = !bgImageEnabled;
 
         // 背景模糊度开关和值
-        const bgBlurEnabled = settings.bgBlurEnabled !== false; // 默认开启
+        const bgBlurEnabled = settings.bgBlurEnabled === true; // 默认关闭（根据SQL）
         this.setSwitchState('bg-blur-switch', bgBlurEnabled);
         document.getElementById('bg-blur').value = settings.bgBlur || 5;
         document.getElementById('bg-blur-value').textContent = settings.bgBlur || 5;
         document.getElementById('bg-blur').disabled = !bgBlurEnabled;
 
         // 背景透明度开关和值
-        const bgOpacityEnabled = settings.bgOpacityEnabled !== false; // 默认开启
+        const bgOpacityEnabled = settings.bgOpacityEnabled === true; // 默认关闭（根据SQL）
         this.setSwitchState('bg-opacity-switch', bgOpacityEnabled);
         document.getElementById('bg-opacity').value = settings.bgOpacity || 0.8;
         document.getElementById('bg-opacity-value').textContent = settings.bgOpacity || 0.8;
         document.getElementById('bg-opacity').disabled = !bgOpacityEnabled;
 
         // 遮罩层颜色开关和值
-        const overlayColorEnabled = settings.overlayColorEnabled !== false; // 默认开启
+        const overlayColorEnabled = settings.overlayColorEnabled === true; // 默认关闭（根据SQL）
         this.setSwitchState('overlay-color-switch', overlayColorEnabled);
-        document.getElementById('overlay-color').value = settings.overlayColor || '#000000';
+        document.getElementById('overlay-color').value = settings.overlayColor || '#ffffff';
         document.getElementById('overlay-color').disabled = !overlayColorEnabled;
 
         // 遮罩层透明度开关和值
-        const overlayOpacityEnabled = settings.overlayOpacityEnabled !== false; // 默认开启
+        const overlayOpacityEnabled = settings.overlayOpacityEnabled === true; // 默认关闭（根据SQL）
         this.setSwitchState('overlay-opacity-switch', overlayOpacityEnabled);
         document.getElementById('overlay-opacity').value = settings.overlayOpacity || 0.3;
         document.getElementById('overlay-opacity-value').textContent = settings.overlayOpacity || 0.3;
@@ -709,9 +709,9 @@ class SettingsModalHandler {
 
         // 图标样式
         document.getElementById('icon-radius').value = settings.iconRadius || 0.5;
-        this.setSwitchState('icon-shadow-switch', settings.iconShadow !== false);
+        this.setSwitchState('icon-shadow-switch', settings.iconShadow === true); // 默认开启（根据SQL）
         document.getElementById('icon-hover-effect').value = settings.iconHoverEffect || 'scale';
-        this.setSwitchState('show-title-switch', settings.showTitle !== false);
+        this.setSwitchState('show-title-switch', settings.showTitle === true); // 默认显示（根据SQL）
         document.getElementById('title-position').value = settings.titlePosition || 'bottom';
         document.getElementById('title-font-size').value = settings.titleFontSize || 12;
         document.getElementById('title-font-color').value = settings.titleFontColor || '#ffffff';
@@ -735,7 +735,7 @@ class SettingsModalHandler {
         // 交互行为
         document.getElementById('scroll-animation-speed').value = settings.scrollAnimationSpeed || 300;
         document.getElementById('drag-sensitivity').value = settings.dragSensitivity || 5;
-        this.setSwitchState('enable-context-menu-switch', settings.enableContextMenu !== false);
+        this.setSwitchState('enable-context-menu-switch', settings.enableContextMenu === true); // 默认启用（根据SQL）
 
         // 个人信息
         document.getElementById('avatar-url').value = settings.avatarUrl || '';
@@ -1051,7 +1051,7 @@ class SettingsModalHandler {
      */
     applyBackgroundSettings(settings) {
         // 应用背景图片（根据开关状态）
-        const bgImageEnabled = settings.bgImageEnabled !== false;
+        const bgImageEnabled = settings.bgImageEnabled === true;
         if (bgImageEnabled && settings.bgImageUrl) {
             document.body.style.backgroundImage = `url(${settings.bgImageUrl})`;
             document.body.style.backgroundSize = 'cover';
@@ -1062,22 +1062,22 @@ class SettingsModalHandler {
         }
 
         // 应用背景模糊度（根据开关状态）
-        const bgBlurEnabled = settings.bgBlurEnabled !== false;
+        const bgBlurEnabled = settings.bgBlurEnabled === true;
         const bgBlur = bgBlurEnabled ? (settings.bgBlur || 5) : 0;
         document.documentElement.style.setProperty('--bg-blur', `${bgBlur}px`);
 
         // 应用背景透明度（根据开关状态）
-        const bgOpacityEnabled = settings.bgOpacityEnabled !== false;
+        const bgOpacityEnabled = settings.bgOpacityEnabled === true;
         const bgOpacity = bgOpacityEnabled ? (settings.bgOpacity || 0.8) : 1;
         document.documentElement.style.setProperty('--bg-opacity', bgOpacity);
 
         // 应用遮罩层颜色（根据开关状态）
-        const overlayColorEnabled = settings.overlayColorEnabled !== false;
-        const overlayColor = overlayColorEnabled ? (settings.overlayColor || '#000000') : 'transparent';
+        const overlayColorEnabled = settings.overlayColorEnabled === true;
+        const overlayColor = overlayColorEnabled ? (settings.overlayColor || '#ffffff') : 'transparent';
         document.documentElement.style.setProperty('--overlay-color', overlayColor);
 
         // 应用遮罩层透明度（根据开关状态）
-        const overlayOpacityEnabled = settings.overlayOpacityEnabled !== false;
+        const overlayOpacityEnabled = settings.overlayOpacityEnabled === true;
         const overlayOpacity = overlayOpacityEnabled ? (settings.overlayOpacity || 0.3) : 0;
         document.documentElement.style.setProperty('--overlay-opacity', overlayOpacity);
 
@@ -1099,9 +1099,9 @@ class SettingsModalHandler {
 
         // 构建背景效果样式
         const bgBlur = getComputedStyle(document.documentElement).getPropertyValue('--bg-blur').trim() || '0px';
-        const bgOpacity = getComputedStyle(document.documentElement).getPropertyValue('--bg-opacity').trim() || '1';
-        const overlayColor = getComputedStyle(document.documentElement).getPropertyValue('--overlay-color').trim() || 'transparent';
-        const overlayOpacity = getComputedStyle(document.documentElement).getPropertyValue('--overlay-opacity').trim() || '0';
+        const bgOpacity = getComputedStyle(document.documentElement).getPropertyValue('--bg-opacity').trim() || '0.8';
+        const overlayColor = getComputedStyle(document.documentElement).getPropertyValue('--overlay-color').trim() || '#ffffff';
+        const overlayOpacity = getComputedStyle(document.documentElement).getPropertyValue('--overlay-opacity').trim() || '0.3';
 
         styleElement.textContent = `
             body::before {

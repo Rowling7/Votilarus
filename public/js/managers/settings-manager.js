@@ -7,21 +7,47 @@ class SettingsManager {
         this.settings = {};
         this.defaultSettings = {
             theme_mode: 'light',
-            theme_color: '#3B82F6',
+            theme_color: '#3b82f6',
             sidebar_width: '6',
             cell_base_size: '4',
             cell_gap: '2',
             grid_rows: '5',
             grid_cols: '13',
             search_engine: 'baidu',
-            avatar_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Felix',
+            avatar_url: 'static/ico/loading2.gif\n',
+            username: 'Votilarus',
+            bio: 'Everything will be OK!',
             bg_image_url: 'static/background/image061.png',
             // 背景样式开关（默认关闭）
             bg_image_enabled: '0',
             bg_blur_enabled: '0',
             bg_opacity_enabled: '0',
             overlay_color_enabled: '0',
-            overlay_opacity_enabled: '0'
+            overlay_opacity_enabled: '0',
+            // 图标样式
+            icon_radius: '0.5',
+            icon_shadow: '1',
+            icon_hover_effect: 'scale',
+            show_title: '1',
+            title_position: 'bottom',
+            title_font_size: '12',
+            title_font_color: '#ffffff',
+            title_max_length: '8',
+            tooltip_delay: '300',
+            // Dock 设置
+            dock_position: 'bottom',
+            dock_max_icons: '10',
+            dock_blur: '10',
+            dock_opacity: '0.3',
+            fisheye_scale: '1.5',
+            fisheye_range: '1',
+            // 搜索设置
+            search_box_position: 'center',
+            search_box_style: 'rounded',
+            // 交互行为
+            scroll_animation_speed: '300',
+            drag_sensitivity: '5',
+            enable_context_menu: '1'
         };
     }
 
@@ -38,7 +64,7 @@ class SettingsManager {
 
     applySettings() {
         // 应用主题模式
-        const themeMode = this.settings.theme_mode || 'dark';
+        const themeMode = this.settings.theme_mode || 'light';
         if (themeMode === 'auto') {
             const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
             document.documentElement.setAttribute('data-theme', prefersDark ? 'dark' : 'light');
@@ -47,7 +73,7 @@ class SettingsManager {
         }
 
         // 应用主题色
-        const themeColor = this.settings.theme_color || '#3B82F6';
+        const themeColor = this.settings.theme_color || '#3b82f6';
         document.documentElement.style.setProperty('--theme-color', themeColor);
 
         // 应用侧栏宽度
@@ -103,7 +129,7 @@ class SettingsManager {
 
         // 应用背景透明度（根据开关状态）
         const bgOpacityEnabled = this.settings.bg_opacity_enabled !== '0';
-        const bgOpacity = bgOpacityEnabled ? (parseFloat(this.settings.bg_opacity) || 0) : 1;
+        const bgOpacity = bgOpacityEnabled ? (parseFloat(this.settings.bg_opacity) || 0.8) : 1;
         document.documentElement.style.setProperty('--bg-opacity', bgOpacity);
 
         // 应用遮罩层颜色（根据开关状态）
@@ -134,7 +160,7 @@ class SettingsManager {
 
         // 构建背景效果样式
         const bgBlur = getComputedStyle(document.documentElement).getPropertyValue('--bg-blur').trim() || '5px';
-        const bgOpacity = getComputedStyle(document.documentElement).getPropertyValue('--bg-opacity').trim() || '0';
+        const bgOpacity = getComputedStyle(document.documentElement).getPropertyValue('--bg-opacity').trim() || '0.8';
         const overlayColor = getComputedStyle(document.documentElement).getPropertyValue('--overlay-color').trim() || '#ffffff';
         const overlayOpacity = getComputedStyle(document.documentElement).getPropertyValue('--overlay-opacity').trim() || '0.3';
 
@@ -236,14 +262,14 @@ class SettingsManager {
             sidebarWidth: parseInt(this.settings.sidebar_width) || 6,
 
             // 外观主题
-            themeMode: this.settings.theme_mode || 'dark',
-            themeColor: this.settings.theme_color || '#3B82F6',
+            themeMode: this.settings.theme_mode || 'light',
+            themeColor: this.settings.theme_color || '#3b82f6',
             bgImageEnabled: this.settings.bg_image_enabled !== '0',
             bgImageUrl: this.settings.bg_image_url || '',
             bgBlurEnabled: this.settings.bg_blur_enabled !== '0',
             bgBlur: parseInt(this.settings.bg_blur) || 5,
             bgOpacityEnabled: this.settings.bg_opacity_enabled !== '0',
-            bgOpacity: parseFloat(this.settings.bg_opacity) || 0,
+            bgOpacity: parseFloat(this.settings.bg_opacity) || 0.8,
             overlayColorEnabled: this.settings.overlay_color_enabled !== '0',
             overlayColor: this.settings.overlay_color || '#ffffff',
             overlayOpacityEnabled: this.settings.overlay_opacity_enabled !== '0',
@@ -251,9 +277,9 @@ class SettingsManager {
 
             // 图标样式
             iconRadius: parseFloat(this.settings.icon_radius) || 0.5,
-            iconShadow: this.settings.icon_shadow !== '0',
+            iconShadow: this.settings.icon_shadow === '1',
             iconHoverEffect: this.settings.icon_hover_effect || 'scale',
-            showTitle: this.settings.show_title !== '0',
+            showTitle: this.settings.show_title === '1',
             titlePosition: this.settings.title_position || 'bottom',
             titleFontSize: parseInt(this.settings.title_font_size) || 12,
             titleFontColor: this.settings.title_font_color || '#ffffff',
@@ -276,7 +302,7 @@ class SettingsManager {
             // 交互行为
             scrollAnimationSpeed: parseInt(this.settings.scroll_animation_speed) || 300,
             dragSensitivity: parseInt(this.settings.drag_sensitivity) || 5,
-            enableContextMenu: this.settings.enable_context_menu !== '0',
+            enableContextMenu: this.settings.enable_context_menu === '1',
 
             // 个人信息
             avatarUrl: this.settings.avatar_url || '',
