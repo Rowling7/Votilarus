@@ -140,7 +140,7 @@ router.post('/import', (req, res) => {
 
 // 恢复默认设置
 router.post('/reset', (req, res) => {
-    // 默认设置
+    // 默认设置 - 使用数据库中已存在的字段名
     const defaultSettings = {
         grid_cols: '13',
         grid_rows: '5',
@@ -148,10 +148,10 @@ router.post('/reset', (req, res) => {
         sidebar_width: '4',
         theme_mode: 'dark',
         theme_color: '#667eea',
-        background_url: '',
-        background_blur: '5',
-        background_opacity: '0.8',
-        overlay_color: '#000000',
+        bg_image_url: 'static/background/image061.png',
+        bg_blur: '5',
+        bg_opacity: '0',
+        overlay_color: '#ffffff',
         overlay_opacity: '0.3',
         icon_radius: '0.5',
         icon_shadow: '1',
@@ -159,19 +159,19 @@ router.post('/reset', (req, res) => {
         show_title: '1',
         title_position: 'bottom',
         title_font_size: '12',
-        title_color: '#ffffff',
+        title_font_color: '#ffffff',
         title_max_length: '8',
         tooltip_delay: '300',
         dock_position: 'bottom',
-        dock_max_items: '10',
+        dock_max_icons: '10',
         dock_blur: '10',
         dock_opacity: '0.3',
         fisheye_scale: '1.5',
         fisheye_range: '2',
         search_engine: 'baidu',
-        search_position: 'center',
-        search_style: 'rounded',
-        scroll_speed: '300',
+        search_box_position: 'center',
+        search_box_style: 'rounded',
+        scroll_animation_speed: '300',
         drag_sensitivity: '5',
         enable_context_menu: '1',
         darkmode: '1'
@@ -209,6 +209,51 @@ router.post('/reset', (req, res) => {
         .catch(err => {
             res.status(500).json({ error: err.message });
         });
+});
+
+// 获取单个设置项
+router.get('/:key', (req, res) => {
+    const key = req.params.key;
+    const sql = 'SELECT value FROM stettings WHERE key = ? AND isdel = ?';
+    
+    db.get(sql, [key, '0'], (err, row) => {
+        if (err) {
+            res.status(500).json({ error: err.message });
+            return;
+        }
+        
+        if (row) {
+            res.json({ value: row.value });
+        } else {
+            res.status(404).json({ error: 'Setting not found' });
+        }
+    });
+});
+
+// 批量获取设置项
+router.post('/batch', (req, res) => {
+    const keys = req.body.keys || [];
+    if (!Array.isArray(keys) || keys.length === 0) {
+        return res.status(400).json({ error: 'Keys array is required' });
+    }
+    
+    const placeholders = keys.map(() => '?').join(',');
+    const sql = `SELECT key, value FROM stettings WHERE key IN (${placeholders}) AND isdel = ?`;
+    const params = [...keys, '0'];
+    
+    db.all(sql, params, (err, rows) => {
+        if (err) {
+            res.status(500).json({ error: err.message });
+            return;
+        }
+        
+        const settings = {};
+        rows.forEach(row => {
+            settings[row.key] = row.value;
+        });
+        
+        res.json(settings);
+    });
 });
 
 module.exports = {

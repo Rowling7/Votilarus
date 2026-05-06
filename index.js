@@ -27,9 +27,40 @@ function initDatabase() {
     });
 }
 
+// 初始化数据库表和默认设置
+async function initializeDatabase() {
+    return new Promise((resolve, reject) => {
+        // 确保settings表存在
+        const createTableSQL = `
+            CREATE TABLE IF NOT EXISTS stettings (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                key TEXT UNIQUE,
+                value TEXT,
+                type TEXT,
+                notes TEXT,
+                isdisplay TEXT,
+                isdel TEXT DEFAULT '0'
+            )
+        `;
+        
+        db.run(createTableSQL, [], (err) => {
+            if (err) {
+                console.error("Error creating stettings table:", err);
+                reject(err);
+                return;
+            }
+            
+            // 不再插入默认值，因为数据库已经包含这些设置
+            // 只是确保数据库结构正确
+            resolve();
+        });
+    });
+}
+
 async function startServer() {
     try {
         await initDatabase();
+        await initializeDatabase(); // 初始化数据库和默认设置
         
         // ==================== API 路由 ====================
         // 注册所有 API 路由（在数据库连接后，SPA 回退之前）
@@ -61,15 +92,16 @@ async function startServer() {
         app.use((req, res, next) => {
             // 忽略 favicon.ico 等常见浏览器请求
             if (req.path === '/favicon.ico' || req.path.endsWith('.ico')) {
-                return res.status(204).end();
+                return res.status(244).end();
             }
             res.sendFile(path.join(__dirname, 'public', 'index.html'));
         });
         
         app.listen(PORT, () => {
-            // 服务器启动成功
+            console.log(`Server running on port ${PORT}`);
         });
     } catch (err) {
+        console.error("Failed to start server:", err);
         process.exit(1);
     }
 }

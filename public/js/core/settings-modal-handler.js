@@ -17,7 +17,7 @@ class SettingsModalHandler {
     init() {
         // 创建 Modal DOM
         this.createModalElement();
-        
+
         // 绑定关闭事件
         this.bindEvents();
     }
@@ -29,11 +29,11 @@ class SettingsModalHandler {
         // 创建遮罩层
         this.overlay = document.createElement('div');
         this.overlay.className = 'modal-overlay';
-        
+
         // 创建 Modal 容器
         this.modal = document.createElement('div');
         this.modal.className = 'settings-modal';
-        
+
         // Modal HTML 结构
         this.modal.innerHTML = `
             <div class="modal-header">
@@ -72,7 +72,7 @@ class SettingsModalHandler {
                 </div>
             </div>
         `;
-        
+
         // 添加到页面
         document.body.appendChild(this.overlay);
         document.body.appendChild(this.modal);
@@ -114,31 +114,84 @@ class SettingsModalHandler {
                     <input type="color" id="theme-color" value="#3B82F6">
                 </div>
                 
+                <!-- 背景样式 -->
+                <h4 style="margin: 1.5rem 0 1rem 0; color: var(--text-primary); font-size: 1.1rem; padding-bottom: 0.5rem; border-bottom: 2px solid var(--theme-color);">🖼️ 背景样式</h4>
+                
+                <div class="setting-item">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <label style="margin: 0;">启用背景图片</label>
+                        <div class="switch-container" style="gap: 0.5rem;">
+                            <div class="switch" id="bg-image-switch"></div>
+                            <span>启用/禁用</span>
+                        </div>
+                    </div>
+                </div>
+                
                 <div class="setting-item">
                     <label for="bg-image-url">背景图片 URL</label>
-                    <input type="url" id="bg-image-url" placeholder="https://example.com/bg.jpg">
+                    <input type="url" id="bg-image-url" placeholder="https://example.com/bg.jpg" disabled>
+                </div>
+                
+                <div class="setting-item">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <label style="margin: 0;">启用背景模糊</label>
+                        <div class="switch-container" style="gap: 0.5rem;">
+                            <div class="switch" id="bg-blur-switch"></div>
+                            <span>启用/禁用</span>
+                        </div>
+                    </div>
                 </div>
                 
                 <div class="setting-item">
                     <label for="bg-blur">背景模糊度</label>
-                    <input type="range" id="bg-blur" min="0" max="20" value="5">
+                    <input type="range" id="bg-blur" min="0" max="20" value="5" disabled>
                     <span class="range-value" id="bg-blur-value">5</span>
                 </div>
                 
                 <div class="setting-item">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <label style="margin: 0;">启用背景透明度</label>
+                        <div class="switch-container" style="gap: 0.5rem;">
+                            <div class="switch" id="bg-opacity-switch"></div>
+                            <span>启用/禁用</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="setting-item">
                     <label for="bg-opacity">背景透明度</label>
-                    <input type="range" id="bg-opacity" min="0" max="1" step="0.1" value="0.8">
+                    <input type="range" id="bg-opacity" min="0" max="1" step="0.1" value="0.8" disabled>
                     <span class="range-value" id="bg-opacity-value">0.8</span>
                 </div>
                 
                 <div class="setting-item">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <label style="margin: 0;">启用遮罩层颜色</label>
+                        <div class="switch-container" style="gap: 0.5rem;">
+                            <div class="switch" id="overlay-color-switch"></div>
+                            <span>启用/禁用</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="setting-item">
                     <label for="overlay-color">遮罩层颜色</label>
-                    <input type="color" id="overlay-color" value="#000000">
+                    <input type="color" id="overlay-color" value="#000000" disabled>
+                </div>
+                
+                <div class="setting-item">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <label style="margin: 0;">启用遮罩层透明度</label>
+                        <div class="switch-container" style="gap: 0.5rem;">
+                            <div class="switch" id="overlay-opacity-switch"></div>
+                            <span>启用/禁用</span>
+                        </div>
+                    </div>
                 </div>
                 
                 <div class="setting-item">
                     <label for="overlay-opacity">遮罩层透明度</label>
-                    <input type="range" id="overlay-opacity" min="0" max="1" step="0.1" value="0.3">
+                    <input type="range" id="overlay-opacity" min="0" max="1" step="0.1" value="0.3" disabled>
                     <span class="range-value" id="overlay-opacity-value">0.3</span>
                 </div>
             </div>
@@ -413,42 +466,42 @@ class SettingsModalHandler {
         // 关闭按钮
         const closeBtn = this.modal.querySelector('.modal-close-btn');
         closeBtn.addEventListener('click', () => this.close());
-        
+
         // 点击遮罩层关闭
         this.overlay.addEventListener('click', () => this.close());
-        
+
         // ESC 键关闭
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape' && this.modal.classList.contains('active')) {
                 this.close();
             }
         });
-        
+
         // 取消按钮
         const cancelBtn = document.getElementById('cancel-settings-btn');
         cancelBtn.addEventListener('click', () => this.close());
-        
+
         // 保存按钮
         const saveBtn = document.getElementById('save-settings-btn');
         saveBtn.addEventListener('click', () => this.saveSettings());
-        
+
         // 恢复默认按钮
         const resetBtn = document.getElementById('reset-settings-btn');
         resetBtn.addEventListener('click', () => this.resetToDefault());
-        
+
         // 页签切换
         this.bindTabSwitching();
-        
+
         // 滑块值实时更新
         this.bindRangeInputs();
-        
+
         // 开关切换
         this.bindSwitches();
-        
+
         // 导出配置
         const exportBtn = document.getElementById('export-config-btn');
         exportBtn.addEventListener('click', () => this.exportConfig());
-        
+
         // 导入配置
         const importBtn = document.getElementById('import-config-btn');
         const importFile = document.getElementById('import-config-file');
@@ -476,14 +529,14 @@ class SettingsModalHandler {
         // 移除所有 active 类
         const tabBtns = this.modal.querySelectorAll('.tab-btn');
         const tabContents = this.modal.querySelectorAll('.tab-content');
-        
+
         tabBtns.forEach(btn => btn.classList.remove('active'));
         tabContents.forEach(content => content.classList.remove('active'));
-        
+
         // 激活目标页签
         const targetBtn = this.modal.querySelector(`.tab-btn[data-tab="${tabName}"]`);
         const targetContent = this.modal.querySelector(`#tab-${tabName}`);
-        
+
         if (targetBtn && targetContent) {
             targetBtn.classList.add('active');
             targetContent.classList.add('active');
@@ -500,7 +553,7 @@ class SettingsModalHandler {
             { input: 'overlay-opacity', display: 'overlay-opacity-value' },
             { input: 'dock-opacity', display: 'dock-opacity-value' }
         ];
-        
+
         rangeInputs.forEach(({ input, display }) => {
             const inputEl = document.getElementById(input);
             const displayEl = document.getElementById(display);
@@ -519,17 +572,59 @@ class SettingsModalHandler {
         const switches = [
             'icon-shadow-switch',
             'show-title-switch',
-            'enable-context-menu-switch'
+            'enable-context-menu-switch',
+            'bg-image-switch',
+            'bg-blur-switch',
+            'bg-opacity-switch',
+            'overlay-color-switch',
+            'overlay-opacity-switch'
         ];
-        
+
         switches.forEach(switchId => {
             const switchEl = document.getElementById(switchId);
             if (switchEl) {
                 switchEl.addEventListener('click', () => {
                     switchEl.classList.toggle('active');
+
+                    // 根据开关状态启用/禁用对应的输入控件
+                    this.toggleControlBySwitch(switchId);
                 });
             }
         });
+    }
+
+    /**
+     * 根据开关状态启用/禁用对应的输入控件
+     */
+    toggleControlBySwitch(switchId) {
+        const switchEl = document.getElementById(switchId);
+        const isActive = switchEl.classList.contains('active');
+
+        let controlId;
+        switch (switchId) {
+            case 'bg-image-switch':
+                controlId = 'bg-image-url';
+                break;
+            case 'bg-blur-switch':
+                controlId = 'bg-blur';
+                break;
+            case 'bg-opacity-switch':
+                controlId = 'bg-opacity';
+                break;
+            case 'overlay-color-switch':
+                controlId = 'overlay-color';
+                break;
+            case 'overlay-opacity-switch':
+                controlId = 'overlay-opacity';
+                break;
+            default:
+                return;
+        }
+
+        const controlEl = document.getElementById(controlId);
+        if (controlEl) {
+            controlEl.disabled = !isActive;
+        }
     }
 
     /**
@@ -538,7 +633,7 @@ class SettingsModalHandler {
     open() {
         // 加载当前设置
         this.loadCurrentSettings();
-        
+
         // 显示 Modal
         this.overlay.classList.add('active');
         this.modal.classList.add('active');
@@ -558,7 +653,7 @@ class SettingsModalHandler {
     loadCurrentSettings() {
         // TODO: 从 settingsManager 获取实际设置
         this.currentSettings = settingsManager.getAllSettings();
-        
+
         // 填充表单字段
         this.fillFormFields();
     }
@@ -568,25 +663,50 @@ class SettingsModalHandler {
      */
     fillFormFields() {
         const settings = this.currentSettings;
-        
+
         // 基础设置
         document.getElementById('grid-rows').value = settings.gridRows || 5;
         document.getElementById('grid-cols').value = settings.gridCols || 13;
         document.getElementById('grid-gap').value = settings.gridGap || 2;
         document.getElementById('sidebar-width').value = settings.sidebarWidth || 6;
-        
+
         // 外观主题
         document.getElementById('theme-mode').value = settings.themeMode || 'dark';
         document.getElementById('theme-color').value = settings.themeColor || '#3B82F6';
+
+        // 背景图片开关和值
+        const bgImageEnabled = settings.bgImageEnabled !== false; // 默认开启
+        this.setSwitchState('bg-image-switch', bgImageEnabled);
         document.getElementById('bg-image-url').value = settings.bgImageUrl || '';
+        document.getElementById('bg-image-url').disabled = !bgImageEnabled;
+
+        // 背景模糊度开关和值
+        const bgBlurEnabled = settings.bgBlurEnabled !== false; // 默认开启
+        this.setSwitchState('bg-blur-switch', bgBlurEnabled);
         document.getElementById('bg-blur').value = settings.bgBlur || 5;
         document.getElementById('bg-blur-value').textContent = settings.bgBlur || 5;
+        document.getElementById('bg-blur').disabled = !bgBlurEnabled;
+
+        // 背景透明度开关和值
+        const bgOpacityEnabled = settings.bgOpacityEnabled !== false; // 默认开启
+        this.setSwitchState('bg-opacity-switch', bgOpacityEnabled);
         document.getElementById('bg-opacity').value = settings.bgOpacity || 0.8;
         document.getElementById('bg-opacity-value').textContent = settings.bgOpacity || 0.8;
+        document.getElementById('bg-opacity').disabled = !bgOpacityEnabled;
+
+        // 遮罩层颜色开关和值
+        const overlayColorEnabled = settings.overlayColorEnabled !== false; // 默认开启
+        this.setSwitchState('overlay-color-switch', overlayColorEnabled);
         document.getElementById('overlay-color').value = settings.overlayColor || '#000000';
+        document.getElementById('overlay-color').disabled = !overlayColorEnabled;
+
+        // 遮罩层透明度开关和值
+        const overlayOpacityEnabled = settings.overlayOpacityEnabled !== false; // 默认开启
+        this.setSwitchState('overlay-opacity-switch', overlayOpacityEnabled);
         document.getElementById('overlay-opacity').value = settings.overlayOpacity || 0.3;
         document.getElementById('overlay-opacity-value').textContent = settings.overlayOpacity || 0.3;
-        
+        document.getElementById('overlay-opacity').disabled = !overlayOpacityEnabled;
+
         // 图标样式
         document.getElementById('icon-radius').value = settings.iconRadius || 0.5;
         this.setSwitchState('icon-shadow-switch', settings.iconShadow !== false);
@@ -597,7 +717,7 @@ class SettingsModalHandler {
         document.getElementById('title-font-color').value = settings.titleFontColor || '#ffffff';
         document.getElementById('title-max-length').value = settings.titleMaxLength || 8;
         document.getElementById('tooltip-delay').value = settings.tooltipDelay || 300;
-        
+
         // Dock 设置
         document.getElementById('dock-position').value = settings.dockPosition || 'bottom';
         document.getElementById('dock-max-icons').value = settings.dockMaxIcons || 10;
@@ -606,17 +726,17 @@ class SettingsModalHandler {
         document.getElementById('dock-opacity-value').textContent = settings.dockOpacity || 0.3;
         document.getElementById('fisheye-scale').value = settings.fisheyeScale || 1.5;
         document.getElementById('fisheye-range').value = settings.fisheyeRange || 2;
-        
+
         // 搜索设置
         document.getElementById('default-search-engine').value = settings.defaultSearchEngine || 'baidu';
         document.getElementById('search-box-position').value = settings.searchBoxPosition || 'center';
         document.getElementById('search-box-style').value = settings.searchBoxStyle || 'rounded';
-        
+
         // 交互行为
         document.getElementById('scroll-animation-speed').value = settings.scrollAnimationSpeed || 300;
         document.getElementById('drag-sensitivity').value = settings.dragSensitivity || 5;
         this.setSwitchState('enable-context-menu-switch', settings.enableContextMenu !== false);
-        
+
         // 个人信息
         document.getElementById('avatar-url').value = settings.avatarUrl || '';
         document.getElementById('username').value = settings.username || '';
@@ -642,16 +762,16 @@ class SettingsModalHandler {
      */
     async saveSettings() {
         const newSettings = this.collectFormValues();
-        
+
         try {
             await settingsManager.saveAllSettings(newSettings);
-            
+
             // 应用设置
             this.applySettings(newSettings);
-            
+
             // 关闭 Modal
             this.close();
-            
+
             // 显示成功提示
             toast.success('设置已保存！');
         } catch (error) {
@@ -669,16 +789,21 @@ class SettingsModalHandler {
             gridCols: parseInt(document.getElementById('grid-cols').value),
             gridGap: parseFloat(document.getElementById('grid-gap').value) || 2,
             sidebarWidth: parseInt(document.getElementById('sidebar-width').value),
-            
+
             // 外观主题
             themeMode: document.getElementById('theme-mode').value,
             themeColor: document.getElementById('theme-color').value,
+            bgImageEnabled: document.getElementById('bg-image-switch').classList.contains('active'),
             bgImageUrl: document.getElementById('bg-image-url').value,
+            bgBlurEnabled: document.getElementById('bg-blur-switch').classList.contains('active'),
             bgBlur: parseInt(document.getElementById('bg-blur').value),
+            bgOpacityEnabled: document.getElementById('bg-opacity-switch').classList.contains('active'),
             bgOpacity: parseFloat(document.getElementById('bg-opacity').value),
+            overlayColorEnabled: document.getElementById('overlay-color-switch').classList.contains('active'),
             overlayColor: document.getElementById('overlay-color').value,
+            overlayOpacityEnabled: document.getElementById('overlay-opacity-switch').classList.contains('active'),
             overlayOpacity: parseFloat(document.getElementById('overlay-opacity').value),
-            
+
             // 图标样式
             iconRadius: parseFloat(document.getElementById('icon-radius').value),
             iconShadow: document.getElementById('icon-shadow-switch').classList.contains('active'),
@@ -689,7 +814,7 @@ class SettingsModalHandler {
             titleFontColor: document.getElementById('title-font-color').value,
             titleMaxLength: parseInt(document.getElementById('title-max-length').value),
             tooltipDelay: parseInt(document.getElementById('tooltip-delay').value),
-            
+
             // Dock 设置
             dockPosition: document.getElementById('dock-position').value,
             dockMaxIcons: parseInt(document.getElementById('dock-max-icons').value),
@@ -697,17 +822,17 @@ class SettingsModalHandler {
             dockOpacity: parseFloat(document.getElementById('dock-opacity').value),
             fisheyeScale: parseFloat(document.getElementById('fisheye-scale').value),
             fisheyeRange: parseInt(document.getElementById('fisheye-range').value),
-            
+
             // 搜索设置
             defaultSearchEngine: document.getElementById('default-search-engine').value,
             searchBoxPosition: document.getElementById('search-box-position').value,
             searchBoxStyle: document.getElementById('search-box-style').value,
-            
+
             // 交互行为
             scrollAnimationSpeed: parseInt(document.getElementById('scroll-animation-speed').value),
             dragSensitivity: parseInt(document.getElementById('drag-sensitivity').value),
             enableContextMenu: document.getElementById('enable-context-menu-switch').classList.contains('active'),
-            
+
             // 个人信息
             avatarUrl: document.getElementById('avatar-url').value,
             username: document.getElementById('username').value,
@@ -721,48 +846,51 @@ class SettingsModalHandler {
     applySettings(settings) {
         // 1. 更新主题色
         document.documentElement.style.setProperty('--theme-color', settings.themeColor);
-        
+
         // 2. 更新背景（默认为空）
         if (settings.bgImageUrl) {
             document.body.style.backgroundImage = `url(${settings.bgImageUrl})`;
         } else {
             document.body.style.backgroundImage = 'none';
         }
-        
+
         // 3. 应用图标圆角
         this.applyIconRadius(settings.iconRadius);
-        
+
         // 4. 应用标题设置
         this.applyTitleSettings(settings);
-        
+
         // 5. 应用搜索框位置
         this.applySearchBoxPosition(settings.searchBoxPosition);
-        
+
         // 6. 应用搜索框样式
         this.applySearchBoxStyle(settings.searchBoxStyle);
-        
+
         // 7. 应用网格设置
         this.applyGridSettings(settings);
-        
+
         // 8. 应用 Dock 设置
         this.applyDockSettings(settings);
+
+        // 9. 应用背景设置（包括开关状态）
+        this.applyBackgroundSettings(settings);
     }
-    
+
     /**
      * 应用搜索框位置
      */
     applySearchBoxPosition(position) {
         const searchContainer = document.querySelector('.search-container');
         if (!searchContainer) return;
-        
+
         // 重置所有位置样式
         searchContainer.style.top = '';
         searchContainer.style.bottom = '';
         searchContainer.style.left = '';
         searchContainer.style.right = '';
         searchContainer.style.transform = '';
-        
-        switch(position) {
+
+        switch (position) {
             case 'center':
                 searchContainer.style.top = '2rem';
                 searchContainer.style.left = '50%';
@@ -781,15 +909,15 @@ class SettingsModalHandler {
                 break;
         }
     }
-    
+
     /**
      * 应用搜索框样式
      */
     applySearchBoxStyle(style) {
         const searchBox = document.querySelector('.search-box');
         if (!searchBox) return;
-        
-        switch(style) {
+
+        switch (style) {
             case 'rounded':
                 searchBox.style.borderRadius = '2rem';
                 break;
@@ -798,7 +926,7 @@ class SettingsModalHandler {
                 break;
         }
     }
-    
+
     /**
      * 应用图标圆角设置
      */
@@ -806,7 +934,7 @@ class SettingsModalHandler {
         const radiusValue = radius || 0.5;
         document.documentElement.style.setProperty('--icon-radius', `${radiusValue}rem`);
     }
-    
+
     /**
      * 应用标题设置
      */
@@ -814,23 +942,23 @@ class SettingsModalHandler {
         // 1. 应用标题字体大小
         const fontSize = settings.titleFontSize || 12;
         document.documentElement.style.setProperty('--title-font-size', `${fontSize}px`);
-        
+
         // 2. 应用标题字体颜色
         const fontColor = settings.titleFontColor || '#ffffff';
         document.documentElement.style.setProperty('--title-color', fontColor);
-        
+
         // 3. 应用标题位置
         const position = settings.titlePosition || 'bottom';
         document.documentElement.style.setProperty('--title-position', position);
-        
+
         // 4. 应用标题最大长度
         const maxLength = settings.titleMaxLength || 8;
         document.documentElement.style.setProperty('--title-max-length', maxLength);
-        
+
         // 5. 重新渲染所有图标以应用新设置
         this.refreshAllIcons();
     }
-    
+
     /**
      * 刷新所有图标以应用新设置
      */
@@ -844,7 +972,7 @@ class SettingsModalHandler {
             }
         });
     }
-    
+
     /**
      * 应用网格设置
      */
@@ -852,24 +980,24 @@ class SettingsModalHandler {
         // 更新网格间距 CSS 变量
         const gapValue = settings.gridGap || 2;
         document.documentElement.style.setProperty('--cell-gap', `${gapValue}rem`);
-        
+
         // 更新所有网格容器的行列数
         const gridContainers = document.querySelectorAll('.grid-container');
         gridContainers.forEach((container) => {
             const categoryPanel = container.closest('.category-panel');
             if (!categoryPanel) return;
-            
+
             // 计算容器可用宽度
             const panelStyle = window.getComputedStyle(categoryPanel);
             const panelPadding = parseFloat(panelStyle.paddingLeft) + parseFloat(panelStyle.paddingRight);
             const availableWidth = categoryPanel.clientWidth - panelPadding;
-            
+
             // 计算网格所需宽度
             const cellSize = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--cell-base-size')) || 64;
             const cellGap = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--cell-gap')) || 32;
             const gridCols = settings.gridCols || 13;
             const gridWidth = gridCols * cellSize + (gridCols - 1) * cellGap;
-            
+
             // 如果网格宽度大于可用宽度，自动调整列数
             if (gridWidth > availableWidth) {
                 const maxCols = Math.floor((availableWidth + cellGap) / (cellSize + cellGap));
@@ -880,14 +1008,14 @@ class SettingsModalHandler {
             }
         });
     }
-    
+
     /**
      * 应用 Dock 设置
      */
     applyDockSettings(settings) {
         const dock = document.getElementById('dock');
         if (!dock) return;
-        
+
         // 更新 Dock 位置
         dock.style.bottom = '';
         dock.style.left = '';
@@ -895,8 +1023,8 @@ class SettingsModalHandler {
         dock.style.top = '';
         dock.style.transform = '';
         dock.style.flexDirection = '';
-        
-        switch(settings.dockPosition) {
+
+        switch (settings.dockPosition) {
             case 'bottom':
                 dock.style.bottom = '1rem';
                 dock.style.left = '50%';
@@ -919,6 +1047,94 @@ class SettingsModalHandler {
     }
 
     /**
+     * 应用背景设置（包括开关状态）
+     */
+    applyBackgroundSettings(settings) {
+        // 应用背景图片（根据开关状态）
+        const bgImageEnabled = settings.bgImageEnabled !== false;
+        if (bgImageEnabled && settings.bgImageUrl) {
+            document.body.style.backgroundImage = `url(${settings.bgImageUrl})`;
+            document.body.style.backgroundSize = 'cover';
+            document.body.style.backgroundPosition = 'center';
+            document.body.style.backgroundRepeat = 'no-repeat';
+        } else {
+            document.body.style.backgroundImage = 'none';
+        }
+
+        // 应用背景模糊度（根据开关状态）
+        const bgBlurEnabled = settings.bgBlurEnabled !== false;
+        const bgBlur = bgBlurEnabled ? (settings.bgBlur || 5) : 0;
+        document.documentElement.style.setProperty('--bg-blur', `${bgBlur}px`);
+
+        // 应用背景透明度（根据开关状态）
+        const bgOpacityEnabled = settings.bgOpacityEnabled !== false;
+        const bgOpacity = bgOpacityEnabled ? (settings.bgOpacity || 0.8) : 1;
+        document.documentElement.style.setProperty('--bg-opacity', bgOpacity);
+
+        // 应用遮罩层颜色（根据开关状态）
+        const overlayColorEnabled = settings.overlayColorEnabled !== false;
+        const overlayColor = overlayColorEnabled ? (settings.overlayColor || '#000000') : 'transparent';
+        document.documentElement.style.setProperty('--overlay-color', overlayColor);
+
+        // 应用遮罩层透明度（根据开关状态）
+        const overlayOpacityEnabled = settings.overlayOpacityEnabled !== false;
+        const overlayOpacity = overlayOpacityEnabled ? (settings.overlayOpacity || 0.3) : 0;
+        document.documentElement.style.setProperty('--overlay-opacity', overlayOpacity);
+
+        // 更新 body 的伪元素样式以应用背景效果
+        this.updateBodyBackgroundStyles();
+    }
+
+    /**
+     * 更新 body 背景相关样式
+     */
+    updateBodyBackgroundStyles() {
+        // 创建或更新用于背景效果的样式
+        let styleElement = document.getElementById('background-styles');
+        if (!styleElement) {
+            styleElement = document.createElement('style');
+            styleElement.id = 'background-styles';
+            document.head.appendChild(styleElement);
+        }
+
+        // 构建背景效果样式
+        const bgBlur = getComputedStyle(document.documentElement).getPropertyValue('--bg-blur').trim() || '0px';
+        const bgOpacity = getComputedStyle(document.documentElement).getPropertyValue('--bg-opacity').trim() || '1';
+        const overlayColor = getComputedStyle(document.documentElement).getPropertyValue('--overlay-color').trim() || 'transparent';
+        const overlayOpacity = getComputedStyle(document.documentElement).getPropertyValue('--overlay-opacity').trim() || '0';
+
+        styleElement.textContent = `
+            body::before {
+                content: '';
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: inherit;
+                background-size: cover;
+                background-position: center;
+                background-repeat: no-repeat;
+                filter: blur(${bgBlur});
+                z-index: -1;
+                opacity: ${bgOpacity};
+            }
+            
+            body::after {
+                content: '';
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: ${overlayColor};
+                z-index: -1;
+                opacity: ${overlayOpacity};
+            }
+        `;
+    }
+
+    /**
      * 恢复默认设置
      */
     async resetToDefault() {
@@ -929,17 +1145,17 @@ class SettingsModalHandler {
             cancelText: '取消',
             type: 'danger'
         });
-        
+
         if (!confirmed) {
             return;
         }
-        
+
         try {
             await settingsManager.resetToDefault();
-            
+
             // 重新加载设置
             this.loadCurrentSettings();
-            
+
             toast.success('已恢复默认设置');
         } catch (error) {
             toast.error('恢复默认设置失败，请重试');
@@ -954,14 +1170,14 @@ class SettingsModalHandler {
         const jsonStr = JSON.stringify(settings, null, 2);
         const blob = new Blob([jsonStr], { type: 'application/json' });
         const url = URL.createObjectURL(blob);
-        
+
         const a = document.createElement('a');
         a.href = url;
         a.download = `votilarus-config-${new Date().toISOString().split('T')[0]}.json`;
         a.click();
-        
+
         URL.revokeObjectURL(url);
-        
+
         toast.success('配置已导出');
     }
 
@@ -971,12 +1187,12 @@ class SettingsModalHandler {
     importConfig(event) {
         const file = event.target.files[0];
         if (!file) return;
-        
+
         const reader = new FileReader();
         reader.onload = async (e) => {
             try {
                 const settings = JSON.parse(e.target.result);
-                
+
                 const confirmed = await ConfirmModal.show({
                     title: '导入配置',
                     message: '导入配置将覆盖当前设置，是否继续？',
@@ -984,23 +1200,23 @@ class SettingsModalHandler {
                     cancelText: '取消',
                     type: 'warning'
                 });
-                        
+
                 if (!confirmed) {
                     return;
                 }
-                
+
                 await settingsManager.saveAllSettings(settings);
-                
+
                 // 重新加载设置
                 this.loadCurrentSettings();
-                
+
                 toast.success('配置导入成功');
             } catch (error) {
                 toast.error('导入配置失败，请检查文件格式');
             }
         };
         reader.readAsText(file);
-        
+
         // 清空文件选择
         event.target.value = '';
     }

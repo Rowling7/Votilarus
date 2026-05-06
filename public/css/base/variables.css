@@ -35,6 +35,12 @@
     --glass-border: rgba(255, 255, 255, 0.3);
     --glass-blur: 10px;
     
+    /* 背景设置 */
+    --bg-blur: 5px;
+    --bg-opacity: 0.8;
+    --overlay-color: #000000;
+    --overlay-opacity: 0.3;
+    
     /* 布局尺寸 */
     --sidebar-width: 6%;
     --cell-base-size: 4rem;

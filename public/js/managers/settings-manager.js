@@ -15,6 +15,13 @@ class SettingsManager {
             grid_cols: '13',
             search_engine: 'baidu',
             avatar_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Felix',
+            bg_image_url: 'static/background/image061.png',
+            // 背景样式开关（默认关闭）
+            bg_image_enabled: '0',
+            bg_blur_enabled: '0',
+            bg_opacity_enabled: '0',
+            overlay_color_enabled: '0',
+            overlay_opacity_enabled: '0'
         };
     }
 
@@ -58,14 +65,6 @@ class SettingsManager {
         const gridRows = parseInt(this.settings.grid_rows) || 5;
         this.applyGridDimensions(gridCols, gridRows);
 
-        // 应用背景图片（默认为空）
-        const bgImageUrl = this.settings.bg_image_url || '';
-        if (bgImageUrl) {
-            document.body.style.backgroundImage = `url(${bgImageUrl})`;
-        } else {
-            document.body.style.backgroundImage = 'none';
-        }
-
         // 应用图标圆角
         const iconRadius = this.settings.icon_radius || '0.5';
         document.documentElement.style.setProperty('--icon-radius', `${iconRadius}rem`);
@@ -76,6 +75,98 @@ class SettingsManager {
         if (avatarImg) {
             avatarImg.querySelector('img').src = avatarUrl;
         }
+
+        // 应用背景设置
+        this.applyBackgroundSettings();
+    } // 结束 applySettings 方法
+
+    /**
+     * 应用背景设置
+     */
+    applyBackgroundSettings() {
+        // 应用背景图片（根据开关状态）
+        const bgImageEnabled = this.settings.bg_image_enabled !== '0';
+        const bgImageUrl = this.settings.bg_image_url || '';
+        if (bgImageEnabled && bgImageUrl) {
+            document.body.style.backgroundImage = `url(/data/${bgImageUrl})`;
+            document.body.style.backgroundSize = 'cover';
+            document.body.style.backgroundPosition = 'center';
+            document.body.style.backgroundRepeat = 'no-repeat';
+        } else {
+            document.body.style.backgroundImage = 'none';
+        }
+
+        // 应用背景模糊度（根据开关状态）
+        const bgBlurEnabled = this.settings.bg_blur_enabled !== '0';
+        const bgBlur = bgBlurEnabled ? (parseInt(this.settings.bg_blur) || 5) : 0;
+        document.documentElement.style.setProperty('--bg-blur', `${bgBlur}px`);
+
+        // 应用背景透明度（根据开关状态）
+        const bgOpacityEnabled = this.settings.bg_opacity_enabled !== '0';
+        const bgOpacity = bgOpacityEnabled ? (parseFloat(this.settings.bg_opacity) || 0) : 1;
+        document.documentElement.style.setProperty('--bg-opacity', bgOpacity);
+
+        // 应用遮罩层颜色（根据开关状态）
+        const overlayColorEnabled = this.settings.overlay_color_enabled !== '0';
+        const overlayColor = overlayColorEnabled ? (this.settings.overlay_color || '#ffffff') : 'transparent';
+        document.documentElement.style.setProperty('--overlay-color', overlayColor);
+
+        // 应用遮罩层透明度（根据开关状态）
+        const overlayOpacityEnabled = this.settings.overlay_opacity_enabled !== '0';
+        const overlayOpacity = overlayOpacityEnabled ? (parseFloat(this.settings.overlay_opacity) || 0.3) : 0;
+        document.documentElement.style.setProperty('--overlay-opacity', overlayOpacity);
+
+        // 更新 body 的伪元素样式以应用背景效果
+        this.updateBodyBackgroundStyles();
+    }
+
+    /**
+     * 更新 body 背景相关样式
+     */
+    updateBodyBackgroundStyles() {
+        // 创建或更新用于背景效果的样式
+        let styleElement = document.getElementById('background-styles');
+        if (!styleElement) {
+            styleElement = document.createElement('style');
+            styleElement.id = 'background-styles';
+            document.head.appendChild(styleElement);
+        }
+
+        // 构建背景效果样式
+        const bgBlur = getComputedStyle(document.documentElement).getPropertyValue('--bg-blur').trim() || '5px';
+        const bgOpacity = getComputedStyle(document.documentElement).getPropertyValue('--bg-opacity').trim() || '0';
+        const overlayColor = getComputedStyle(document.documentElement).getPropertyValue('--overlay-color').trim() || '#ffffff';
+        const overlayOpacity = getComputedStyle(document.documentElement).getPropertyValue('--overlay-opacity').trim() || '0.3';
+
+        styleElement.textContent = `
+            body::before {
+                content: '';
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: inherit;
+                background-size: cover;
+                background-position: center;
+                background-repeat: no-repeat;
+                filter: blur(${bgBlur});
+                z-index: -1;
+                opacity: ${bgOpacity};
+            }
+            
+            body::after {
+                content: '';
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: ${overlayColor};
+                z-index: -1;
+                opacity: ${overlayOpacity};
+            }
+        `;
     }
 
     /**
@@ -85,21 +176,21 @@ class SettingsManager {
         // 等待 DOM 加载完成后应用
         setTimeout(() => {
             const gridContainers = document.querySelectorAll('.grid-container');
-            
+
             gridContainers.forEach((container) => {
                 const categoryPanel = container.closest('.category-panel');
                 if (!categoryPanel) return;
-                
+
                 // 计算容器可用宽度（减去 padding）
                 const panelStyle = window.getComputedStyle(categoryPanel);
                 const panelPadding = parseFloat(panelStyle.paddingLeft) + parseFloat(panelStyle.paddingRight);
                 const availableWidth = categoryPanel.clientWidth - panelPadding;
-                
+
                 // 计算网格所需宽度
                 const cellSize = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--cell-base-size')) || 64;
                 const cellGap = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--cell-gap')) || 32;
                 const gridWidth = cols * cellSize + (cols - 1) * cellGap;
-                
+
                 // 如果网格宽度大于可用宽度，自动调整列数
                 if (gridWidth > availableWidth) {
                     // 计算最大可容纳列数
@@ -143,16 +234,21 @@ class SettingsManager {
             gridCols: parseInt(this.settings.grid_cols) || 13,
             gridGap: parseFloat(this.settings.cell_gap) || 2,
             sidebarWidth: parseInt(this.settings.sidebar_width) || 6,
-            
+
             // 外观主题
             themeMode: this.settings.theme_mode || 'dark',
             themeColor: this.settings.theme_color || '#3B82F6',
+            bgImageEnabled: this.settings.bg_image_enabled !== '0',
             bgImageUrl: this.settings.bg_image_url || '',
+            bgBlurEnabled: this.settings.bg_blur_enabled !== '0',
             bgBlur: parseInt(this.settings.bg_blur) || 5,
-            bgOpacity: parseFloat(this.settings.bg_opacity) || 0.8,
-            overlayColor: this.settings.overlay_color || '#000000',
+            bgOpacityEnabled: this.settings.bg_opacity_enabled !== '0',
+            bgOpacity: parseFloat(this.settings.bg_opacity) || 0,
+            overlayColorEnabled: this.settings.overlay_color_enabled !== '0',
+            overlayColor: this.settings.overlay_color || '#ffffff',
+            overlayOpacityEnabled: this.settings.overlay_opacity_enabled !== '0',
             overlayOpacity: parseFloat(this.settings.overlay_opacity) || 0.3,
-            
+
             // 图标样式
             iconRadius: parseFloat(this.settings.icon_radius) || 0.5,
             iconShadow: this.settings.icon_shadow !== '0',
@@ -163,7 +259,7 @@ class SettingsManager {
             titleFontColor: this.settings.title_font_color || '#ffffff',
             titleMaxLength: parseInt(this.settings.title_max_length) || 8,
             tooltipDelay: parseInt(this.settings.tooltip_delay) || 300,
-            
+
             // Dock 设置
             dockPosition: this.settings.dock_position || 'bottom',
             dockMaxIcons: parseInt(this.settings.dock_max_icons) || 10,
@@ -171,17 +267,17 @@ class SettingsManager {
             dockOpacity: parseFloat(this.settings.dock_opacity) || 0.3,
             fisheyeScale: parseFloat(this.settings.fisheye_scale) || 1.5,
             fisheyeRange: parseInt(this.settings.fisheye_range) || 2,
-            
+
             // 搜索设置
             defaultSearchEngine: this.settings.search_engine || 'baidu',
             searchBoxPosition: this.settings.search_box_position || 'center',
             searchBoxStyle: this.settings.search_box_style || 'rounded',
-            
+
             // 交互行为
             scrollAnimationSpeed: parseInt(this.settings.scroll_animation_speed) || 300,
             dragSensitivity: parseInt(this.settings.drag_sensitivity) || 5,
             enableContextMenu: this.settings.enable_context_menu !== '0',
-            
+
             // 个人信息
             avatarUrl: this.settings.avatar_url || '',
             username: this.settings.username || '',
@@ -199,16 +295,21 @@ class SettingsManager {
             grid_cols: newSettings.gridCols,
             cell_gap: newSettings.gridGap,
             sidebar_width: newSettings.sidebarWidth,
-            
+
             // 外观主题
             theme_mode: newSettings.themeMode,
             theme_color: newSettings.themeColor,
+            bg_image_enabled: newSettings.bgImageEnabled ? '1' : '0',
             bg_image_url: newSettings.bgImageUrl,
+            bg_blur_enabled: newSettings.bgBlurEnabled ? '1' : '0',
             bg_blur: newSettings.bgBlur,
+            bg_opacity_enabled: newSettings.bgOpacityEnabled ? '1' : '0',
             bg_opacity: newSettings.bgOpacity,
+            overlay_color_enabled: newSettings.overlayColorEnabled ? '1' : '0',
             overlay_color: newSettings.overlayColor,
+            overlay_opacity_enabled: newSettings.overlayOpacityEnabled ? '1' : '0',
             overlay_opacity: newSettings.overlayOpacity,
-            
+
             // 图标样式
             icon_radius: newSettings.iconRadius,
             icon_shadow: newSettings.iconShadow ? '1' : '0',
@@ -219,7 +320,7 @@ class SettingsManager {
             title_font_color: newSettings.titleFontColor,
             title_max_length: newSettings.titleMaxLength,
             tooltip_delay: newSettings.tooltipDelay,
-            
+
             // Dock 设置
             dock_position: newSettings.dockPosition,
             dock_max_icons: newSettings.dockMaxIcons,
@@ -227,17 +328,17 @@ class SettingsManager {
             dock_opacity: newSettings.dockOpacity,
             fisheye_scale: newSettings.fisheyeScale,
             fisheye_range: newSettings.fisheyeRange,
-            
+
             // 搜索设置
             search_engine: newSettings.defaultSearchEngine,
             search_box_position: newSettings.searchBoxPosition,
             search_box_style: newSettings.searchBoxStyle,
-            
+
             // 交互行为
             scroll_animation_speed: newSettings.scrollAnimationSpeed,
             drag_sensitivity: newSettings.dragSensitivity,
             enable_context_menu: newSettings.enableContextMenu ? '1' : '0',
-            
+
             // 个人信息
             avatar_url: newSettings.avatarUrl,
             username: newSettings.username,
@@ -262,10 +363,10 @@ class SettingsManager {
     async resetToDefault() {
         // 重置为默认值
         this.settings = { ...this.defaultSettings };
-        
+
         // 保存到数据库
         await updateSettings(this.defaultSettings);
-        
+
         // 应用默认设置
         this.applySettings();
     }
