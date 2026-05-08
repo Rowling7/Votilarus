@@ -1,7 +1,7 @@
 // ==================== 添加图标对话框处理器 ====================
 
-import ConfirmModal from '../components/confirm-modal.js';
-import toast from '../utils/toast.js';
+import ConfirmModal from '../../components/ConfirmModal.js';
+import ToastNotification from '../../utils/ToastNotification.js';
 
 class AddIconDialogHandler {
     constructor() {
@@ -24,11 +24,11 @@ class AddIconDialogHandler {
         // 遮罩层
         this.overlay = document.createElement('div');
         this.overlay.className = 'modal-overlay';
-        
+
         // 对话框
         this.dialog = document.createElement('div');
         this.dialog.className = 'icon-editor-dialog';
-        
+
         this.dialog.innerHTML = `
             <div class="dialog-header">
                 <h3>➕ 添加图标</h3>
@@ -64,10 +64,10 @@ class AddIconDialogHandler {
                 <button class="btn btn-primary" id="save-add-icon-btn">添加</button>
             </div>
         `;
-        
+
         document.body.appendChild(this.overlay);
         document.body.appendChild(this.dialog);
-        
+
         this.bindEvents();
     }
 
@@ -78,29 +78,29 @@ class AddIconDialogHandler {
         // 关闭按钮
         const closeBtn = this.dialog.querySelector('.dialog-close-btn');
         closeBtn.addEventListener('click', () => this.close());
-        
+
         // 点击遮罩层
         this.overlay.addEventListener('click', () => this.close());
-        
+
         // ESC 键
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape' && this.dialog.classList.contains('active')) {
                 this.close();
             }
         });
-        
+
         // 取消按钮
         const cancelBtn = document.getElementById('cancel-add-icon-btn');
         cancelBtn.addEventListener('click', () => this.close());
-        
+
         // 保存按钮
         const saveBtn = document.getElementById('save-add-icon-btn');
         saveBtn.addEventListener('click', () => this.save());
-        
+
         // 实时预览
         const nameInput = document.getElementById('add-icon-name');
         const imageInput = document.getElementById('add-icon-image');
-        
+
         nameInput.addEventListener('input', () => this.updatePreview());
         imageInput.addEventListener('input', () => this.updatePreview());
     }
@@ -110,19 +110,19 @@ class AddIconDialogHandler {
      */
     open(categoryId) {
         this.currentCategoryId = categoryId;
-        
+
         // 清空表单
         document.getElementById('add-icon-name').value = '';
         document.getElementById('add-icon-url').value = '';
         document.getElementById('add-icon-image').value = '';
-        
+
         // 更新预览
         this.updatePreview();
-        
+
         // 显示对话框
         this.overlay.classList.add('active');
         this.dialog.classList.add('active');
-        
+
         // 聚焦到名称输入框
         setTimeout(() => {
             document.getElementById('add-icon-name').focus();
@@ -144,12 +144,12 @@ class AddIconDialogHandler {
     updatePreview() {
         const name = document.getElementById('add-icon-name').value || '图标名称';
         const imageUrl = document.getElementById('add-icon-image').value;
-        
+
         const previewIcon = document.getElementById('add-preview-icon');
         const previewName = document.getElementById('add-preview-name');
-        
+
         previewName.textContent = name;
-        
+
         if (imageUrl) {
             previewIcon.style.backgroundImage = `url(${imageUrl})`;
             previewIcon.textContent = '';
@@ -166,31 +166,31 @@ class AddIconDialogHandler {
         const name = document.getElementById('add-icon-name').value.trim();
         const target = document.getElementById('add-icon-url').value.trim();
         const bgimage = document.getElementById('add-icon-image').value.trim();
-        
+
         if (!name) {
-            toast.warning('请输入图标名称');
+            ToastNotification.warning('请输入图标名称');
             return;
         }
-                
+
         if (!target) {
-            toast.warning('请输入链接地址');
+            ToastNotification.warning('请输入链接地址');
             return;
         }
-                
+
         try {
-            const { createItem } = await import('./api.js');
-                    
+            const { createItem } = await import('../api-client.js');
+
             const result = await createItem({
                 name,
                 target,
                 bgimage: bgimage || null,
                 category_id: this.currentCategoryId
             });
-                    
-            toast.success('图标创建成功！请刷新页面查看');
+
+            ToastNotification.success('图标创建成功！请刷新页面查看');
             this.close();
         } catch (error) {
-            toast.error('创建失败: ' + error.message);
+            ToastNotification.error('创建失败: ' + error.message);
         }
     }
 }

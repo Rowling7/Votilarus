@@ -1,8 +1,8 @@
 // ==================== 设置 Modal 处理器 ====================
 
-import settingsManager from '../managers/settings-manager.js';
-import ConfirmModal from '../components/confirm-modal.js';
-import toast from '../utils/toast.js';
+import SettingsManager from '../../managers/SettingsManager.js';
+import ConfirmModal from '../../components/ConfirmModal.js';
+import ToastNotification from '../../utils/ToastNotification.js';
 
 class SettingsModalHandler {
     constructor() {
@@ -652,7 +652,7 @@ class SettingsModalHandler {
      */
     loadCurrentSettings() {
         // TODO: 从 settingsManager 获取实际设置
-        this.currentSettings = settingsManager.getAllSettings();
+        this.currentSettings = SettingsManager.getAllSettings();
 
         // 填充表单字段
         this.fillFormFields();
@@ -764,7 +764,7 @@ class SettingsModalHandler {
         const newSettings = this.collectFormValues();
 
         try {
-            await settingsManager.saveAllSettings(newSettings);
+            await SettingsManager.saveAllSettings(newSettings);
 
             // 应用设置
             this.applySettings(newSettings);
@@ -773,9 +773,9 @@ class SettingsModalHandler {
             this.close();
 
             // 显示成功提示
-            toast.success('设置已保存！');
+            ToastNotification.success('设置已保存！');
         } catch (error) {
-            toast.error('保存设置失败，请重试');
+            ToastNotification.error('保存设置失败，请重试');
         }
     }
 
@@ -1151,14 +1151,14 @@ class SettingsModalHandler {
         }
 
         try {
-            await settingsManager.resetToDefault();
+            await SettingsManager.resetToDefault();
 
             // 重新加载设置
             this.loadCurrentSettings();
 
-            toast.success('已恢复默认设置');
+            ToastNotification.success('已恢复默认设置');
         } catch (error) {
-            toast.error('恢复默认设置失败，请重试');
+            ToastNotification.error('恢复默认设置失败，请重试');
         }
     }
 
@@ -1178,7 +1178,7 @@ class SettingsModalHandler {
 
         URL.revokeObjectURL(url);
 
-        toast.success('配置已导出');
+        ToastNotification.success('配置已导出');
     }
 
     /**
@@ -1205,14 +1205,14 @@ class SettingsModalHandler {
                     return;
                 }
 
-                await settingsManager.saveAllSettings(settings);
+                await SettingsManager.saveAllSettings(settings);
 
                 // 重新加载设置
                 this.loadCurrentSettings();
 
-                toast.success('配置导入成功');
+                ToastNotification.success('配置导入成功');
             } catch (error) {
-                toast.error('导入配置失败，请检查文件格式');
+                ToastNotification.error('导入配置失败，请检查文件格式');
             }
         };
         reader.readAsText(file);

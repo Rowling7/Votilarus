@@ -1,8 +1,8 @@
-const categoriesRoute = require('./categories');
-const itemsRoute = require('./items');
-const layoutsRoute = require('./layouts');
-const dockRoute = require('./dock');
-const settingsRoute = require('./settings');
+const categoriesRoute = require('./category-routes');
+const itemsRoute = require('./icon-routes');
+const layoutsRoute = require('./layout-routes');
+const dockRoute = require('./dock-routes');
+const settingsRoute = require('./settings-routes');
 
 /**
  * 注册所有路由到 Express 应用

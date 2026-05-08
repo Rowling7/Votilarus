@@ -1,6 +1,6 @@
 // ==================== 设置管理器 ====================
 
-import { fetchSettings, updateSettings } from '../core/api.js';
+import { fetchSettings, updateSettings } from '../core/api-client.js';
 
 class SettingsManager {
     constructor() {

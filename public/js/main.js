@@ -1,19 +1,19 @@
 // ==================== 应用主入口 ====================
 
 import { registerAllComponents } from './components/index.js';
-import settingsManager from './managers/settings-manager.js';
-import categoryManager from './managers/category-manager.js';
-import iconRenderer from './core/icon-renderer.js';
-import sidebarRenderer from './core/sidebar-renderer.js';
-import searchHandler from './core/search-handler.js';
-import dragHandler from './core/drag-handler.js';
-import contextMenuHandler from './core/context-menu-handler.js';
-import settingsModalHandler from './core/settings-modal-handler.js';
-import dockRenderer from './core/dock-renderer.js';
-import iconEditorHandler from './core/icon-editor-handler.js';
-import tooltipManager from './core/tooltip-manager.js';
-import addIconDialog from './core/add-icon-dialog.js';
-import addWidgetDialog from './core/add-widget-dialog.js';
+import SettingsManager from './managers/SettingsManager.js';
+import CategoryManager from './managers/CategoryManager.js';
+import IconRenderer from './core/renderers/IconRenderer.js';
+import SidebarRenderer from './core/renderers/SidebarRenderer.js';
+import SearchHandler from './core/handlers/SearchHandler.js';
+import DragHandler from './core/handlers/DragHandler.js';
+import ContextMenuHandler from './core/handlers/ContextMenuHandler.js';
+import SettingsModalHandler from './core/handlers/SettingsModalHandler.js';
+import DockRenderer from './core/renderers/DockRenderer.js';
+import IconEditorHandler from './core/handlers/IconEditorHandler.js';
+import TooltipManager from './managers/TooltipManager.js';
+import AddIconDialog from './core/dialogs/AddIconDialog.js';
+import AddWidgetDialog from './core/dialogs/AddWidgetDialog.js';
 
 class App {
     constructor() {
@@ -23,62 +23,62 @@ class App {
     async init() {
         try {
             const totalStartTime = performance.now();
-            
+
             // 注册 Web Components
             registerAllComponents();
-            
+
             // 初始化设置
-            await settingsManager.init();
-            
-            // 将 settingsManager 暴露到全局，供其他模块使用
-            window.settingsManager = settingsManager;
-            
+            await SettingsManager.init();
+
+            // 将 SettingsManager 暴露到全局，供其他模块使用
+            window.settingsManager = SettingsManager;
+
             // 初始化分类和数据
             const dataLoadStart = performance.now();
-            await categoryManager.init();
+            await CategoryManager.init();
             const dataLoadEnd = performance.now();
-            
-            // 将 categoryManager 暴露到全局，供其他模块使用
-            window.categoryManager = categoryManager;
-            
+
+            // 将 CategoryManager 暴露到全局，供其他模块使用
+            window.categoryManager = CategoryManager;
+
             // 渲染侧边栏
-            sidebarRenderer.render(categoryManager.getCategories());
-            
+            SidebarRenderer.render(CategoryManager.getCategories());
+
             // 渲染所有图标
             const renderStart = performance.now();
-            iconRenderer.renderAllCategories();
+            IconRenderer.renderAllCategories();
             const renderEnd = performance.now();
-            
+
             // 初始化拖拽功能
-            dragHandler.init();
-            
+            DragHandler.init();
+
             // 初始化右键菜单
-            contextMenuHandler.init();
-            
+            ContextMenuHandler.init();
+
             // 初始化设置 Modal
-            settingsModalHandler.init();
-            
+            SettingsModalHandler.init();
+
             // 初始化 Dock 栏
-            await dockRenderer.init();
-            
+            await DockRenderer.init();
+
             // 初始化图标编辑器
-            iconEditorHandler.init();
-            
+            IconEditorHandler.init();
+
             // 初始化 Tooltip
-            tooltipManager.init();
-            
+            TooltipManager.init();
+
             // 初始化添加图标对话框
-            addIconDialog.init();
-            
+            AddIconDialog.init();
+
             // 初始化添加小组件对话框
-            addWidgetDialog.init();
-            
+            AddWidgetDialog.init();
+
             // 绑定头像点击事件（打开设置）
             this.bindAvatarClick();
-            
+
             // 设置横向滚动支持（Shift + 滚轮）
             this.setupHorizontalScroll();
-            
+
             const totalEndTime = performance.now();
         } catch (error) {
             // 静默处理初始化错误
@@ -87,20 +87,20 @@ class App {
 
     setupHorizontalScroll() {
         const contentArea = document.getElementById('contentArea');
-        
+
         // 鼠标滚轮实现左右切换分类
         let scrollTimeout;
         contentArea.addEventListener('wheel', (e) => {
             e.preventDefault();
-            
+
             // 防抖处理
             clearTimeout(scrollTimeout);
             scrollTimeout = setTimeout(() => {
                 // 获取包含首页的所有可切换分类
-                const allCategories = categoryManager.getAllSwitchableCategories();
-                const currentUuid = categoryManager.getCurrentCategory();
+                const allCategories = CategoryManager.getAllSwitchableCategories();
+                const currentUuid = CategoryManager.getCurrentCategory();
                 const currentIndex = allCategories.findIndex(c => c.uuid == currentUuid);
-                
+
                 let nextIndex;
                 if (e.deltaY > 0 || e.deltaX > 0) {
                     // 向下或向右滚动 -> 下一个分类
@@ -109,10 +109,10 @@ class App {
                     // 向上或向左滚动 -> 上一个分类
                     nextIndex = (currentIndex - 1 + allCategories.length) % allCategories.length;
                 }
-                
+
                 // 切换分类
                 const nextCategory = allCategories[nextIndex];
-                sidebarRenderer.switchCategory(nextCategory.uuid);
+                SidebarRenderer.switchCategory(nextCategory.uuid);
             }, 50);
         });
     }
@@ -128,7 +128,7 @@ class App {
         const avatar = document.querySelector('.sidebar-avatar');
         if (avatar) {
             avatar.addEventListener('click', () => {
-                settingsModalHandler.open();
+                SettingsModalHandler.open();
             });
         }
     }

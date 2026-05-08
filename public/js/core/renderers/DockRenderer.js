@@ -1,6 +1,6 @@
 // ==================== Dock 栏渲染器 ====================
 
-import { fetchDockItems, reorderDock } from '../core/api.js';
+import { fetchDockItems, reorderDock } from '../api-client.js';
 
 class DockRenderer {
     constructor() {
@@ -18,7 +18,7 @@ class DockRenderer {
     async init() {
         // 创建 Dock DOM
         this.createDockElement();
-        
+
         // 加载 Dock 数据
         await this.loadDockItems();
     }
@@ -30,7 +30,7 @@ class DockRenderer {
         this.dockContainer = document.createElement('div');
         this.dockContainer.className = 'dock-container';
         this.dockContainer.id = 'dock';
-        
+
         // 添加到页面
         document.body.appendChild(this.dockContainer);
     }
@@ -52,22 +52,22 @@ class DockRenderer {
      */
     render() {
         this.dockContainer.innerHTML = '';
-        
+
         if (this.dockItems.length === 0) {
             this.dockContainer.style.display = 'none';
             return;
         }
-        
+
         this.dockContainer.style.display = 'flex';
-        
+
         // 限制最大数量
         const itemsToShow = this.dockItems.slice(0, this.maxItems);
-        
+
         itemsToShow.forEach(item => {
             const dockItem = this.createDockItem(item);
             this.dockContainer.appendChild(dockItem);
         });
-        
+
         // 在 Dock 容器上监听 mouseleave（而不是在每个图标上）
         // 这样只有当鼠标完全离开 Dock 区域时才会重置效果
         this.dockContainer.addEventListener('mouseleave', () => {
@@ -83,11 +83,11 @@ class DockRenderer {
         dockItem.className = 'dock-item';
         dockItem.dataset.itemUuid = item.item_uuid;
         dockItem.title = item.name;
-        
+
         // 图标
         const icon = document.createElement('div');
         icon.className = 'dock-item-icon';
-        
+
         if (item.bgimage) {
             const imageUrl = item.bgimage.replace(/\\/g, '/');
             icon.style.backgroundImage = `url(${imageUrl})`;
@@ -95,16 +95,16 @@ class DockRenderer {
             // 使用默认图标或首字母
             icon.textContent = item.name.charAt(0).toUpperCase();
         }
-        
+
         dockItem.appendChild(icon);
-        
+
         // 点击事件 - 打开链接
         dockItem.addEventListener('click', () => {
             if (item.target) {
                 window.open(item.target, '_blank');
             }
         });
-        
+
         // 启用拖拽
         dockItem.draggable = true;
         dockItem.addEventListener('dragstart', (e) => {
@@ -113,12 +113,12 @@ class DockRenderer {
             dockItem.classList.add('dragging');
             this.draggedDockItem = dockItem;
         });
-        
+
         dockItem.addEventListener('dragend', () => {
             dockItem.classList.remove('dragging');
             this.draggedDockItem = null;
         });
-        
+
         // 监听 Dock 内的拖拽排序
         dockItem.addEventListener('dragover', (e) => {
             e.preventDefault();
@@ -126,14 +126,14 @@ class DockRenderer {
                 this.handleDockDragOver(e, dockItem);
             }
         });
-        
+
         dockItem.addEventListener('drop', (e) => {
             e.preventDefault();
             if (this.draggedDockItem && dockItem !== this.draggedDockItem) {
                 this.handleDockDrop(dockItem);
             }
         });
-        
+
         // 鱼眼效果 - 鼠标移动时放大（使用 requestAnimationFrame 优化）
         dockItem.addEventListener('mousemove', (e) => {
             if (this.fisheyeTimer) {
@@ -143,7 +143,7 @@ class DockRenderer {
                 this.applyFisheyeEffect(dockItem);
             });
         });
-        
+
         return dockItem;
     }
 
@@ -152,7 +152,7 @@ class DockRenderer {
      */
     async addItem(itemUuid) {
         try {
-            const { addToDock } = await import('../core/api.js');
+            const { addToDock } = await import('../api-client.js');
             await addToDock(itemUuid);
             await this.loadDockItems();
         } catch (error) {
@@ -167,7 +167,7 @@ class DockRenderer {
         this.maxItems = max;
         this.render();
     }
-    
+
     /**
      * 处理 Dock 拖拽经过
      */
@@ -175,14 +175,14 @@ class DockRenderer {
         const allItems = Array.from(this.dockContainer.querySelectorAll('.dock-item'));
         const draggedIndex = allItems.indexOf(this.draggedDockItem);
         const targetIndex = allItems.indexOf(targetItem);
-        
+
         if (draggedIndex < targetIndex) {
             this.dockContainer.insertBefore(this.draggedDockItem, targetItem.nextSibling);
         } else {
             this.dockContainer.insertBefore(this.draggedDockItem, targetItem);
         }
     }
-    
+
     /**
      * 处理 Dock 放置并保存排序
      */
@@ -193,37 +193,37 @@ class DockRenderer {
                 item_uuid: item.dataset.itemUuid,
                 sort_order: index
             }));
-            
+
             await reorderDock(reorderData);
         } catch (error) {
         }
     }
-    
+
     /**
      * 应用鱼眼效果
      */
     applyFisheyeEffect(hoveredItem) {
         const allItems = Array.from(this.dockContainer.querySelectorAll('.dock-item'));
         const hoveredIndex = allItems.indexOf(hoveredItem);
-        
+
         if (hoveredIndex === -1) return;
-        
+
         // 使用 DocumentFragment 批量更新 DOM
         allItems.forEach((item, index) => {
             const distance = Math.abs(index - hoveredIndex);
-            
+
             if (distance <= this.fisheyeRange) {
                 // 计算缩放比例：距离越近，放大越多
                 const scale = 1 + (this.fisheyeScale - 1) * (1 - distance / (this.fisheyeRange + 1));
                 const translateY = (scale - 1) * -20; // 向上移动
-                
+
                 item.style.transform = `scale(${scale}) translateY(${translateY}px)`;
             } else {
                 item.style.transform = 'scale(1) translateY(0)';
             }
         });
     }
-    
+
     /**
      * 重置鱼眼效果
      */

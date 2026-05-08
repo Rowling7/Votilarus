@@ -1,6 +1,6 @@
 // ==================== 搜索功能处理器 ====================
 
-import settingsManager from '../managers/settings-manager.js';
+import SettingsManager from '../../managers/SettingsManager.js';
 
 class SearchHandler {
     constructor() {
@@ -49,7 +49,7 @@ class SearchHandler {
         const query = this.searchBox.value.trim();
         if (!query) return;
 
-        const engine = settingsManager.get('search_engine') || 'baidu';
+        const engine = SettingsManager.get('search_engine') || 'baidu';
         const url = this.searchEngines[engine] + encodeURIComponent(query);
 
         window.open(url, '_blank');
@@ -58,17 +58,17 @@ class SearchHandler {
 
     toggleSearchEngine() {
         const engines = Object.keys(this.searchEngines);
-        const currentEngine = settingsManager.get('search_engine') || 'baidu';
+        const currentEngine = SettingsManager.get('search_engine') || 'baidu';
         const currentIndex = engines.indexOf(currentEngine);
         const nextIndex = (currentIndex + 1) % engines.length;
         const nextEngine = engines[nextIndex];
 
-        settingsManager.set('search_engine', nextEngine);
+        SettingsManager.set('search_engine', nextEngine);
         this.updateSearchEngineIcon();
     }
 
     updateSearchEngineIcon() {
-        const engine = settingsManager.get('search_engine') || 'baidu';
+        const engine = SettingsManager.get('search_engine') || 'baidu';
         const icons = {
             baidu: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%233B82F6'%3E%3Cpath d='M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z'/%3E%3C/svg%3E",
             bing: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23008373'%3E%3Cpath d='M5 3v18l7-4.5V7.5L5 3zm2 3.5l5 3v7l-5 3v-13zm7-2.5v16l7-4V8L14 4z'/%3E%3C/svg%3E",

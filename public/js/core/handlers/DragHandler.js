@@ -1,6 +1,6 @@
 // ==================== 拖拽功能处理器 ====================
 
-import { updateItemLayout, reorderItems, moveItemToCategory } from './api.js';
+import { updateItemLayout, reorderItems, moveItemToCategory } from '../api-client.js';
 
 class DragHandler {
     constructor() {
@@ -16,7 +16,7 @@ class DragHandler {
     init() {
         // 使用事件委托，减少事件监听器数量
         const contentArea = document.getElementById('contentArea');
-        
+
         if (contentArea) {
             // 监听图标的拖拽开始事件（事件委托）
             contentArea.addEventListener('dragstart', (e) => {
@@ -30,7 +30,7 @@ class DragHandler {
             contentArea.addEventListener('dragend', (e) => {
                 this.handleDragEnd(e);
             });
-            
+
             // 监听网格内的拖拽排序
             contentArea.addEventListener('dragenter', (e) => {
                 const gridItem = e.target.closest('.grid-item');
@@ -130,41 +130,41 @@ class DragHandler {
         try {
             // 更新图标的分类归属
             await moveItemToCategory(this.draggedData.itemUuid, targetPanelId);
-            
+
             // TODO: 需要重新渲染网格
             alert('图标已移动，请刷新页面查看');
         } catch (error) {
             alert('移动失败: ' + error.message);
         }
     }
-    
+
     /**
      * 处理拖拽进入另一个图标上方
      */
     async handleDragEnter(e, targetItem) {
         if (!this.draggedElement || !targetItem) return;
-        
+
         const gridContainer = this.draggedElement.closest('.grid-container');
         if (!gridContainer) return;
-        
+
         // 获取所有网格项
         const allItems = Array.from(gridContainer.querySelectorAll('.grid-item'));
         const draggedIndex = allItems.indexOf(this.draggedElement);
         const targetIndex = allItems.indexOf(targetItem);
-        
+
         if (draggedIndex === -1 || targetIndex === -1) return;
-        
+
         // 交换位置
         if (draggedIndex < targetIndex) {
             gridContainer.insertBefore(this.draggedElement, targetItem.nextSibling);
         } else {
             gridContainer.insertBefore(this.draggedElement, targetItem);
         }
-        
+
         // 保存排序到数据库
         await this.saveSortOrder(gridContainer);
     }
-    
+
     /**
      * 保存排序到数据库
      */
@@ -172,13 +172,13 @@ class DragHandler {
         try {
             const categoryId = gridContainer.closest('.category-panel').dataset.categoryId;
             const items = Array.from(gridContainer.querySelectorAll('.grid-item'));
-            
+
             const layoutUpdates = items.map((item, index) => ({
                 item_uuid: item.dataset.itemUuid,
                 category_id: categoryId,
                 sort_order: index
             }));
-            
+
             await reorderItems(layoutUpdates);
         } catch (error) {
         }

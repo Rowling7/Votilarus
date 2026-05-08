@@ -1,13 +1,13 @@
 // ==================== 添加小组件对话框处理器 ====================
 
-import toast from '../utils/toast.js';
+import ToastNotification from '../../utils/ToastNotification.js';
 
 class AddWidgetDialogHandler {
     constructor() {
         this.dialog = null;
         this.overlay = null;
         this.currentCategoryId = null;
-        
+
         // 可用的小组件列表
         this.availableWidgets = [
             { id: 'clock', name: '时钟', icon: '⏰', description: '显示当前时间' },
@@ -30,12 +30,12 @@ class AddWidgetDialogHandler {
         // 遮罩层
         this.overlay = document.createElement('div');
         this.overlay.className = 'modal-overlay';
-        
+
         // 对话框
         this.dialog = document.createElement('div');
         this.dialog.className = 'icon-editor-dialog';
         this.dialog.style.maxWidth = '600px';
-        
+
         this.dialog.innerHTML = `
             <div class="dialog-header">
                 <h3>🧩 添加小组件</h3>
@@ -50,10 +50,10 @@ class AddWidgetDialogHandler {
                 <button class="btn btn-secondary" id="cancel-add-widget-btn">取消</button>
             </div>
         `;
-        
+
         document.body.appendChild(this.overlay);
         document.body.appendChild(this.dialog);
-        
+
         this.bindEvents();
     }
 
@@ -80,21 +80,21 @@ class AddWidgetDialogHandler {
         // 关闭按钮
         const closeBtn = this.dialog.querySelector('.dialog-close-btn');
         closeBtn.addEventListener('click', () => this.close());
-        
+
         // 点击遮罩层
         this.overlay.addEventListener('click', () => this.close());
-        
+
         // ESC 键
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape' && this.dialog.classList.contains('active')) {
                 this.close();
             }
         });
-        
+
         // 取消按钮
         const cancelBtn = document.getElementById('cancel-add-widget-btn');
         cancelBtn.addEventListener('click', () => this.close());
-        
+
         // 添加按钮点击
         this.dialog.addEventListener('click', (e) => {
             const addBtn = e.target.closest('.widget-add-btn');
@@ -111,7 +111,7 @@ class AddWidgetDialogHandler {
      */
     open(categoryId) {
         this.currentCategoryId = categoryId;
-        
+
         // 显示对话框
         this.overlay.classList.add('active');
         this.dialog.classList.add('active');
@@ -131,17 +131,17 @@ class AddWidgetDialogHandler {
      */
     async addWidget(widgetId) {
         try {
-            const { createWidget } = await import('./api.js');
-            
+            const { createWidget } = await import('../api-client.js');
+
             const result = await createWidget({
                 widget_type: widgetId,
                 category_id: this.currentCategoryId
             });
-            
-            toast.success(`小组件 "${widgetId}" 添加成功！请刷新页面查看`);
+
+            ToastNotification.success(`小组件 "${widgetId}" 添加成功！请刷新页面查看`);
             this.close();
         } catch (error) {
-            toast.error('添加失败: ' + error.message);
+            ToastNotification.error('添加失败: ' + error.message);
         }
     }
 }

@@ -1,7 +1,7 @@
 // ==================== 右键菜单处理器 ====================
 
-import ConfirmModal from '../components/confirm-modal.js';
-import toast from '../utils/toast.js';
+import ConfirmModal from '../../components/ConfirmModal.js';
+import ToastNotification from '../../utils/ToastNotification.js';
 
 class ContextMenuHandler {
     constructor() {
@@ -281,13 +281,13 @@ class ContextMenuHandler {
         // 从 CategoryManager 获取布局信息（包含 category_id）
         const layout = this.getItemLayout(itemUuid);
         if (!layout || !layout.category_id) {
-            toast.error('无法获取图标布局信息');
+            ToastNotification.error('无法获取图标布局信息');
             return;
         }
 
         try {
             // 调用 API 更新数据库
-            const { updateItemLayout } = await import('./api.js');
+            const { updateItemLayout } = await import('../api-client.js');
             await updateItemLayout({
                 item_uuid: itemUuid,
                 category_id: layout.category_id,
@@ -306,10 +306,10 @@ class ContextMenuHandler {
                     window.categoryManager.layouts[itemUuid].height = height;
                 }
 
-                toast.success(`图标尺寸已更改为 ${size}`);
+                ToastNotification.success(`图标尺寸已更改为 ${size}`);
             }
         } catch (error) {
-            toast.error('更新尺寸失败: ' + error.message);
+            ToastNotification.error('更新尺寸失败: ' + error.message);
         }
     }
 
@@ -319,8 +319,8 @@ class ContextMenuHandler {
     async editItem(gridItem) {
         const itemUuid = gridItem.dataset.itemUuid;
 
-        // 从 categoryManager 获取完整的图标数据
-        const categoryManagerModule = await import('../managers/category-manager.js');
+        // 从 CategoryManager 获取完整的图标数据
+        const categoryManagerModule = await import('../../managers/CategoryManager.js');
         const categoryManager = categoryManagerModule.default;
 
         // 查找图标所属的分类
@@ -353,7 +353,7 @@ class ContextMenuHandler {
         }
 
         try {
-            const iconEditor = await import('./icon-editor-handler.js');
+            const iconEditor = await import('./IconEditorHandler.js');
             iconEditor.default.open(iconData);
         } catch (error) {
             console.error('打开编辑器失败:', error);
@@ -365,14 +365,14 @@ class ContextMenuHandler {
      */
     async addToDock(itemUuid) {
         try {
-            const dockRenderer = await import('./dock-renderer.js');
+            const dockRenderer = await import('../renderers/DockRenderer.js');
             await dockRenderer.default.addItem(itemUuid);
-            toast.success('已添加到 Dock');
+            ToastNotification.success('已添加到 Dock');
         } catch (error) {
             if (error.message.includes('已在 Dock 中')) {
-                toast.warning('该图标已在 Dock 中');
+                ToastNotification.warning('该图标已在 Dock 中');
             } else {
-                toast.error('添加失败: ' + error.message);
+                ToastNotification.error('添加失败: ' + error.message);
             }
         }
     }
@@ -394,7 +394,7 @@ class ContextMenuHandler {
         }
 
         try {
-            const { deleteItem } = await import('./api.js');
+            const { deleteItem } = await import('../api-client.js');
             await deleteItem(itemUuid);
 
             // 从 DOM 中移除
@@ -403,9 +403,9 @@ class ContextMenuHandler {
                 gridItem.remove();
             }
 
-            toast.success('图标已删除');
+            ToastNotification.success('图标已删除');
         } catch (error) {
-            toast.error('删除失败: ' + error.message);
+            ToastNotification.error('删除失败: ' + error.message);
         }
     }
 
@@ -414,7 +414,7 @@ class ContextMenuHandler {
      */
     async addIcon(categoryId) {
         try {
-            const addIconDialog = await import('./add-icon-dialog.js');
+            const addIconDialog = await import('../dialogs/AddIconDialog.js');
             addIconDialog.default.open(categoryId);
         } catch (error) {
         }
@@ -425,10 +425,10 @@ class ContextMenuHandler {
      */
     async addWidget(categoryId) {
         try {
-            const addWidgetDialog = await import('./add-widget-dialog.js');
+            const addWidgetDialog = await import('../dialogs/AddWidgetDialog.js');
             addWidgetDialog.default.open(categoryId);
         } catch (error) {
-            toast.error('打开对话框失败');
+            ToastNotification.error('打开对话框失败');
         }
     }
 
@@ -566,7 +566,7 @@ class ContextMenuHandler {
      */
     async removeFromDock(itemUuid) {
         try {
-            const { removeFromDock } = await import('./api.js');
+            const { removeFromDock } = await import('../api-client.js');
             await removeFromDock(itemUuid);
 
             // 从 DOM 中移除
@@ -575,7 +575,7 @@ class ContextMenuHandler {
                 dockItem.remove();
             }
         } catch (error) {
-            toast.error('移除失败: ' + error.message);
+            ToastNotification.error('移除失败: ' + error.message);
         }
     }
 }

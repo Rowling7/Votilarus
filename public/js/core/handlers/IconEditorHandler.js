@@ -1,6 +1,6 @@
 // ==================== 图标编辑对话框处理器 ====================
 
-import toast from '../utils/toast.js';
+import ToastNotification from '../../utils/ToastNotification.js';
 
 class IconEditorHandler {
     constructor() {
@@ -170,12 +170,12 @@ class IconEditorHandler {
         console.log('新背景图:', bgimage);
 
         if (!name) {
-            toast.warning('请输入图标名称');
+            ToastNotification.warning('请输入图标名称');
             return;
         }
 
         try {
-            const { updateItem } = await import('./api.js');
+            const { updateItem } = await import('../api-client.js');
 
             console.log('调用 API 更新数据库...');
             await updateItem(this.currentItem.uuid, {
@@ -190,12 +190,12 @@ class IconEditorHandler {
             this.updateIconInDOM(name, target, bgimage);
             console.log('DOM 更新完成');
 
-            toast.success('保存成功！');
+            ToastNotification.success('保存成功！');
             this.close();
             console.log('=== 图标保存完成 ===\n');
         } catch (error) {
             console.error('保存失败:', error);
-            toast.error('保存失败: ' + error.message);
+            ToastNotification.error('保存失败: ' + error.message);
         }
     }
 

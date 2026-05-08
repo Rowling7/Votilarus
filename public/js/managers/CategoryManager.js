@@ -1,6 +1,6 @@
 // ==================== 分类管理器 ====================
 
-import { fetchCategories, fetchItems, fetchLayouts } from '../core/api.js';
+import { fetchCategories, fetchItems, fetchLayouts } from '../core/api-client.js';
 
 class CategoryManager {
     constructor() {

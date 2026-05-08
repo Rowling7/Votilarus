@@ -1,12 +1,12 @@
 // ==================== Web Components 统一注册器 ====================
 
-import NavIcon from './nav-icon.js';
-import NavDock from './nav-dock.js';
-import SearchBox from './search-box.js';
-import NavSidebar from './nav-sidebar.js';
-import NavWidget from './nav-widget.js';
-import SettingsModal from './settings-modal.js';
-import ConfirmModal from './confirm-modal.js';
+import NavIcon from './NavIcon.js';
+import NavDock from './NavDock.js';
+import SearchBox from './SearchBox.js';
+import NavSidebar from './NavSidebar.js';
+import NavWidget from './NavWidget.js';
+import SettingsModal from './SettingsModal.js';
+import ConfirmModal from './ConfirmModal.js';
 
 /**
  * 注册所有 Web Components
@@ -44,12 +44,12 @@ export function registerComponent(name) {
     };
 
     const ComponentClass = componentMap[name];
-    
+
     if (ComponentClass && !customElements.get(name)) {
         customElements.define(name, ComponentClass);
         return true;
     }
-    
+
     return false;
 }
 
