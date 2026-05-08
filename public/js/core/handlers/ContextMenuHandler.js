@@ -204,18 +204,39 @@ class ContextMenuHandler {
 
         // 定位菜单
         this.menu.style.display = 'block';
-        this.menu.style.left = x + 'px';
-        this.menu.style.top = y + 'px';
 
-        // 确保菜单不超出视口
+        // 智能边界检测：确保菜单不超出视口
         setTimeout(() => {
             const rect = this.menu.getBoundingClientRect();
-            if (rect.right > window.innerWidth) {
-                this.menu.style.left = (x - rect.width) + 'px';
+            const menuWidth = rect.width;
+            const menuHeight = rect.height;
+            const padding = 10; // 边距
+
+            let finalX = x;
+            let finalY = y;
+
+            // 水平方向检测
+            if (x + menuWidth > window.innerWidth - padding) {
+                // 右侧超出，显示在鼠标左侧
+                finalX = x - menuWidth;
             }
-            if (rect.bottom > window.innerHeight) {
-                this.menu.style.top = (y - rect.height) + 'px';
+            if (finalX < padding) {
+                // 左侧超出，贴左边显示
+                finalX = padding;
             }
+
+            // 垂直方向检测
+            if (y + menuHeight > window.innerHeight - padding) {
+                // 底部超出，显示在鼠标上方
+                finalY = y - menuHeight;
+            }
+            if (finalY < padding) {
+                // 顶部超出，贴顶边显示
+                finalY = padding;
+            }
+
+            this.menu.style.left = finalX + 'px';
+            this.menu.style.top = finalY + 'px';
         }, 0);
     }
 
@@ -288,20 +309,40 @@ class ContextMenuHandler {
 
         // 定位子菜单
         this.submenu.style.display = 'block';
-        this.submenu.style.left = x + 'px';
-        this.submenu.style.top = y + 'px';
 
-        // 确保子菜单不超出视口
+        // 智能边界检测：确保子菜单不超出视口
         setTimeout(() => {
             const rect = this.submenu.getBoundingClientRect();
-            if (rect.right > window.innerWidth) {
-                // 如果右侧超出，显示在主菜单左侧
-                const mainRect = this.menu.getBoundingClientRect();
-                this.submenu.style.left = (mainRect.left - rect.width - 5) + 'px';
+            const mainRect = this.menu.getBoundingClientRect();
+            const submenuWidth = rect.width;
+            const submenuHeight = rect.height;
+            const padding = 10; // 边距
+
+            let finalX = x;
+            let finalY = y;
+
+            // 水平方向检测
+            if (x + submenuWidth > window.innerWidth - padding) {
+                // 右侧超出，显示在主菜单左侧
+                finalX = mainRect.left - submenuWidth - 5;
             }
-            if (rect.bottom > window.innerHeight) {
-                this.submenu.style.top = (y - rect.height) + 'px';
+            if (finalX < padding) {
+                // 左侧超出，贴左边显示
+                finalX = padding;
             }
+
+            // 垂直方向检测
+            if (y + submenuHeight > window.innerHeight - padding) {
+                // 底部超出，向上调整
+                finalY = window.innerHeight - submenuHeight - padding;
+            }
+            if (finalY < padding) {
+                // 顶部超出，贴顶边显示
+                finalY = padding;
+            }
+
+            this.submenu.style.left = finalX + 'px';
+            this.submenu.style.top = finalY + 'px';
         }, 0);
     }
 

@@ -4,6 +4,8 @@
     position: fixed;
     z-index: 10000;
     min-width: 160px;
+    max-height: 70vh;
+    /* 最大高度为视口高度的 70% */
     padding: 0.5rem 0;
     background: var(--glass-bg);
     backdrop-filter: blur(20px);
@@ -12,6 +14,9 @@
     border-radius: 0.75rem;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
     animation: menuFadeIn 0.15s ease;
+    overflow-y: auto;
+    /* 超出时显示滚动条 */
+    overflow-x: hidden;
 }
 
 @keyframes menuFadeIn {
@@ -19,10 +24,31 @@
         opacity: 0;
         transform: scale(0.95);
     }
+
     to {
         opacity: 1;
         transform: scale(1);
     }
+}
+
+/* 自定义滚动条样式 */
+.context-menu::-webkit-scrollbar {
+    width: 6px;
+}
+
+.context-menu::-webkit-scrollbar-track {
+    background: transparent;
+    border-radius: 3px;
+}
+
+.context-menu::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 3px;
+    transition: background var(--transition-fast);
+}
+
+.context-menu::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.4);
 }
 
 .context-menu-item {
@@ -77,6 +103,7 @@
         opacity: 0;
         transform: translateX(-10px);
     }
+
     to {
         opacity: 1;
         transform: translateX(0);
