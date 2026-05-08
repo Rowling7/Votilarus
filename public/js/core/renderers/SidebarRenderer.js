@@ -40,9 +40,9 @@ class SidebarRenderer {
         categories.forEach(category => {
             const categoryDiv = document.createElement('div');
             categoryDiv.className = 'sidebar-category';
-            categoryDiv.dataset.categoryId = category.uuid;
+            categoryDiv.dataset.categoryId = category.id;
 
-            // 如果有 ico 字段（SVG 内容），直接渲染 SVG；否则显示 aindex 文字
+            // 如果有 ico 字段（SVG 内容），直接渲染 SVG；否则显示 category_name 文字
             if (category.ico) {
                 // 创建容器并插入 SVG 内容
                 const iconContainer = document.createElement('div');
@@ -50,17 +50,17 @@ class SidebarRenderer {
                 iconContainer.innerHTML = category.ico;
                 categoryDiv.appendChild(iconContainer);
             } else {
-                // 显示 aindex 文字
-                categoryDiv.textContent = category.aindex;
+                // 显示 category_name 文字
+                categoryDiv.textContent = category.category_name;
             }
 
             // 如果当前选中该分类，添加 active 样式
-            if (category.uuid == currentCategory) {
+            if (category.id == currentCategory) {
                 categoryDiv.classList.add('active');
             }
 
             categoryDiv.addEventListener('click', () => {
-                this.switchCategory(category.uuid);
+                this.switchCategory(category.id);
             });
 
             this.categoriesContainer.appendChild(categoryDiv);

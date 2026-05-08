@@ -81,34 +81,34 @@ class DockRenderer {
     createDockItem(item) {
         const dockItem = document.createElement('div');
         dockItem.className = 'dock-item';
-        dockItem.dataset.itemUuid = item.item_uuid;
-        dockItem.title = item.name;
+        dockItem.dataset.itemId = item.id;
+        dockItem.title = item.title;
 
         // 图标
         const icon = document.createElement('div');
         icon.className = 'dock-item-icon';
 
-        if (item.bgimage) {
-            const imageUrl = item.bgimage.replace(/\\/g, '/');
+        if (item.icon_path) {
+            const imageUrl = item.icon_path.replace(/\\/g, '/');
             icon.style.backgroundImage = `url(${imageUrl})`;
         } else {
             // 使用默认图标或首字母
-            icon.textContent = item.name.charAt(0).toUpperCase();
+            icon.textContent = item.title.charAt(0).toUpperCase();
         }
 
         dockItem.appendChild(icon);
 
         // 点击事件 - 打开链接
         dockItem.addEventListener('click', () => {
-            if (item.target) {
-                window.open(item.target, '_blank');
+            if (item.link_url) {
+                window.open(item.link_url, '_blank');
             }
         });
 
         // 启用拖拽
         dockItem.draggable = true;
         dockItem.addEventListener('dragstart', (e) => {
-            e.dataTransfer.setData('text/plain', item.item_uuid);
+            e.dataTransfer.setData('text/plain', item.id);
             e.dataTransfer.effectAllowed = 'move';
             dockItem.classList.add('dragging');
             this.draggedDockItem = dockItem;
@@ -150,10 +150,10 @@ class DockRenderer {
     /**
      * 添加图标到 Dock
      */
-    async addItem(itemUuid) {
+    async addItem(itemId) {
         try {
             const { addToDock } = await import('../api-client.js');
-            await addToDock(itemUuid);
+            await addToDock(itemId);
             await this.loadDockItems();
         } catch (error) {
             throw error;
@@ -190,7 +190,7 @@ class DockRenderer {
         try {
             const items = Array.from(this.dockContainer.querySelectorAll('.dock-item'));
             const reorderData = items.map((item, index) => ({
-                item_uuid: item.dataset.itemUuid,
+                item_id: item.dataset.itemId,
                 sort_order: index
             }));
 

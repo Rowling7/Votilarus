@@ -29,17 +29,17 @@ class NavIcon extends HTMLElement {
         const uuid = this.getAttribute('uuid') || '';
 
         const [width, height] = size.split('x').map(Number);
-        
+
         // 获取标题最大长度设置
         const titleMaxLength = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--title-max-length')) || 8;
         const displayTitle = title.length > titleMaxLength ? title.substring(0, titleMaxLength) + '...' : title;
-        
+
         // 获取标题位置设置
         const titlePosition = getComputedStyle(document.documentElement).getPropertyValue('--title-position').trim() || 'bottom';
-        
+
         // 根据位置计算样式
         let titlePositionStyle = '';
-        switch(titlePosition) {
+        switch (titlePosition) {
             case 'top':
                 titlePositionStyle = `
                     top: -1.5rem;
@@ -121,10 +121,10 @@ class NavIcon extends HTMLElement {
                 }
             </style>
             <div class="icon-container" data-uuid="${uuid}" data-url="${url}">
-                ${image 
-                    ? `<div class="icon-bg"></div>` 
-                    : `<div class="icon-letter">${title.charAt(0).toUpperCase()}</div>`
-                }
+                ${image
+                ? `<div class="icon-bg"></div>`
+                : `<div class="icon-letter">${title.charAt(0).toUpperCase()}</div>`
+            }
                 <div class="icon-title">${displayTitle}</div>
             </div>
         `;
@@ -132,7 +132,7 @@ class NavIcon extends HTMLElement {
 
     bindEvents() {
         const container = this.shadowRoot.querySelector('.icon-container');
-        
+
         // 点击事件
         container.addEventListener('click', (e) => {
             const url = container.dataset.url;
@@ -144,10 +144,10 @@ class NavIcon extends HTMLElement {
         // 拖拽事件
         container.setAttribute('draggable', 'true');
         container.addEventListener('dragstart', (e) => {
-            e.dataTransfer.setData('text/plain', container.dataset.uuid);
+            e.dataTransfer.setData('text/plain', container.dataset.itemId);
             this.dispatchEvent(new CustomEvent('drag-start', {
                 bubbles: true,
-                detail: { uuid: container.dataset.uuid }
+                detail: { itemId: container.dataset.itemId }
             }));
         });
 
@@ -156,8 +156,8 @@ class NavIcon extends HTMLElement {
             e.preventDefault();
             this.dispatchEvent(new CustomEvent('context-menu', {
                 bubbles: true,
-                detail: { 
-                    uuid: container.dataset.uuid,
+                detail: {
+                    itemId: container.dataset.itemId,
                     x: e.clientX,
                     y: e.clientY
                 }

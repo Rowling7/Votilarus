@@ -11,8 +11,8 @@ function setDatabase(database) {
 
 // 获取所有分类
 router.get('/', (req, res) => {
-    const sql = 'SELECT * FROM A70 WHERE isdel = ? ORDER BY uuid ASC';
-    
+    const sql = 'SELECT * FROM icon_categories WHERE deleted_flag = ? ORDER BY id ASC';
+
     db.all(sql, ['0'], (err, rows) => {
         if (err) {
             res.status(500).json({ error: err.message });

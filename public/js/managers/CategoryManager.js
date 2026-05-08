@@ -28,7 +28,7 @@ class CategoryManager {
         try {
             const allLayouts = await fetchLayouts();
             allLayouts.forEach(layout => {
-                this.layouts[layout.item_uuid] = layout;
+                this.layouts[layout.item_id] = layout;
             });
         } catch (error) {
         }
@@ -36,10 +36,10 @@ class CategoryManager {
         // 优化2：并行加载所有分类的图标
         const loadPromises = this.categories.map(async (category) => {
             try {
-                const items = await fetchItems(category.uuid);
-                return { uuid: category.uuid, items };
+                const items = await fetchItems(category.id);
+                return { categoryId: category.id, items };
             } catch (error) {
-                return { uuid: category.uuid, items: [] };
+                return { categoryId: category.id, items: [] };
             }
         });
 
@@ -48,7 +48,7 @@ class CategoryManager {
 
         // 存储结果
         results.forEach(result => {
-            this.items[result.uuid] = result.items;
+            this.items[result.categoryId] = result.items;
         });
     }
 
@@ -64,7 +64,7 @@ class CategoryManager {
             // 重新获取布局信息
             const allLayouts = await fetchLayouts();
             allLayouts.forEach(layout => {
-                this.layouts[layout.item_uuid] = layout;
+                this.layouts[layout.item_id] = layout;
             });
 
             return items;
@@ -82,8 +82,8 @@ class CategoryManager {
         return this.items[categoryUuid] || [];
     }
 
-    getLayout(itemUuid) {
-        return this.layouts[itemUuid];
+    getLayout(itemId) {
+        return this.layouts[itemId];
     }
 
     getCurrentCategory() {
@@ -95,8 +95,8 @@ class CategoryManager {
     }
 
     getCategoryName(uuid) {
-        const category = this.categories.find(c => c.uuid == uuid);
-        return category ? category.name : '';
+        const category = this.categories.find(c => c.id == uuid);
+        return category ? category.category_name : '';
     }
 
     /**
@@ -104,7 +104,7 @@ class CategoryManager {
      */
     getAllSwitchableCategories() {
         // 首页作为第一个分类
-        const homeCategory = { uuid: '-1', name: '首页', aindex: '🏠' };
+        const homeCategory = { id: '-1', category_name: '首页', category_code: 'home' };
         return [homeCategory, ...this.categories];
     }
 }

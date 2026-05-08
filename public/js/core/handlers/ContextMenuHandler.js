@@ -89,14 +89,14 @@ class ContextMenuHandler {
 
         // 判断是图标还是 widget
         const isWidget = gridItem.dataset.type === 'widget';
-        const itemUuid = isWidget ? gridItem.dataset.uuid : gridItem.dataset.itemUuid;
+        const itemId = isWidget ? gridItem.dataset.uuid : gridItem.dataset.itemId;
 
         if (isWidget) {
             // Widget 的右键菜单
             this.showWidgetMenu(e, gridItem);
         } else {
             // 图标的右键菜单
-            const layout = this.getItemLayout(itemUuid);
+            const layout = this.getItemLayout(itemId);
 
             const menuItems = [
                 {
@@ -105,16 +105,16 @@ class ContextMenuHandler {
                 },
                 {
                     label: '设置大小',
-                    action: () => this.showSizeSelector(gridItem, itemUuid),
+                    action: () => this.showSizeSelector(gridItem, itemId),
                     hasSubmenu: true
                 },
                 {
                     label: '添加到 Dock',
-                    action: () => this.addToDock(itemUuid)
+                    action: () => this.addToDock(itemId)
                 },
                 {
                     label: '删除',
-                    action: () => this.deleteItem(itemUuid),
+                    action: () => this.deleteItem(itemId),
                     className: 'danger'
                 }
             ];
@@ -263,7 +263,7 @@ class ContextMenuHandler {
     /**
      * 显示尺寸选择器（子菜单）
      */
-    showSizeSelector(gridItem, itemUuid) {
+    showSizeSelector(gridItem, itemId) {
         const sizes = [
             '1x1', '1x2', '1x3', '1x4',
             '2x1', '2x2', '2x3', '2x4'
@@ -279,7 +279,7 @@ class ContextMenuHandler {
 
         const menuItems = sizes.map(size => ({
             label: size === currentSize ? `✓ ${size}` : size,
-            action: () => this.changeSize(itemUuid, size)
+            action: () => this.changeSize(itemId, size)
         }));
 
         // 获取主菜单位置，在它右侧显示子菜单
@@ -349,12 +349,12 @@ class ContextMenuHandler {
     /**
      * 更改图标/widget 尺寸
      */
-    async changeSize(itemUuid, size) {
+    async changeSize(itemId, size) {
         const [width, height] = size.split('x').map(Number);
 
         // 判断是图标还是 widget
-        const gridItem = document.querySelector(`[data-item-uuid="${itemUuid}"]`) ||
-            document.querySelector(`[data-uuid="${itemUuid}"]`);
+        const gridItem = document.querySelector(`[data-item-id="${itemId}"]`) ||
+            document.querySelector(`[data-uuid="${itemId}"]`);
 
         if (!gridItem) {
             ToastNotification.error('未找到元素');
@@ -372,7 +372,7 @@ class ContextMenuHandler {
                 ToastNotification.success(`小组件尺寸已更改为 ${size}`);
             } else {
                 // 图标需要调用 API 更新数据库
-                const layout = this.getItemLayout(itemUuid);
+                const layout = this.getItemLayout(itemId);
                 if (!layout || !layout.category_id) {
                     ToastNotification.error('无法获取图标布局信息');
                     return;
@@ -380,7 +380,7 @@ class ContextMenuHandler {
 
                 const { updateItemLayout } = await import('../api-client.js');
                 await updateItemLayout({
-                    item_uuid: itemUuid,
+                    item_id: itemId,
                     category_id: layout.category_id,
                     width: width,
                     height: height
@@ -390,9 +390,9 @@ class ContextMenuHandler {
                 gridItem.className = `grid-item size-${size}`;
 
                 // 同步更新 CategoryManager 缓存
-                if (window.categoryManager && window.categoryManager.layouts[itemUuid]) {
-                    window.categoryManager.layouts[itemUuid].width = width;
-                    window.categoryManager.layouts[itemUuid].height = height;
+                if (window.categoryManager && window.categoryManager.layouts[itemId]) {
+                    window.categoryManager.layouts[itemId].width = width;
+                    window.categoryManager.layouts[itemId].height = height;
                 }
 
                 ToastNotification.success(`图标尺寸已更改为 ${size}`);
@@ -406,7 +406,7 @@ class ContextMenuHandler {
      * 编辑图标
      */
     async editItem(gridItem) {
-        const itemUuid = gridItem.dataset.itemUuid;
+        const itemId = gridItem.dataset.itemId;
 
         // 从 CategoryManager 获取完整的图标数据
         const categoryManagerModule = await import('../../managers/CategoryManager.js');
@@ -417,15 +417,15 @@ class ContextMenuHandler {
         const categories = categoryManager.getCategories();
 
         for (const category of categories) {
-            const items = categoryManager.getItems(category.uuid);
-            const item = items.find(i => i.uuid === itemUuid);
+            const items = categoryManager.getItems(category.id);
+            const item = items.find(i => i.id === itemId);
             if (item) {
                 iconData = {
-                    uuid: item.uuid,
-                    name: item.name,
-                    target: item.target,
-                    bgimage: item.bgimage || '',
-                    category_id: category.uuid
+                    uuid: item.id,
+                    name: item.title,
+                    target: item.link_url,
+                    bgimage: item.icon_path || '',
+                    category_id: category.id
                 };
                 break;
             }
@@ -434,7 +434,7 @@ class ContextMenuHandler {
         // 如果没找到，使用 DOM 中的数据作为后备
         if (!iconData) {
             iconData = {
-                uuid: itemUuid,
+                uuid: itemId,
                 name: gridItem.querySelector('.nav-icon-title')?.textContent || '',
                 target: gridItem.dataset.url || '',
                 bgimage: ''
@@ -452,10 +452,10 @@ class ContextMenuHandler {
     /**
      * 添加到 Dock
      */
-    async addToDock(itemUuid) {
+    async addToDock(itemId) {
         try {
             const dockRenderer = await import('../renderers/DockRenderer.js');
-            await dockRenderer.default.addItem(itemUuid);
+            await dockRenderer.default.addItem(itemId);
             ToastNotification.success('已添加到 Dock');
         } catch (error) {
             if (error.message.includes('已在 Dock 中')) {
@@ -469,7 +469,7 @@ class ContextMenuHandler {
     /**
      * 删除图标
      */
-    async deleteItem(itemUuid) {
+    async deleteItem(itemId) {
         const confirmed = await ConfirmModal.show({
             title: '删除图标',
             message: '确定要删除这个图标吗？',
@@ -484,10 +484,10 @@ class ContextMenuHandler {
 
         try {
             const { deleteItem } = await import('../api-client.js');
-            await deleteItem(itemUuid);
+            await deleteItem(itemId);
 
             // 从 DOM 中移除
-            const gridItem = document.querySelector(`[data-item-uuid="${itemUuid}"]`);
+            const gridItem = document.querySelector(`[data-item-id="${itemId}"]`);
             if (gridItem) {
                 gridItem.remove();
             }
@@ -558,17 +558,17 @@ class ContextMenuHandler {
     /**
      * 获取图标布局信息
      */
-    getItemLayout(itemUuid) {
+    getItemLayout(itemId) {
         // 优先从 CategoryManager 获取布局信息
         if (window.categoryManager) {
-            const layout = window.categoryManager.getLayout(itemUuid);
+            const layout = window.categoryManager.getLayout(itemId);
             if (layout) {
                 return layout; // 包含 { pos_x, pos_y, width, height, sort_order, category_id }
             }
         }
 
         // 降级方案：从 DOM 中获取当前尺寸
-        const gridItem = document.querySelector(`[data-item-uuid="${itemUuid}"]`);
+        const gridItem = document.querySelector(`[data-item-id="${itemId}"]`);
         if (!gridItem) return { width: 1, height: 1 };
 
         const className = gridItem.className;
@@ -586,7 +586,7 @@ class ContextMenuHandler {
      * 显示 Dock 图标右键菜单
      */
     showDockItemMenu(e, dockItem) {
-        const itemUuid = dockItem.dataset.itemUuid;
+        const itemId = dockItem.dataset.itemId;
 
         const menuItems = [
             {
@@ -607,9 +607,8 @@ class ContextMenuHandler {
             },
             {
                 label: '从 Dock 移除',
-                action: () => this.removeFromDock(itemUuid),
-                className: 'danger'
-            }
+                action: () => this.removeFromDock(itemId),
+            },
         ];
 
         this.renderMenu(menuItems, e.clientX, e.clientY);
@@ -687,13 +686,13 @@ class ContextMenuHandler {
     /**
      * 从 Dock 移除图标
      */
-    async removeFromDock(itemUuid) {
+    async removeFromDock(itemId) {
         try {
             const { removeFromDock } = await import('../api-client.js');
-            await removeFromDock(itemUuid);
+            await removeFromDock(itemId);
 
             // 从 DOM 中移除
-            const dockItem = document.querySelector(`.dock-item[data-item-uuid="${itemUuid}"]`);
+            const dockItem = document.querySelector(`.dock-item[data-item-id="${itemId}"]`);
             if (dockItem) {
                 dockItem.remove();
             }

@@ -63,7 +63,7 @@ class DragHandler {
     handleDragStart(e, element) {
         this.draggedElement = element;
         this.draggedData = {
-            itemUuid: element.dataset.itemUuid,
+            itemId: element.dataset.itemId,
             url: element.dataset.url,
             sourcePanel: element.closest('.category-panel').dataset.categoryId
         };
@@ -129,7 +129,7 @@ class DragHandler {
 
         try {
             // 更新图标的分类归属
-            await moveItemToCategory(this.draggedData.itemUuid, targetPanelId);
+            await moveItemToCategory(this.draggedData.itemId, targetPanelId);
 
             // TODO: 需要重新渲染网格
             alert('图标已移动，请刷新页面查看');
@@ -174,7 +174,7 @@ class DragHandler {
             const items = Array.from(gridContainer.querySelectorAll('.grid-item'));
 
             const layoutUpdates = items.map((item, index) => ({
-                item_uuid: item.dataset.itemUuid,
+                item_id: item.dataset.itemId,
                 category_id: categoryId,
                 sort_order: index
             }));

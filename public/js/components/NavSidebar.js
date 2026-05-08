@@ -132,14 +132,14 @@ class NavSidebar extends HTMLElement {
             </style>
             <div class="sidebar-container">
                 <div class="avatar" title="${username}">
-                    ${avatarUrl 
-                        ? `<img src="${avatarUrl}" alt="${username}">` 
-                        : `<div class="avatar-placeholder">${username.charAt(0).toUpperCase()}</div>`
-                    }
+                    ${avatarUrl
+                ? `<img src="${avatarUrl}" alt="${username}">`
+                : `<div class="avatar-placeholder">${username.charAt(0).toUpperCase()}</div>`
+            }
                 </div>
                 <div class="category-list">
                     ${this.categories.map((cat, index) => `
-                        <div class="category-item ${index === 0 ? 'active' : ''}" data-category-id="${cat.uuid}">
+                        <div class="category-item ${index === 0 ? 'active' : ''}" data-category-id="${cat.id}">
                             <div class="category-icon">${cat.icon || '📁'}</div>
                             <div class="category-name">${cat.name}</div>
                         </div>
@@ -165,7 +165,7 @@ class NavSidebar extends HTMLElement {
         categoryItems.forEach(item => {
             item.addEventListener('click', () => {
                 const categoryId = item.dataset.categoryId;
-                
+
                 // 更新激活状态
                 categoryItems.forEach(i => i.classList.remove('active'));
                 item.classList.add('active');

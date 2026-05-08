@@ -157,14 +157,14 @@ class IconRenderer {
     createLazyCategoryPanel(category, index) {
         const panel = document.createElement('div');
         panel.className = 'category-panel';
-        panel.id = `category-${category.uuid}`;
-        panel.dataset.categoryId = category.uuid;
+        panel.id = `category-${category.id}`;
+        panel.dataset.categoryId = category.id;
         panel.dataset.loaded = 'false'; // 标记为未加载
 
         // 创建一个空的网格容器，稍后填充
         const gridContainer = document.createElement('div');
         gridContainer.className = 'grid-container';
-        gridContainer.id = `grid-${category.uuid}`;
+        gridContainer.id = `grid-${category.id}`;
         panel.appendChild(gridContainer);
 
         return panel;
@@ -187,8 +187,8 @@ class IconRenderer {
 
         // 按 sort_order 排序
         const sortedItems = items.sort((a, b) => {
-            const layoutA = CategoryManager.getLayout(a.uuid);
-            const layoutB = CategoryManager.getLayout(b.uuid);
+            const layoutA = CategoryManager.getLayout(a.id);
+            const layoutB = CategoryManager.getLayout(b.id);
             if (!layoutA || !layoutB) return 0;
             return layoutA.sort_order - layoutB.sort_order;
         });
@@ -209,20 +209,20 @@ class IconRenderer {
     createCategoryPanel(category, index) {
         const panel = document.createElement('div');
         panel.className = 'category-panel';
-        panel.id = `category-${category.uuid}`;
-        panel.dataset.categoryId = category.uuid;
+        panel.id = `category-${category.id}`;
+        panel.dataset.categoryId = category.id;
 
         // 创建网格容器
         const gridContainer = document.createElement('div');
         gridContainer.className = 'grid-container';
 
         // 获取该分类下的图标
-        const items = categoryManager.getItems(category.uuid);
+        const items = categoryManager.getItems(category.id);
 
         // 按 sort_order 排序
         const sortedItems = items.sort((a, b) => {
-            const layoutA = CategoryManager.getLayout(a.uuid);
-            const layoutB = CategoryManager.getLayout(b.uuid);
+            const layoutA = CategoryManager.getLayout(a.id);
+            const layoutB = CategoryManager.getLayout(b.id);
             if (!layoutA || !layoutB) return 0;
             return layoutA.sort_order - layoutB.sort_order;
         });
@@ -243,7 +243,7 @@ class IconRenderer {
     }
 
     createIcon(item) {
-        const layout = CategoryManager.getLayout(item.uuid);
+        const layout = CategoryManager.getLayout(item.id);
 
         if (!layout) {
             return null;
@@ -251,19 +251,19 @@ class IconRenderer {
 
         const gridItem = document.createElement('div');
         gridItem.className = `grid-item size-${layout.width}x${layout.height}`;
-        gridItem.dataset.itemUuid = item.uuid;
-        gridItem.dataset.url = item.target;
-        gridItem.dataset.tooltip = item.name; // 添加 tooltip
+        gridItem.dataset.itemId = item.id;
+        gridItem.dataset.url = item.link_url;
+        gridItem.dataset.tooltip = item.title; // 添加 tooltip
 
         const iconDiv = document.createElement('div');
         iconDiv.className = 'nav-icon';
 
         // 如果有背景图，显示图片（使用懒加载）
-        if (item.bgimage) {
+        if (item.icon_path) {
             const bgDiv = document.createElement('div');
             bgDiv.className = 'nav-icon-bg';
             // 将 Windows 路径分隔符 \ 转换为 URL 友好的 /
-            const imageUrl = item.bgimage.replace(/\\/g, '/');
+            const imageUrl = item.icon_path.replace(/\\/g, '/');
             bgDiv.dataset.lazySrc = imageUrl; // 标记为懒加载
             iconDiv.appendChild(bgDiv);
 
@@ -275,7 +275,7 @@ class IconRenderer {
             // 否则显示首字母
             const letterDiv = document.createElement('div');
             letterDiv.className = 'nav-icon-letter';
-            letterDiv.textContent = this.getFirstLetter(item.name);
+            letterDiv.textContent = this.getFirstLetter(item.title);
             iconDiv.appendChild(letterDiv);
         }
 
@@ -289,15 +289,15 @@ class IconRenderer {
         if (showTitle) {
             const titleDiv = document.createElement('div');
             titleDiv.className = 'nav-icon-title';
-            titleDiv.textContent = item.name;
-            titleDiv.title = item.name;
+            titleDiv.textContent = item.title;
+            titleDiv.title = item.title;
             gridItem.appendChild(titleDiv);
         }
 
         // 点击事件 - 使用事件委托优化
         gridItem.addEventListener('click', () => {
-            if (item.target) {
-                window.open(item.target, '_blank');
+            if (item.link_url) {
+                window.open(item.link_url, '_blank');
             }
         });
 

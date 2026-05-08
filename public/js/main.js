@@ -103,7 +103,7 @@ class App {
                 // 获取包含首页的所有可切换分类
                 const allCategories = CategoryManager.getAllSwitchableCategories();
                 const currentUuid = CategoryManager.getCurrentCategory();
-                const currentIndex = allCategories.findIndex(c => c.uuid == currentUuid);
+                const currentIndex = allCategories.findIndex(c => c.id == currentUuid);
 
                 let nextIndex;
                 if (e.deltaY > 0 || e.deltaX > 0) {
@@ -116,7 +116,7 @@ class App {
 
                 // 切换分类
                 const nextCategory = allCategories[nextIndex];
-                SidebarRenderer.switchCategory(nextCategory.uuid);
+                SidebarRenderer.switchCategory(nextCategory.id);
             }, 50);
         });
     }

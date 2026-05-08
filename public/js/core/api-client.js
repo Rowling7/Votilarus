@@ -30,7 +30,7 @@ export async function fetchCategories() {
     const cacheKey = getCacheKey(`${API_BASE}/categories`);
     const cached = getCachedData(cacheKey);
     if (cached) return cached;
-    
+
     const response = await fetch(`${API_BASE}/categories`);
     if (!response.ok) {
         throw new Error('获取分类失败');
@@ -46,11 +46,11 @@ export async function fetchItems(categoryUuid = null) {
     if (categoryUuid !== undefined && categoryUuid !== null) {
         url += `?category_uuid=${categoryUuid}`;
     }
-    
+
     const cacheKey = getCacheKey(url);
     const cached = getCachedData(cacheKey);
     if (cached) return cached;
-    
+
     const response = await fetch(url);
     if (!response.ok) {
         throw new Error('获取图标失败');
@@ -60,16 +60,16 @@ export async function fetchItems(categoryUuid = null) {
     return data;
 }
 
-export async function fetchLayouts(itemUuid = null) {
+export async function fetchLayouts(itemId = null) {
     let url = `${API_BASE}/layout`;
-    if (itemUuid) {
-        url += `?item_uuid=${itemUuid}`;
+    if (itemId) {
+        url += `?item_id=${itemId}`;
     }
-    
+
     const cacheKey = getCacheKey(url);
     const cached = getCachedData(cacheKey);
     if (cached) return cached;
-    
+
     const response = await fetch(url);
     if (!response.ok) {
         throw new Error('获取布局失败');
@@ -88,13 +88,13 @@ export async function fetchDockItems() {
 }
 
 // 添加图标到 Dock
-export async function addToDock(itemUuid) {
+export async function addToDock(itemId) {
     const response = await fetch(`${API_BASE}/dock`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ item_uuid: itemUuid }),
+        body: JSON.stringify({ item_id: itemId }),
     });
     if (!response.ok) {
         const error = await response.json();
@@ -104,8 +104,8 @@ export async function addToDock(itemUuid) {
 }
 
 // 从 Dock 移除图标
-export async function removeFromDock(itemUuid) {
-    const response = await fetch(`${API_BASE}/dock/${itemUuid}`, {
+export async function removeFromDock(itemId) {
+    const response = await fetch(`${API_BASE}/dock/${itemId}`, {
         method: 'DELETE',
     });
     if (!response.ok) {
@@ -182,13 +182,13 @@ export async function reorderItems(items) {
 }
 
 // 移动图标到另一个分类
-export async function moveItemToCategory(itemUuid, newCategoryId) {
+export async function moveItemToCategory(itemId, newCategoryId) {
     const response = await fetch(`${API_BASE}/items/move`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ item_uuid: itemUuid, new_category_id: newCategoryId }),
+        body: JSON.stringify({ item_id: itemId, new_category_id: newCategoryId }),
     });
     if (!response.ok) {
         throw new Error('移动图标失败');
@@ -197,8 +197,8 @@ export async function moveItemToCategory(itemUuid, newCategoryId) {
 }
 
 // 删除图标（软删除）
-export async function deleteItem(itemUuid) {
-    const response = await fetch(`${API_BASE}/items/${itemUuid}`, {
+export async function deleteItem(itemId) {
+    const response = await fetch(`${API_BASE}/items/${itemId}`, {
         method: 'DELETE',
     });
     if (!response.ok) {
@@ -208,8 +208,8 @@ export async function deleteItem(itemUuid) {
 }
 
 // 更新图标信息
-export async function updateItem(itemUuid, data) {
-    const response = await fetch(`${API_BASE}/items/${itemUuid}`, {
+export async function updateItem(itemId, data) {
+    const response = await fetch(`${API_BASE}/items/${itemId}`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',

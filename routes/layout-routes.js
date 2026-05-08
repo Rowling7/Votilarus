@@ -123,7 +123,7 @@ router.get('/item/:uuid', (req, res) => {
     const { uuid } = req.params;
     const categoryId = req.query.category_id;
 
-    let sql = 'SELECT * FROM item_layouts WHERE item_uuid = ?';
+    let sql = 'SELECT * FROM item_layouts WHERE item_id = ?';
     const params = [uuid];
 
     if (categoryId) {
@@ -158,9 +158,9 @@ router.get('/category/:categoryId', (req, res) => {
     const { categoryId } = req.params;
 
     const sql = `
-        SELECT il.*, a.name, a.target, a.bgimage
+        SELECT il.*, a.title, a.link_url, a.icon_path
         FROM item_layouts il
-        LEFT JOIN A7001 a ON il.item_uuid = a.uuid
+        LEFT JOIN icon_items a ON il.item_id = a.id
         WHERE il.category_id = ? AND il.is_active = '1'
         ORDER BY il.sort_order ASC
     `;
