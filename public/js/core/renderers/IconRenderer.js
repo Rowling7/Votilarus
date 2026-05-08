@@ -2,6 +2,7 @@
 
 import CategoryManager from '../../managers/CategoryManager.js';
 import DragHandler from '../handlers/DragHandler.js';
+import WidgetManager from '../../managers/WidgetManager.js';
 
 class IconRenderer {
     constructor() {
@@ -142,17 +143,11 @@ class IconRenderer {
      */
     addDefaultWidgets(container) {
         // 添加时钟小组件
-        const clockWidget = document.createElement('nav-widget');
-        clockWidget.setAttribute('type', 'clock');
-        clockWidget.setAttribute('size', '2x2');
-        clockWidget.setAttribute('uuid', 'widget-clock');
+        const clockWidget = WidgetManager.createWidgetElement('clock', '2x2', 'widget-clock');
         container.appendChild(clockWidget);
 
         // 添加日历小组件
-        const calendarWidget = document.createElement('nav-widget');
-        calendarWidget.setAttribute('type', 'calendar');
-        calendarWidget.setAttribute('size', '2x2');
-        calendarWidget.setAttribute('uuid', 'widget-calendar');
+        const calendarWidget = WidgetManager.createWidgetElement('calendar', '2x2', 'widget-calendar');
         container.appendChild(calendarWidget);
     }
 

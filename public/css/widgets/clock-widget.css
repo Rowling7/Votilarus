@@ -1,0 +1,28 @@
+/* ==================== 时钟小组件样式 ==================== */
+
+.clock-widget {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: white;
+}
+
+.clock-time {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: var(--theme-color, #667eea);
+}
+
+.clock-date {
+    font-size: 1rem;
+    margin-top: 0.5rem;
+    opacity: 0.8;
+}
+
+.clock-weekday {
+    font-size: 0.9rem;
+    margin-top: 0.25rem;
+    opacity: 0.6;
+}

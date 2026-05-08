@@ -86,26 +86,59 @@ class ContextMenuHandler {
      */
     showItemMenu(e, gridItem) {
         this.targetElement = gridItem;
-        const itemUuid = gridItem.dataset.itemUuid;
-        const layout = this.getItemLayout(itemUuid);
+
+        // 判断是图标还是 widget
+        const isWidget = gridItem.dataset.type === 'widget';
+        const itemUuid = isWidget ? gridItem.dataset.uuid : gridItem.dataset.itemUuid;
+
+        if (isWidget) {
+            // Widget 的右键菜单
+            this.showWidgetMenu(e, gridItem);
+        } else {
+            // 图标的右键菜单
+            const layout = this.getItemLayout(itemUuid);
+
+            const menuItems = [
+                {
+                    label: '编辑图标',
+                    action: () => this.editItem(gridItem)
+                },
+                {
+                    label: '设置大小',
+                    action: () => this.showSizeSelector(gridItem, itemUuid),
+                    hasSubmenu: true
+                },
+                {
+                    label: '添加到 Dock',
+                    action: () => this.addToDock(itemUuid)
+                },
+                {
+                    label: '删除',
+                    action: () => this.deleteItem(itemUuid),
+                    className: 'danger'
+                }
+            ];
+
+            this.renderMenu(menuItems, e.clientX, e.clientY);
+        }
+    }
+
+    /**
+     * 显示 Widget 右键菜单
+     */
+    showWidgetMenu(e, gridItem) {
+        const widgetUuid = gridItem.dataset.uuid;
+        const currentSize = gridItem.dataset.size || '2x2';
 
         const menuItems = [
             {
-                label: '编辑图标',
-                action: () => this.editItem(gridItem)
-            },
-            {
-                label: '设置大小 ',
-                action: () => this.showSizeSelector(gridItem, itemUuid),
+                label: '设置大小',
+                action: () => this.showSizeSelector(gridItem, widgetUuid),
                 hasSubmenu: true
             },
             {
-                label: '添加到 Dock',
-                action: () => this.addToDock(itemUuid)
-            },
-            {
                 label: '删除',
-                action: () => this.deleteItem(itemUuid),
+                action: () => this.deleteWidget(widgetUuid),
                 className: 'danger'
             }
         ];
@@ -273,31 +306,46 @@ class ContextMenuHandler {
     }
 
     /**
-     * 更改图标尺寸
+     * 更改图标/widget 尺寸
      */
     async changeSize(itemUuid, size) {
         const [width, height] = size.split('x').map(Number);
 
-        // 从 CategoryManager 获取布局信息（包含 category_id）
-        const layout = this.getItemLayout(itemUuid);
-        if (!layout || !layout.category_id) {
-            ToastNotification.error('无法获取图标布局信息');
+        // 判断是图标还是 widget
+        const gridItem = document.querySelector(`[data-item-uuid="${itemUuid}"]`) ||
+            document.querySelector(`[data-uuid="${itemUuid}"]`);
+
+        if (!gridItem) {
+            ToastNotification.error('未找到元素');
             return;
         }
 
-        try {
-            // 调用 API 更新数据库
-            const { updateItemLayout } = await import('../api-client.js');
-            await updateItemLayout({
-                item_uuid: itemUuid,
-                category_id: layout.category_id,
-                width: width,
-                height: height
-            });
+        const isWidget = gridItem.dataset.type === 'widget';
 
-            // 更新 UI
-            const gridItem = document.querySelector(`[data-item-uuid="${itemUuid}"]`);
-            if (gridItem) {
+        try {
+            if (isWidget) {
+                // Widget 只需更新 UI 和 dataset
+                gridItem.className = `grid-item widget-item widget-${size}`;
+                gridItem.dataset.size = size;
+
+                ToastNotification.success(`小组件尺寸已更改为 ${size}`);
+            } else {
+                // 图标需要调用 API 更新数据库
+                const layout = this.getItemLayout(itemUuid);
+                if (!layout || !layout.category_id) {
+                    ToastNotification.error('无法获取图标布局信息');
+                    return;
+                }
+
+                const { updateItemLayout } = await import('../api-client.js');
+                await updateItemLayout({
+                    item_uuid: itemUuid,
+                    category_id: layout.category_id,
+                    width: width,
+                    height: height
+                });
+
+                // 更新 UI
                 gridItem.className = `grid-item size-${size}`;
 
                 // 同步更新 CategoryManager 缓存
@@ -404,6 +452,40 @@ class ContextMenuHandler {
             }
 
             ToastNotification.success('图标已删除');
+        } catch (error) {
+            ToastNotification.error('删除失败: ' + error.message);
+        }
+    }
+
+    /**
+     * 删除 Widget
+     */
+    async deleteWidget(widgetUuid) {
+        const confirmed = await ConfirmModal.show({
+            title: '删除小组件',
+            message: '确定要删除这个小组件吗？',
+            confirmText: '删除',
+            cancelText: '取消',
+            type: 'danger'
+        });
+
+        if (!confirmed) {
+            return;
+        }
+
+        try {
+            // 销毁 widget 实例
+            if (window.widgetManager) {
+                window.widgetManager.destroy(widgetUuid);
+            }
+
+            // 从 DOM 中移除
+            const gridItem = document.querySelector(`[data-uuid="${widgetUuid}"]`);
+            if (gridItem) {
+                gridItem.remove();
+            }
+
+            ToastNotification.success('小组件已删除');
         } catch (error) {
             ToastNotification.error('删除失败: ' + error.message);
         }

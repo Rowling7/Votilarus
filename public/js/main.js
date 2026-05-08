@@ -3,6 +3,7 @@
 import { registerAllComponents } from './components/index.js';
 import SettingsManager from './managers/SettingsManager.js';
 import CategoryManager from './managers/CategoryManager.js';
+import WidgetManager from './managers/WidgetManager.js';
 import IconRenderer from './core/renderers/IconRenderer.js';
 import SidebarRenderer from './core/renderers/SidebarRenderer.js';
 import SearchHandler from './core/handlers/SearchHandler.js';
@@ -40,6 +41,9 @@ class App {
 
             // 将 CategoryManager 暴露到全局，供其他模块使用
             window.categoryManager = CategoryManager;
+
+            // 将 WidgetManager 暴露到全局，供其他模块使用
+            window.widgetManager = WidgetManager;
 
             // 渲染侧边栏
             SidebarRenderer.render(CategoryManager.getCategories());

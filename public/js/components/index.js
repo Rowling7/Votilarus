@@ -4,7 +4,6 @@ import NavIcon from './NavIcon.js';
 import NavDock from './NavDock.js';
 import SearchBox from './SearchBox.js';
 import NavSidebar from './NavSidebar.js';
-import NavWidget from './NavWidget.js';
 import SettingsModal from './SettingsModal.js';
 import ConfirmModal from './ConfirmModal.js';
 
@@ -17,7 +16,6 @@ export function registerAllComponents() {
         { name: 'nav-dock', class: NavDock },
         { name: 'search-box', class: SearchBox },
         { name: 'nav-sidebar', class: NavSidebar },
-        { name: 'nav-widget', class: NavWidget },
         { name: 'settings-modal', class: SettingsModal },
         { name: 'confirm-modal', class: ConfirmModal }
     ];
@@ -38,7 +36,6 @@ export function registerComponent(name) {
         'nav-dock': NavDock,
         'search-box': SearchBox,
         'nav-sidebar': NavSidebar,
-        'nav-widget': NavWidget,
         'settings-modal': SettingsModal,
         'confirm-modal': ConfirmModal
     };
@@ -58,7 +55,6 @@ export {
     NavDock,
     SearchBox,
     NavSidebar,
-    NavWidget,
     SettingsModal,
     ConfirmModal
 };

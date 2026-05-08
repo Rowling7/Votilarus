@@ -177,28 +177,25 @@
     grid-row: span 2;
 }
 
-/* 小组件尺寸 */
-nav-widget[size="1x1"],
+/* ==================== Widget 尺寸样式 ==================== */
+/* Widget 作为 grid-item，通过 class 控制尺寸 */
 .grid-item.widget-1x1 {
     width: var(--cell-base-size);
     height: var(--cell-base-size);
 }
 
-nav-widget[size="1x2"],
 .grid-item.widget-1x2 {
     width: calc(var(--cell-base-size) * 2 + var(--cell-gap));
     height: var(--cell-base-size);
     grid-column: span 2;
 }
 
-nav-widget[size="2x1"],
 .grid-item.widget-2x1 {
     width: var(--cell-base-size);
     height: calc(var(--cell-base-size) * 2 + var(--cell-gap));
     grid-row: span 2;
 }
 
-nav-widget[size="2x2"],
 .grid-item.widget-2x2 {
     width: calc(var(--cell-base-size) * 2 + var(--cell-gap));
     height: calc(var(--cell-base-size) * 2 + var(--cell-gap));
@@ -206,7 +203,6 @@ nav-widget[size="2x2"],
     grid-row: span 2;
 }
 
-nav-widget[size="2x3"],
 .grid-item.widget-2x3 {
     width: calc(var(--cell-base-size) * 3 + var(--cell-gap) * 2);
     height: calc(var(--cell-base-size) * 2 + var(--cell-gap));
@@ -214,15 +210,9 @@ nav-widget[size="2x3"],
     grid-row: span 2;
 }
 
-nav-widget[size="2x4"],
 .grid-item.widget-2x4 {
     width: calc(var(--cell-base-size) * 4 + var(--cell-gap) * 3);
     height: calc(var(--cell-base-size) * 2 + var(--cell-gap));
     grid-column: span 4;
     grid-row: span 2;
-}
-
-/* 小组件作为 Grid 子元素的间距处理 */
-.grid-container nav-widget {
-    margin: calc(var(--cell-gap) / 2);
 }
