@@ -6,7 +6,8 @@
 
 /* Layout */
 @import 'layout/grid.css';
-@import 'layout/sidebar.css';
+/* sidebar.css 已迁移到 NavSidebar.js 中统一管理 */
+/* @import 'layout/sidebar.css'; */
 
 /* Components */
 @import 'components/search.css';

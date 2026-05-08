@@ -15,6 +15,7 @@ import IconEditorHandler from './core/handlers/IconEditorHandler.js';
 import TooltipManager from './managers/TooltipManager.js';
 import AddIconDialog from './core/dialogs/AddIconDialog.js';
 import AddWidgetDialog from './core/dialogs/AddWidgetDialog.js';
+import NavSidebar from './components/NavSidebar.js';
 
 class App {
     constructor() {
@@ -24,6 +25,9 @@ class App {
     async init() {
         try {
             const totalStartTime = performance.now();
+
+            // 注入侧边栏样式（从 NavSidebar 组件）
+            NavSidebar.injectStyles();
 
             // 注册 Web Components
             registerAllComponents();
