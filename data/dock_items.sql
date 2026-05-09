@@ -10,7 +10,7 @@
  Target Server Version : 3035005
  File Encoding         : 65001
 
- Date: 08/05/2026 16:41:13
+ Date: 09/05/2026 09:48:13
 */
 
 PRAGMA foreign_keys = false;
@@ -30,16 +30,11 @@ CREATE TABLE "dock_items" (
 -- ----------------------------
 -- Records of dock_items
 -- ----------------------------
-INSERT INTO "dock_items" VALUES (83, '3', 1, '2026-05-08 08:11:25');
-INSERT INTO "dock_items" VALUES (84, '4', 2, '2026-05-08 08:11:30');
-INSERT INTO "dock_items" VALUES (85, '195', 3, '2026-05-08 08:11:34');
-INSERT INTO "dock_items" VALUES (86, '42', 4, '2026-05-08 08:12:15');
-INSERT INTO "dock_items" VALUES (87, '124', 5, '2026-05-08 08:12:25');
 
 -- ----------------------------
 -- Auto increment value for dock_items
 -- ----------------------------
-UPDATE "sqlite_sequence" SET seq = 87 WHERE name = 'dock_items';
+UPDATE "sqlite_sequence" SET seq = 91 WHERE name = 'dock_items';
 
 -- ----------------------------
 -- Indexes structure for table dock_items

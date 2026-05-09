@@ -10,7 +10,7 @@
  Target Server Version : 3035005
  File Encoding         : 65001
 
- Date: 08/05/2026 16:41:23
+ Date: 09/05/2026 09:48:22
 */
 
 PRAGMA foreign_keys = false;
@@ -241,7 +241,7 @@ INSERT INTO "icon_items" VALUES (203, 12, 0, '耐视点播', 'https://nsvod.me/'
 -- ----------------------------
 -- Auto increment value for icon_items
 -- ----------------------------
-UPDATE "sqlite_sequence" SET seq = 203 WHERE name = 'icon_items';
+UPDATE "sqlite_sequence" SET seq = 205 WHERE name = 'icon_items';
 
 -- ----------------------------
 -- Indexes structure for table icon_items

@@ -10,7 +10,7 @@
  Target Server Version : 3035005
  File Encoding         : 65001
 
- Date: 06/05/2026 14:37:50
+ Date: 09/05/2026 10:04:06
 */
 
 PRAGMA foreign_keys = false;
@@ -49,9 +49,9 @@ INSERT INTO "settings" VALUES (13, 'HistoryWidget', 'HistoryContainer', 'widget'
 INSERT INTO "settings" VALUES (14, 'grid_rows', '5', 'personal', '网格行数', '1', '0');
 INSERT INTO "settings" VALUES (15, 'grid_cols', '13', 'personal', '网格列数（13-20）', '1', '0');
 INSERT INTO "settings" VALUES (16, 'cell_gap', '2', 'personal', '单元格间距 (rem)', '1', '0');
-INSERT INTO "settings" VALUES (17, 'sidebar_width', '6', 'personal', '左侧导航栏宽度 (%)', '1', '0');
+INSERT INTO "settings" VALUES (17, 'sidebar_width', '4', 'personal', '左侧导航栏宽度 (%)', '1', '0');
 INSERT INTO "settings" VALUES (18, 'theme_mode', 'light', 'personal', '主题模式: dark/light/auto', '1', '0');
-INSERT INTO "settings" VALUES (19, 'theme_color', '#3b82f6', 'personal', '主题色', '1', '0');
+INSERT INTO "settings" VALUES (19, 'theme_color', '#863cf6', 'personal', '主题色', '1', '0');
 INSERT INTO "settings" VALUES (20, 'bg_image_enabled', '0', 'personal', '背景图片开关', '1', '0');
 INSERT INTO "settings" VALUES (21, 'bg_image_url', 'static/background/image061.png', 'personal', '背景图片URL地址', '1', '0');
 INSERT INTO "settings" VALUES (22, 'bg_blur_enabled', '0', 'personal', '背景模糊程度开关', '1', '0');
@@ -82,9 +82,8 @@ INSERT INTO "settings" VALUES (46, 'search_box_position', 'center', 'personal', 
 INSERT INTO "settings" VALUES (47, 'search_box_style', 'rounded', 'personal', '搜索框样式: rounded/square', '1', '0');
 INSERT INTO "settings" VALUES (48, 'scroll_animation_speed', '300', 'personal', '滚动动画速度 (ms)', '1', '0');
 INSERT INTO "settings" VALUES (49, 'drag_sensitivity', '5', 'personal', '拖拽灵敏度 (px)', '1', '0');
-INSERT INTO "settings" VALUES (50, 'enable_context_menu', '1', 'personal', '启用右键菜单', '1', '0');
-INSERT INTO "settings" VALUES (51, 'avatar_url', 'static/ico/loading2.gif
-', 'personal', '用户头像URL', '1', '0');
+INSERT INTO "settings" VALUES (50, 'enable_context_menu', '0', 'personal', '启用右键菜单', '1', '0');
+INSERT INTO "settings" VALUES (51, 'avatar_url', 'static/ico/loading2.gif', 'personal', '用户头像URL', '1', '0');
 INSERT INTO "settings" VALUES (52, 'username', 'Votilarus', 'personal', '用户名', '1', '0');
 INSERT INTO "settings" VALUES (53, 'bio', 'Everything will be OK!', 'personal', '个人简介/签名', '1', '0');
 

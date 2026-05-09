@@ -1,7 +1,7 @@
 /*
  Navicat Premium Data Transfer
 
- Source Server         : Pitaya-Main
+ Source Server         : SQLite-Votilarus
  Source Server Type    : SQLite
  Source Server Version : 3035005
  Source Schema         : main
@@ -10,7 +10,7 @@
  Target Server Version : 3035005
  File Encoding         : 65001
 
- Date: 02/05/2026 01:47:30
+ Date: 09/05/2026 10:03:32
 */
 
 PRAGMA foreign_keys = false;
@@ -20,18 +20,22 @@ PRAGMA foreign_keys = false;
 -- ----------------------------
 DROP TABLE IF EXISTS "log";
 CREATE TABLE "log" (
-  "uuid" text NOT NULL,
-  "apis" TEXT,
+  "id" integer NOT NULL,
   "tablename" TEXT,
-  "cloumnValue" TEXT,
-  "cloumnName" TEXT,
+  "column_id" TEXT,
+  "column_name" text,
   "newValue" TEXT,
   "oldValue" TEXT,
+  "apis" TEXT,
   "sqls" TEXT,
-  "date" DATE,
-  "isdel" TEXT,
-  PRIMARY KEY ("uuid")
+  "created_at" DATE,
+  "deleted_flag" integer,
+  PRIMARY KEY ("id")
 );
+
+-- ----------------------------
+-- Records of log
+-- ----------------------------
 
 -- ----------------------------
 -- Indexes structure for table log
@@ -42,15 +46,11 @@ ON "log" (
 );
 CREATE INDEX "index_log_cloumnValue"
 ON "log" (
-  "cloumnValue" ASC
+  "column_id" ASC
 );
 CREATE INDEX "index_log_tablename"
 ON "log" (
   "tablename" ASC
-);
-CREATE INDEX "index_log_uuid"
-ON "log" (
-  "uuid" ASC
 );
 
 PRAGMA foreign_keys = true;

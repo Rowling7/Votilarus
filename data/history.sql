@@ -1,7 +1,7 @@
 /*
  Navicat Premium Data Transfer
 
- Source Server         : Pitaya-Main
+ Source Server         : SQLite-Votilarus
  Source Server Type    : SQLite
  Source Server Version : 3035005
  Source Schema         : main
@@ -10,7 +10,7 @@
  Target Server Version : 3035005
  File Encoding         : 65001
 
- Date: 02/05/2026 01:49:27
+ Date: 09/05/2026 10:03:14
 */
 
 PRAGMA foreign_keys = false;
@@ -21,38 +21,23 @@ PRAGMA foreign_keys = false;
 DROP TABLE IF EXISTS "history";
 CREATE TABLE "history" (
   "id" INTEGER PRIMARY KEY AUTOINCREMENT,
-  "history_id" TEXT,
-  "bgimage" blob,
+  "icon_path" text,
   "url" TEXT NOT NULL,
   "title" TEXT,
-  "visit_count" INTEGER DEFAULT 0,
-  "typed_count" INTEGER DEFAULT 0,
-  "last_visit_time" text,
-  "last_visit_date" DATE,
+  "last_visit_at" DATE,
   "created_at" DATE,
-  "delDatetime" DATE,
-  "isdel" INTEGER DEFAULT 0
+  "deleted_at" DATE,
+  "deleted_flag" INTEGER DEFAULT 0,
+  "updated_at" DATE
 );
+
+-- ----------------------------
+-- Records of history
+-- ----------------------------
 
 -- ----------------------------
 -- Auto increment value for history
 -- ----------------------------
 UPDATE "sqlite_sequence" SET seq = 6852 WHERE name = 'history';
-
--- ----------------------------
--- Indexes structure for table history
--- ----------------------------
-CREATE INDEX "idx_history_id"
-ON "history" (
-  "history_id" ASC
-);
-CREATE INDEX "idx_last_visit_time"
-ON "history" (
-  "last_visit_time" ASC
-);
-CREATE INDEX "idx_url"
-ON "history" (
-  "url" ASC
-);
 
 PRAGMA foreign_keys = true;
