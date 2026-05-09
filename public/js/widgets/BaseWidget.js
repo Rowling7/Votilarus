@@ -12,6 +12,11 @@ class BaseWidget {
         this.container = container;
         this.intervalId = null;
         this.isDestroyed = false;
+        // 默认支持所有尺寸，子类可以覆盖此属性
+        this.supportedSizes = [
+            '1x1', '1x2', '1x3', '1x4',
+            '2x1', '2x2', '2x3', '2x4'
+        ];
     }
 
     /**

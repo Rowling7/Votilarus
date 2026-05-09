@@ -84,7 +84,12 @@ class WidgetManager {
         container.appendChild(widgetContainer);
 
         // 使用 WidgetManager 创建 widget
-        this.create(type, widgetContainer, uuid);
+        const widgetInstance = this.create(type, widgetContainer, uuid);
+
+        // 将 supportedSizes 保存到 dataset，以便右键菜单可以读取
+        if (widgetInstance && widgetInstance.supportedSizes) {
+            container.dataset.supportedSizes = JSON.stringify(widgetInstance.supportedSizes);
+        }
 
         return container;
     }

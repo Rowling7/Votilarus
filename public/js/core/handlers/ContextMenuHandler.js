@@ -130,10 +130,31 @@ class ContextMenuHandler {
         const widgetUuid = gridItem.dataset.uuid;
         const currentSize = gridItem.dataset.size || '2x2';
 
+        // 从 WidgetManager 获取 widget 实例以获取支持的尺寸列表
+        let supportedSizes = [
+            '1x1', '1x2', '1x3', '1x4',
+            '2x1', '2x2', '2x3', '2x4'
+        ];
+
+        // 优先从 widget 实例获取
+        if (window.widgetManager && widgetUuid) {
+            const widgetInstance = window.widgetManager.activeWidgets.get(widgetUuid);
+            if (widgetInstance && widgetInstance.supportedSizes) {
+                supportedSizes = widgetInstance.supportedSizes;
+            }
+        } else if (gridItem.dataset.supportedSizes) {
+            // 后备方案：从 dataset 读取
+            try {
+                supportedSizes = JSON.parse(gridItem.dataset.supportedSizes);
+            } catch (err) {
+                console.warn('Failed to parse supportedSizes from dataset:', err);
+            }
+        }
+
         const menuItems = [
             {
                 label: '设置大小',
-                action: () => this.showSizeSelector(gridItem, widgetUuid),
+                action: () => this.showSizeSelector(gridItem, widgetUuid, supportedSizes),
                 hasSubmenu: true
             },
             {
@@ -262,9 +283,13 @@ class ContextMenuHandler {
 
     /**
      * 显示尺寸选择器（子菜单）
+     * @param {HTMLElement} gridItem - 网格项元素
+     * @param {string} itemId - 项目 ID
+     * @param {Array} customSizes - 自定义尺寸列表（可选）
      */
-    showSizeSelector(gridItem, itemId) {
-        const sizes = [
+    showSizeSelector(gridItem, itemId, customSizes = null) {
+        // 如果提供了自定义尺寸列表，使用它；否则使用默认列表
+        const sizes = customSizes || [
             '1x1', '1x2', '1x3', '1x4',
             '2x1', '2x2', '2x3', '2x4'
         ];
@@ -375,9 +400,27 @@ class ContextMenuHandler {
 
         try {
             if (isWidget) {
-                // Widget 只需更新 UI 和 dataset
+                // Widget 需要更新 UI、dataset 并重新渲染
+                const widgetUuid = itemId;
+                const oldSize = gridItem.dataset.size;
+
+                // 更新 class 和 dataset
                 gridItem.className = `grid-item widget-item widget-${size}`;
                 gridItem.dataset.size = size;
+
+                // 如果尺寸改变，需要重新渲染 widget
+                if (oldSize !== size && window.widgetManager) {
+                    const widgetContainer = gridItem.querySelector('.widget-content');
+                    const widgetType = gridItem.dataset.widgetType;
+
+                    if (widgetContainer && widgetType) {
+                        // 销毁旧实例
+                        window.widgetManager.destroy(widgetUuid);
+
+                        // 创建新实例
+                        window.widgetManager.create(widgetType, widgetContainer, widgetUuid);
+                    }
+                }
 
                 ToastNotification.success(`小组件尺寸已更改为 ${size}`);
             } else {

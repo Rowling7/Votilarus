@@ -22,6 +22,9 @@ class WeatherWidget extends BaseWidget {
         };
         this.weatherData = null;
         this.isHovered = false;
+
+        // 天气组件只支持 2x4 尺寸
+        this.supportedSizes = ['2x4'];
     }
 
     /**

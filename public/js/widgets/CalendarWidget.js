@@ -4,6 +4,16 @@ import BaseWidget from './BaseWidget.js';
 
 class CalendarWidget extends BaseWidget {
     /**
+     * 构造函数
+     * @param {HTMLElement} container - widget 容器元素
+     */
+    constructor(container) {
+        super(container);
+        // 日历组件只支持 2x2 尺寸
+        this.supportedSizes = ['2x2'];
+    }
+
+    /**
      * 渲染日历小组件
      */
     render() {

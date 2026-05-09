@@ -83,3 +83,35 @@
     color: var(--text-tertiary, rgba(255, 255, 255, 0.6));
     line-height: 1.2;
 }
+
+/* ==================== 宽屏布局样式（时分秒在一行） ==================== */
+
+.clock-time-wide {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: var(--theme-color, #667eea);
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    line-height: 1.2;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.clock-time-wide .time-digit {
+    display: inline-block;
+    transition: color 0.3s ease;
+    min-width: 0.6em;
+    text-align: center;
+}
+
+.clock-time-wide .time-separator {
+    display: inline-block;
+    margin: 0 0.15rem;
+    font-weight: bold;
+}
+
+.clock-time-wide .highlight-seven {
+    color: #9c27b0 !important;
+    text-shadow: 0 0 8px rgba(156, 39, 176, 0.5);
+}
