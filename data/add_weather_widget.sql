@@ -1,6 +1,0 @@
--- 添加天气小组件到首页（category_id = -1 对应首页，但实际数据库中首页可能用其他ID）
--- 先查询首页的category_id
--- INSERT INTO icon_items (category_id, title, link_url, icon_path, deleted_flag) VALUES (0, '天气', NULL, NULL, '0');
--- 假设首页category_id是0，插入后获取lastID，然后在item_layouts中创建布局记录
--- 注意：需要先执行上面的INSERT，然后手动替换下面的item_id为实际的ID
--- INSERT INTO item_layouts (item_id, category_id, pos_x, pos_y, width, height, sort_order) VALUES (LAST_INSERT_ID, 0, 0, 2, 2, 4, 3);

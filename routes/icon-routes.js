@@ -82,7 +82,9 @@ router.post('/widget', (req, res) => {
 
     // 小组件名称和默认大小映射
     const widgetConfigs = {
-        'clock': { name: 'ClockWidget', width: 2, height: 2 }
+        'clock': { name: 'ClockWidget', width: 2, height: 2 },
+        'calendar': { name: 'CalendarWidget', width: 2, height: 2 },
+        'weather': { name: 'WeatherWidget', width: 2, height: 4 }
     };
 
     const config = widgetConfigs[widget_type] || { name: widget_type, width: 2, height: 2 };

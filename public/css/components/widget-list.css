@@ -1,0 +1,54 @@
+/* ==================== 小组件列表样式 ==================== */
+
+.widget-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.widget-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 0.75rem;
+    transition: all var(--transition-fast);
+    cursor: pointer;
+}
+
+.widget-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateX(4px);
+}
+
+.widget-icon {
+    font-size: 2.5rem;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 0.5rem;
+}
+
+.widget-info {
+    flex: 1;
+}
+
+.widget-name {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+}
+
+.widget-description {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+.widget-add-btn {
+    padding: 0.5rem 1.5rem;
+}

@@ -12,7 +12,10 @@
 /* Components */
 @import 'components/search.css';
 @import 'components/context-menu.css';
+@import 'components/modal-overlay.css';
 @import 'components/settings-modal.css';
+@import 'components/icon-editor-dialog.css';
+@import 'components/widget-list.css';
 @import 'components/dock.css';
 @import 'components/tooltip.css';
 

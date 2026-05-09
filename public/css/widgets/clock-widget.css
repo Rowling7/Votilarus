@@ -6,23 +6,74 @@
     align-items: center;
     justify-content: center;
     height: 100%;
-    color: white;
+    width: 100%;
+    color: var(--text-primary, white);
+    padding: 0.75rem;
+    box-sizing: border-box;
+    backdrop-filter: blur(var(--glass-blur, 10px));
+    border-radius: 0.5rem;
+    box-shadow: var(--shadow-md, 0 4px 6px rgba(0, 0, 0, 0.1));
+    transition: all var(--transition-normal);
+    overflow: hidden;
 }
 
 .clock-time {
-    font-size: 2.5rem;
+    font-size: 2rem;
     font-weight: bold;
     color: var(--theme-color, #667eea);
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    line-height: 1.2;
+    margin-bottom: 0.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.clock-time .time-digit,
+.clock-seconds .time-digit {
+    display: inline-block;
+    transition: color 0.3s ease;
+    min-width: 0.6em;
+    text-align: center;
+}
+
+.clock-time .time-separator {
+    display: inline-block;
+    margin: 0 0.1rem;
+    font-weight: bold;
+}
+
+.clock-time .highlight-seven,
+.clock-seconds .highlight-seven {
+    color: #9c27b0 !important;
+    text-shadow: 0 0 8px rgba(156, 39, 176, 0.5);
+}
+
+.clock-seconds {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--theme-color-light, #93c5fd);
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    line-height: 1.2;
+    margin-bottom: 0.5rem;
+    opacity: 0.9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .clock-date {
-    font-size: 1rem;
-    margin-top: 0.5rem;
+    font-size: 0.9rem;
+    margin-top: 0.25rem;
     opacity: 0.8;
+    color: var(--text-secondary, rgba(255, 255, 255, 0.8));
+    line-height: 1.2;
 }
 
 .clock-weekday {
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     margin-top: 0.25rem;
     opacity: 0.6;
+    color: var(--text-tertiary, rgba(255, 255, 255, 0.6));
+    line-height: 1.2;
 }

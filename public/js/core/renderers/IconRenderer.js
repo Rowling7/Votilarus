@@ -142,13 +142,9 @@ class IconRenderer {
      * 添加默认小组件到首页
      */
     addDefaultWidgets(container) {
-        // 添加时钟小组件
-        const clockWidget = WidgetManager.createWidgetElement('clock', '2x2', 'widget-clock');
+        // 只添加时钟小组件作为默认组件
+        const clockWidget = WidgetManager.createWidgetElement('clock', '2x2', 'widget-clock-default');
         container.appendChild(clockWidget);
-
-        // 添加日历小组件
-        const calendarWidget = WidgetManager.createWidgetElement('calendar', '2x2', 'widget-calendar');
-        container.appendChild(calendarWidget);
     }
 
     /**
@@ -319,12 +315,12 @@ class IconRenderer {
     createWidgetItem(item, layout) {
         // 根据标题判断 widget 类型
         const widgetTypeMap = {
-            '时钟': 'clock',
-            '日历': 'calendar',
-            '天气': 'weather'
+            'ClockWidget': 'clock',
+            'CalendarWidget': 'calendar',
+            'WeatherWidget': 'weather'
         };
 
-        const widgetType = widgetTypeMap[item.title] || 'clock';
+        const widgetType = widgetTypeMap[item.title] || item.title.toLowerCase().replace('widget', '');
         const size = `${layout.width}x${layout.height}`;
         const uuid = `widget-${item.id}`;
 
