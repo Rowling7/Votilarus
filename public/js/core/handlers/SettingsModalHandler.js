@@ -361,9 +361,7 @@ class SettingsModalHandler {
                 <div class="setting-item">
                     <label for="default-search-engine">默认搜索引擎</label>
                     <select id="default-search-engine">
-                        <option value="baidu">百度</option>
-                        <option value="bing">必应</option>
-                        <option value="google">Google</option>
+                        <option value="">加载中...</option>
                     </select>
                 </div>
                 
@@ -385,6 +383,57 @@ class SettingsModalHandler {
                 </div>
             </div>
         `;
+    }
+
+    /**
+     * 从 API 加载搜索引擎列表并填充到下拉框
+     */
+    async populateSearchEngines() {
+        try {
+            const response = await fetch('/api/search-engines');
+            if (!response.ok) {
+                throw new Error('Failed to fetch search engines');
+            }
+
+            const engines = await response.json();
+            const selectElement = document.getElementById('default-search-engine');
+
+            if (!selectElement) {
+                console.error('default-search-engine element not found');
+                return;
+            }
+
+            // 清空现有选项
+            selectElement.innerHTML = '';
+
+            // 添加默认选项
+            if (engines.length === 0) {
+                const option = document.createElement('option');
+                option.value = '';
+                option.textContent = '暂无搜索引擎';
+                selectElement.appendChild(option);
+                return;
+            }
+
+            // 按 sort_order 排序
+            engines.sort((a, b) => (a.sort_order || 999) - (b.sort_order || 999));
+
+            // 添加所有搜索引擎选项
+            engines.forEach(engine => {
+                const option = document.createElement('option');
+                option.value = engine.title_en;
+                option.textContent = engine.title;
+                selectElement.appendChild(option);
+            });
+
+        } catch (error) {
+            console.error('Error loading search engines:', error);
+            // 如果加载失败，显示错误信息
+            const selectElement = document.getElementById('default-search-engine');
+            if (selectElement) {
+                selectElement.innerHTML = '<option value="">加载失败</option>';
+            }
+        }
     }
 
     /**
@@ -630,9 +679,9 @@ class SettingsModalHandler {
     /**
      * 打开设置 Modal
      */
-    open() {
+    async open() {
         // 加载当前设置
-        this.loadCurrentSettings();
+        await this.loadCurrentSettings();
 
         // 显示 Modal
         this.overlay.classList.add('active');
@@ -650,18 +699,18 @@ class SettingsModalHandler {
     /**
      * 加载当前设置到表单
      */
-    loadCurrentSettings() {
+    async loadCurrentSettings() {
         // TODO: 从 settingsManager 获取实际设置
         this.currentSettings = SettingsManager.getAllSettings();
 
         // 填充表单字段
-        this.fillFormFields();
+        await this.fillFormFields();
     }
 
     /**
      * 填充表单字段
      */
-    fillFormFields() {
+    async fillFormFields() {
         const settings = this.currentSettings;
 
         // 基础设置
@@ -727,7 +776,8 @@ class SettingsModalHandler {
         document.getElementById('fisheye-scale').value = settings.fisheyeScale || 1.5;
         document.getElementById('fisheye-range').value = settings.fisheyeRange || 2;
 
-        // 搜索设置
+        // 搜索设置 - 先加载搜索引擎列表，再填充
+        await this.populateSearchEngines();
         document.getElementById('default-search-engine').value = settings.defaultSearchEngine || 'baidu';
         document.getElementById('search-box-position').value = settings.searchBoxPosition || 'center';
         document.getElementById('search-box-style').value = settings.searchBoxStyle || 'rounded';
