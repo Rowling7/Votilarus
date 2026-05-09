@@ -38,14 +38,14 @@ class IconRenderer {
         }
     }
 
-    renderAllCategories() {
+    async renderAllCategories() {
         const startTime = performance.now();
         const categories = CategoryManager.getCategories();
 
         this.contentArea.innerHTML = '';
 
         // 创建“首页”面板（data-category-id = -1）
-        const homePanel = this.createHomePanel();
+        const homePanel = await this.createHomePanel();
         this.contentArea.appendChild(homePanel);
 
         // 优化：其他分类使用懒渲染，只创建空面板，切换时再填充内容
@@ -117,7 +117,7 @@ class IconRenderer {
     /**
      * 创建首页面板（data-category-id = -1）
      */
-    createHomePanel() {
+    async createHomePanel() {
         const panel = document.createElement('div');
         panel.className = 'category-panel';
         panel.id = 'category--1';
@@ -128,7 +128,7 @@ class IconRenderer {
         gridContainer.className = 'grid-container';
 
         // 在首页添加默认小组件
-        this.addDefaultWidgets(gridContainer);
+        await this.addDefaultWidgets(gridContainer);
 
         // 使用 requestAnimationFrame 优化渲染
         requestAnimationFrame(() => {
@@ -141,10 +141,68 @@ class IconRenderer {
     /**
      * 添加默认小组件到首页
      */
-    addDefaultWidgets(container) {
-        // 只添加时钟小组件作为默认组件
-        const clockWidget = WidgetManager.createWidgetElement('clock', '2x2', 'widget-clock-default');
-        container.appendChild(clockWidget);
+    async addDefaultWidgets(container) {
+        try {
+            const { getWidgets, createWidget } = await import('../api-client.js');
+
+            // 从数据库获取 category_id = -1 的所有组件
+            let widgets = await getWidgets(-1);
+
+            // 如果数据库中没有组件，创建默认的 ClockWidget 记录
+            if (!widgets || widgets.length === 0) {
+                await createWidget({
+                    title: 'ClockWidget',
+                    category_id: -1,
+                    pos_x: 0,
+                    pos_y: 0,
+                    width: 2,
+                    height: 2,
+                    active_flag: 1
+                });
+
+                // 重新获取刚创建的组件
+                widgets = await getWidgets(-1);
+            }
+
+            // 按 sort_order 排序
+            if (widgets && widgets.length > 0) {
+                widgets.sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0));
+
+                // 渲染所有组件
+                widgets.forEach(widget => {
+                    // 根据标题判断 widget 类型
+                    const widgetTypeMap = {
+                        'ClockWidget': 'clock',
+                        'CalendarWidget': 'calendar',
+                        'WeatherWidget': 'weather'
+                    };
+
+                    const widgetType = widgetTypeMap[widget.title] || widget.title.toLowerCase().replace('widget', '');
+                    const size = `${widget.width}x${widget.height}`;
+                    const widgetId = widget.id;
+
+                    // 创建 widget 元素
+                    const widgetElement = WidgetManager.createWidgetElement(widgetType, size, widgetId);
+
+                    // 设置位置信息（如果需要绝对定位）
+                    if (widget.pos_x !== undefined && widget.pos_y !== undefined) {
+                        widgetElement.dataset.posX = widget.pos_x;
+                        widgetElement.dataset.posY = widget.pos_y;
+                    }
+
+                    // 启用拖拽
+                    DragHandler.enableDrag(widgetElement);
+
+                    container.appendChild(widgetElement);
+                });
+            }
+        } catch (error) {
+            console.error('Failed to load/create default widgets:', error);
+
+            // 降级方案：直接创建默认的 ClockWidget
+            const clockWidget = WidgetManager.createWidgetElement('clock', '2x2', null);
+            container.appendChild(clockWidget);
+        }
     }
 
     /**
@@ -322,13 +380,10 @@ class IconRenderer {
 
         const widgetType = widgetTypeMap[item.title] || item.title.toLowerCase().replace('widget', '');
         const size = `${layout.width}x${layout.height}`;
-        const uuid = `widget-${item.id}`;
+        const widgetId = item.id;  // 直接使用 icon_widgets.id
 
         // 使用 WidgetManager 创建 widget 元素
-        const widgetElement = WidgetManager.createWidgetElement(widgetType, size, uuid);
-
-        // 设置 itemId
-        widgetElement.dataset.itemId = item.id;
+        const widgetElement = WidgetManager.createWidgetElement(widgetType, size, widgetId);
 
         // 启用拖拽
         DragHandler.enableDrag(widgetElement);

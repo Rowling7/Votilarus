@@ -89,11 +89,11 @@ class ContextMenuHandler {
 
         // 判断是图标还是 widget
         const isWidget = gridItem.dataset.type === 'widget';
-        const itemId = isWidget ? gridItem.dataset.uuid : gridItem.dataset.itemId;
+        const itemId = isWidget ? gridItem.dataset.widgetId : gridItem.dataset.itemId;
 
         if (isWidget) {
             // Widget 的右键菜单
-            this.showWidgetMenu(e, gridItem);
+            this.showWidgetMenu(e, gridItem, itemId);
         } else {
             // 图标的右键菜单
             const layout = this.getItemLayout(itemId);
@@ -126,24 +126,21 @@ class ContextMenuHandler {
     /**
      * 显示 Widget 右键菜单
      */
-    showWidgetMenu(e, gridItem) {
-        const widgetUuid = gridItem.dataset.uuid;
+    showWidgetMenu(e, gridItem, widgetId) {
         const currentSize = gridItem.dataset.size || '2x2';
 
-        // 从 WidgetManager 获取 widget 实例以获取支持的尺寸列表
+        // 从 WidgetManager 获取支持的尺寸列表
         let supportedSizes = [
             '1x1', '1x2', '1x3', '1x4',
             '2x1', '2x2', '2x3', '2x4'
         ];
 
-        // 优先从 widget 实例获取
-        if (window.widgetManager && widgetUuid) {
-            const widgetInstance = window.widgetManager.activeWidgets.get(widgetUuid);
+        if (window.widgetManager && widgetId) {
+            const widgetInstance = window.widgetManager.activeWidgets.get(parseInt(widgetId));
             if (widgetInstance && widgetInstance.supportedSizes) {
                 supportedSizes = widgetInstance.supportedSizes;
             }
         } else if (gridItem.dataset.supportedSizes) {
-            // 后备方案：从 dataset 读取
             try {
                 supportedSizes = JSON.parse(gridItem.dataset.supportedSizes);
             } catch (err) {
@@ -154,12 +151,12 @@ class ContextMenuHandler {
         const menuItems = [
             {
                 label: '设置大小',
-                action: () => this.showSizeSelector(gridItem, widgetUuid, supportedSizes),
+                action: () => this.showSizeSelector(gridItem, widgetId, supportedSizes),
                 hasSubmenu: true
             },
             {
                 label: '删除',
-                action: () => this.deleteWidget(widgetUuid),
+                action: () => this.deleteWidget(widgetId),
                 className: 'danger'
             }
         ];
@@ -387,9 +384,9 @@ class ContextMenuHandler {
     async changeSize(itemId, size) {
         const [width, height] = size.split('x').map(Number);
 
-        // 判断是图标还是 widget
-        const gridItem = document.querySelector(`[data-item-id="${itemId}"]`) ||
-            document.querySelector(`[data-uuid="${itemId}"]`);
+        // 优先从 widgetId 查找，其次从 itemId 查找
+        let gridItem = document.querySelector(`[data-widget-id="${itemId}"]`) ||
+            document.querySelector(`[data-item-id="${itemId}"]`);
 
         if (!gridItem) {
             ToastNotification.error('未找到元素');
@@ -400,31 +397,57 @@ class ContextMenuHandler {
 
         try {
             if (isWidget) {
-                // Widget 需要更新 UI、dataset 并重新渲染
-                const widgetUuid = itemId;
+                // 组件：调用新的 API 更新 icon_widgets 表
+                const widgetId = parseInt(itemId);
+
+                // 如果 widgetId 无效，只更新 UI，不保存到数据库
+                if (!widgetId || isNaN(widgetId)) {
+                    const oldSize = gridItem.dataset.size;
+                    gridItem.className = `grid-item widget-item widget-${size}`;
+                    gridItem.dataset.size = size;
+
+                    // 如果尺寸改变，重新渲染 widget
+                    if (oldSize !== size && window.widgetManager) {
+                        const widgetContainer = gridItem.querySelector('.widget-content');
+                        const widgetType = gridItem.dataset.widgetType;
+
+                        if (widgetContainer && widgetType) {
+                            window.widgetManager.destroy(widgetId);
+                            window.widgetManager.create(widgetType, widgetContainer, widgetId);
+                        }
+                    }
+
+                    ToastNotification.warning(`小组件尺寸已更改为 ${size}（未保存，因为没有有效的 ID）`);
+                    return;
+                }
+
                 const oldSize = gridItem.dataset.size;
 
-                // 更新 class 和 dataset
+                // 更新 UI
                 gridItem.className = `grid-item widget-item widget-${size}`;
                 gridItem.dataset.size = size;
 
-                // 如果尺寸改变，需要重新渲染 widget
+                // 调用 API 更新数据库
+                const { updateWidgetLayout } = await import('../api-client.js');
+                await updateWidgetLayout(widgetId, {
+                    width: width,
+                    height: height
+                });
+
+                // 如果尺寸改变，重新渲染 widget
                 if (oldSize !== size && window.widgetManager) {
                     const widgetContainer = gridItem.querySelector('.widget-content');
                     const widgetType = gridItem.dataset.widgetType;
 
                     if (widgetContainer && widgetType) {
-                        // 销毁旧实例
-                        window.widgetManager.destroy(widgetUuid);
-
-                        // 创建新实例
-                        window.widgetManager.create(widgetType, widgetContainer, widgetUuid);
+                        window.widgetManager.destroy(widgetId);
+                        window.widgetManager.create(widgetType, widgetContainer, widgetId);
                     }
                 }
 
                 ToastNotification.success(`小组件尺寸已更改为 ${size}`);
             } else {
-                // 图标需要调用 API 更新数据库
+                // 图标：保持原有逻辑不变
                 const layout = this.getItemLayout(itemId);
                 if (!layout || !layout.category_id) {
                     ToastNotification.error('无法获取图标布局信息');
@@ -554,7 +577,7 @@ class ContextMenuHandler {
     /**
      * 删除 Widget
      */
-    async deleteWidget(widgetUuid) {
+    async deleteWidget(widgetId) {
         const confirmed = await ConfirmModal.show({
             title: '删除小组件',
             message: '确定要删除这个小组件吗？',
@@ -568,13 +591,36 @@ class ContextMenuHandler {
         }
 
         try {
+            const parsedWidgetId = parseInt(widgetId);
+
+            // 如果 widgetId 无效，只从 DOM 移除，不调用 API
+            if (!parsedWidgetId || isNaN(parsedWidgetId)) {
+                // 销毁 widget 实例
+                if (window.widgetManager) {
+                    window.widgetManager.destroy(parsedWidgetId);
+                }
+
+                // 从 DOM 中移除
+                const gridItem = document.querySelector(`[data-widget-id="${widgetId}"]`);
+                if (gridItem) {
+                    gridItem.remove();
+                }
+
+                ToastNotification.warning('小组件已从页面移除（未从数据库删除，因为没有有效的 ID）');
+                return;
+            }
+
+            // 调用新的 API 删除组件
+            const { deleteWidget } = await import('../api-client.js');
+            await deleteWidget(parsedWidgetId);
+
             // 销毁 widget 实例
             if (window.widgetManager) {
-                window.widgetManager.destroy(widgetUuid);
+                window.widgetManager.destroy(parsedWidgetId);
             }
 
             // 从 DOM 中移除
-            const gridItem = document.querySelector(`[data-uuid="${widgetUuid}"]`);
+            const gridItem = document.querySelector(`[data-widget-id="${widgetId}"]`);
             if (gridItem) {
                 gridItem.remove();
             }

@@ -6,9 +6,10 @@ class ClockWidget extends BaseWidget {
     /**
      * 构造函数
      * @param {HTMLElement} container - widget 容器元素
+     * @param {number|null} widgetId - icon_widgets.id（数字ID）
      */
-    constructor(container) {
-        super(container);
+    constructor(container, widgetId = null) {
+        super(container, widgetId, 'ClockWidget');
         // 时钟组件只支持 2x2,2x3 和 2x4 尺寸
         this.supportedSizes = ['2x2', '2x3', '2x4'];
     }

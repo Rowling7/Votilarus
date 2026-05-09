@@ -1,5 +1,6 @@
 const categoriesRoute = require('./category-routes');
 const itemsRoute = require('./icon-routes');
+const widgetsRoute = require('./widget-routes');
 const layoutsRoute = require('./layout-routes');
 const dockRoute = require('./dock-routes');
 const settingsRoute = require('./settings-routes');
@@ -14,6 +15,7 @@ function registerRoutes(app, db) {
     // 设置所有路由的数据库连接
     categoriesRoute.setDatabase(db);
     itemsRoute.setDatabase(db);
+    widgetsRoute.setDatabase(db);
     layoutsRoute.setDatabase(db);
     dockRoute.setDatabase(db);
     settingsRoute.setDatabase(db);
@@ -22,6 +24,7 @@ function registerRoutes(app, db) {
     // 注册路由
     app.use('/api/categories', categoriesRoute.router);
     app.use('/api/items', itemsRoute.router);
+    app.use('/api/widgets', widgetsRoute.router);
     app.use('/api/layout', layoutsRoute.router);
     app.use('/api/dock', dockRoute.router);
     app.use('/api/settings', settingsRoute.router);

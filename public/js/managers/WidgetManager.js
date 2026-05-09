@@ -33,10 +33,10 @@ class WidgetManager {
      * 创建 widget
      * @param {string} type - widget 类型
      * @param {HTMLElement} container - 容器元素
-     * @param {string} uuid - widget UUID（可选）
+     * @param {number|null} widgetId - icon_widgets.id（数字ID）
      * @returns {Object|null} widget 实例或 null
      */
-    create(type, container, uuid = '') {
+    create(type, container, widgetId = null) {
         const widgetType = type.toLowerCase();
         const WidgetClass = this.widgetRegistry.get(widgetType);
 
@@ -47,16 +47,16 @@ class WidgetManager {
 
         // 设置容器属性
         container.className = 'widget-container';
-        container.dataset.uuid = uuid;
+        container.dataset.widgetId = widgetId;  // 使用 widgetId
         container.dataset.type = widgetType;
 
-        // 创建 widget 实例
-        const widget = new WidgetClass(container);
+        // 创建 widget 实例，传递 widgetId
+        const widget = new WidgetClass(container, widgetId);
         const result = widget.render();
 
         // 记录活跃的 widget
-        if (uuid) {
-            this.activeWidgets.set(uuid, widget);
+        if (widgetId) {
+            this.activeWidgets.set(widgetId, widget);  // 使用数字ID
         }
 
         return result;
@@ -66,16 +66,16 @@ class WidgetManager {
      * 创建 widget 元素（包含 grid-item 容器）
      * @param {string} type - widget 类型
      * @param {string} size - widget 尺寸（如 '2x2'）
-     * @param {string} uuid - widget UUID
+     * @param {number|null} widgetId - icon_widgets.id（数字ID）
      * @returns {HTMLElement} 完整的 widget grid-item 元素
      */
-    createWidgetElement(type, size = '2x2', uuid = '') {
+    createWidgetElement(type, size = '2x2', widgetId = null) {
         // 创建 grid-item 容器
         const container = document.createElement('div');
         container.className = `grid-item widget-item widget-${size}`;
         container.dataset.type = 'widget';
         container.dataset.widgetType = type.toLowerCase();
-        container.dataset.uuid = uuid;
+        container.dataset.widgetId = widgetId;  // 存储数字ID
         container.dataset.size = size; // 保存尺寸信息，用于右键菜单
 
         // 创建 widget 内容容器
@@ -84,7 +84,7 @@ class WidgetManager {
         container.appendChild(widgetContainer);
 
         // 使用 WidgetManager 创建 widget
-        const widgetInstance = this.create(type, widgetContainer, uuid);
+        const widgetInstance = this.create(type, widgetContainer, widgetId);
 
         // 将 supportedSizes 保存到 dataset，以便右键菜单可以读取
         if (widgetInstance && widgetInstance.supportedSizes) {
@@ -96,13 +96,13 @@ class WidgetManager {
 
     /**
      * 销毁 widget
-     * @param {string} uuid - widget UUID
+     * @param {number} widgetId - icon_widgets.id（数字ID）
      */
-    destroy(uuid) {
-        const widget = this.activeWidgets.get(uuid);
+    destroy(widgetId) {
+        const widget = this.activeWidgets.get(widgetId);
         if (widget) {
             widget.destroy();
-            this.activeWidgets.delete(uuid);
+            this.activeWidgets.delete(widgetId);
         }
     }
 
@@ -110,7 +110,7 @@ class WidgetManager {
      * 销毁所有 widget
      */
     destroyAll() {
-        this.activeWidgets.forEach((widget, uuid) => {
+        this.activeWidgets.forEach((widget, widgetId) => {
             widget.destroy();
         });
         this.activeWidgets.clear();

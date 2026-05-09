@@ -54,7 +54,7 @@ class App {
 
             // 渲染所有图标
             const renderStart = performance.now();
-            IconRenderer.renderAllCategories();
+            await IconRenderer.renderAllCategories();
             const renderEnd = performance.now();
 
             // 初始化拖拽功能

@@ -10,7 +10,7 @@
  Target Server Version : 3035005
  File Encoding         : 65001
 
- Date: 09/05/2026 16:37:41
+ Date: 09/05/2026 16:44:57
 */
 
 PRAGMA foreign_keys = false;
@@ -24,8 +24,8 @@ CREATE TABLE "icon_widgets" (
   "category_id" integer,
   "sort_order" integer,
   "title" TEXT,
-  "pox_x" NUMBER,
-  "pox_y" NUMBER,
+  "pos_x" NUMBER,
+  "pos_y" NUMBER,
   "width" NUMBER,
   "height" NUMBER,
   "active_flag" integer,

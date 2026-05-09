@@ -237,17 +237,82 @@ export async function createItem(itemData) {
     return await response.json();
 }
 
-// 创建小组件
+// 创建小组件 - 已废弃，请使用新的 createWidget API
+// export async function createWidget(widgetData) {
+//     const response = await fetch(`${API_BASE}/items/widget`, {
+//         method: 'POST',
+//         headers: {
+//             'Content-Type': 'application/json',
+//         },
+//         body: JSON.stringify(widgetData),
+//     });
+//     if (!response.ok) {
+//         throw new Error('创建小组件失败');
+//     }
+//     return await response.json();
+// }
+
+// ==================== Widget API ====================
+
+// 获取组件列表
+export async function getWidgets(categoryId = null) {
+    let url = `${API_BASE}/widgets`;
+    if (categoryId !== null && categoryId !== undefined) {
+        url += `?category_id=${categoryId}`;
+    }
+    const response = await fetch(url);
+    if (!response.ok) {
+        throw new Error('获取组件列表失败');
+    }
+    return await response.json();
+}
+
+// 创建组件
 export async function createWidget(widgetData) {
-    const response = await fetch(`${API_BASE}/items/widget`, {
+    const response = await fetch(`${API_BASE}/widgets`, {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(widgetData),
     });
     if (!response.ok) {
-        throw new Error('创建小组件失败');
+        throw new Error('创建组件失败');
+    }
+    return await response.json();
+}
+
+// 更新组件布局（位置、尺寸）
+export async function updateWidgetLayout(widgetId, layoutData) {
+    const response = await fetch(`${API_BASE}/widgets/${widgetId}/layout`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(layoutData),
+    });
+    if (!response.ok) {
+        throw new Error('更新组件布局失败');
+    }
+    return await response.json();
+}
+
+// 批量更新组件排序
+export async function reorderWidgets(updates) {
+    const response = await fetch(`${API_BASE}/widgets/reorder`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ widgets: updates }),
+    });
+    if (!response.ok) {
+        throw new Error('更新组件排序失败');
+    }
+    return await response.json();
+}
+
+// 删除组件
+export async function deleteWidget(widgetId) {
+    const response = await fetch(`${API_BASE}/widgets/${widgetId}`, {
+        method: 'DELETE',
+    });
+    if (!response.ok) {
+        throw new Error('删除组件失败');
     }
     return await response.json();
 }

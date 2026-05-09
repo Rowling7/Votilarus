@@ -133,12 +133,26 @@ class AddWidgetDialogHandler {
         try {
             const { createWidget } = await import('../api-client.js');
 
+            // 小组件名称和默认大小映射
+            const widgetConfigs = {
+                'clock': { title: 'ClockWidget', width: 2, height: 2 },
+                'calendar': { title: 'CalendarWidget', width: 2, height: 2 },
+                'weather': { title: 'WeatherWidget', width: 2, height: 4 }
+            };
+
+            const config = widgetConfigs[widgetId] || { title: widgetId, width: 2, height: 2 };
+
             const result = await createWidget({
-                widget_type: widgetId,
-                category_id: this.currentCategoryId
+                title: config.title,
+                category_id: this.currentCategoryId,
+                pos_x: 0,
+                pos_y: 0,
+                width: config.width,
+                height: config.height,
+                active_flag: 1
             });
 
-            ToastNotification.success(`小组件 "${widgetId}" 添加成功！请刷新页面查看`);
+            ToastNotification.success(`小组件 "${config.title}" 添加成功！请刷新页面查看`);
             this.close();
         } catch (error) {
             ToastNotification.error('添加失败: ' + error.message);

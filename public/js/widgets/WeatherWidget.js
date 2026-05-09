@@ -6,10 +6,11 @@ class WeatherWidget extends BaseWidget {
     /**
      * 构造函数
      * @param {HTMLElement} container - widget 容器元素
+     * @param {number|null} widgetId - icon_widgets.id（数字ID）
      * @param {Object} options - 配置选项
      */
-    constructor(container, options = {}) {
-        super(container);
+    constructor(container, widgetId = null, options = {}) {
+        super(container, widgetId, 'WeatherWidget');
 
         // 从 container 的 dataset 中读取配置
         const city = container.dataset.city || 'Beijing';

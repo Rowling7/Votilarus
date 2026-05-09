@@ -1,6 +1,6 @@
 // ==================== 拖拽功能处理器 ====================
 
-import { updateItemLayout, reorderItems, moveItemToCategory } from '../api-client.js';
+import { updateItemLayout, reorderItems, moveItemToCategory, reorderWidgets } from '../api-client.js';
 
 class DragHandler {
     constructor() {
@@ -62,8 +62,13 @@ class DragHandler {
      */
     handleDragStart(e, element) {
         this.draggedElement = element;
+
+        // 判断是图标还是组件
+        const isWidget = element.dataset.type === 'widget';
+
         this.draggedData = {
-            itemId: element.dataset.itemId,
+            itemId: isWidget ? element.dataset.widgetId : element.dataset.itemId,
+            itemType: isWidget ? 'widget' : 'icon',  // 新增：标识类型
             url: element.dataset.url,
             sourcePanel: element.closest('.category-panel').dataset.categoryId
         };
@@ -173,14 +178,40 @@ class DragHandler {
             const categoryId = gridContainer.closest('.category-panel').dataset.categoryId;
             const items = Array.from(gridContainer.querySelectorAll('.grid-item'));
 
-            const layoutUpdates = items.map((item, index) => ({
-                item_id: item.dataset.itemId,
-                category_id: categoryId,
-                sort_order: index
-            }));
+            // 分离图标和组件
+            const iconUpdates = [];
+            const widgetUpdates = [];
 
-            await reorderItems(layoutUpdates);
+            items.forEach((item, index) => {
+                const isWidget = item.dataset.type === 'widget';
+
+                if (isWidget) {
+                    // 组件：更新 icon_widgets 表的 sort_order
+                    widgetUpdates.push({
+                        widget_id: item.dataset.widgetId,
+                        category_id: categoryId,
+                        sort_order: index
+                    });
+                } else {
+                    // 图标：更新 item_layouts 表的 sort_order
+                    iconUpdates.push({
+                        item_id: item.dataset.itemId,
+                        category_id: categoryId,
+                        sort_order: index
+                    });
+                }
+            });
+
+            // 分别调用不同的 API
+            if (iconUpdates.length > 0) {
+                await reorderItems(iconUpdates);
+            }
+
+            if (widgetUpdates.length > 0) {
+                await reorderWidgets(widgetUpdates);  // 新的 API
+            }
         } catch (error) {
+            console.error('保存排序失败:', error);
         }
     }
 

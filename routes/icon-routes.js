@@ -68,54 +68,54 @@ router.post('/', (req, res) => {
     });
 });
 
-// 创建小组件（特殊类型的图标）
-router.post('/widget', (req, res) => {
-    const { widget_type, category_id } = req.body;
-
-    if (!widget_type || !category_id) {
-        res.status(400).json({ error: '缺少必要参数' });
-        return;
-    }
-
-    // 生成 UUID
-    const uuid = require('crypto').randomUUID();
-
-    // 小组件名称和默认大小映射
-    const widgetConfigs = {
-        'clock': { name: 'ClockWidget', width: 2, height: 2 },
-        'calendar': { name: 'CalendarWidget', width: 2, height: 2 },
-        'weather': { name: 'WeatherWidget', width: 2, height: 4 }
-    };
-
-    const config = widgetConfigs[widget_type] || { name: widget_type, width: 2, height: 2 };
-    const name = config.name;
-    const width = config.width;
-    const height = config.height;
-
-    // 插入 icon_items 表（小组件是特殊的图标，link_url 为空）
-    const insertSql = 'INSERT INTO icon_items (category_id, title, link_url, icon_path, deleted_flag) VALUES (?, ?, ?, ?, ?)';
-    db.run(insertSql, [parseInt(category_id), name, null, null, '0'], function (err) {
-        if (err) {
-            res.status(500).json({ error: err.message });
-            return;
-        }
-
-        // 创建布局记录（根据widget类型设置默认大小）
-        const layoutSql = 'INSERT INTO item_layouts (item_id, category_id, pos_x, pos_y, width, height) VALUES (?, ?, 0, 0, ?, ?)';
-        db.run(layoutSql, [this.lastID, parseInt(category_id), width, height], function (layoutErr) {
-            if (layoutErr) {
-                // 静默处理布局记录创建失败
-            }
-
-            res.json({
-                success: true,
-                itemId: this.lastID,
-                widget_type,
-                message: '小组件创建成功'
-            });
-        });
-    });
-});
+// 创建小组件（特殊类型的图标）- 已废弃，请使用 /api/widgets
+// router.post('/widget', (req, res) => {
+//     const { widget_type, category_id } = req.body;
+//
+//     if (!widget_type || !category_id) {
+//         res.status(400).json({ error: '缺少必要参数' });
+//         return;
+//     }
+//
+//     // 生成 UUID
+//     const uuid = require('crypto').randomUUID();
+//
+//     // 小组件名称和默认大小映射
+//     const widgetConfigs = {
+//         'clock': { name: 'ClockWidget', width: 2, height: 2 },
+//         'calendar': { name: 'CalendarWidget', width: 2, height: 2 },
+//         'weather': { name: 'WeatherWidget', width: 2, height: 4 }
+//     };
+//
+//     const config = widgetConfigs[widget_type] || { name: widget_type, width: 2, height: 2 };
+//     const name = config.name;
+//     const width = config.width;
+//     const height = config.height;
+//
+//     // 插入 icon_items 表（小组件是特殊的图标，link_url 为空）
+//     const insertSql = 'INSERT INTO icon_items (category_id, title, link_url, icon_path, deleted_flag) VALUES (?, ?, ?, ?, ?)';
+//     db.run(insertSql, [parseInt(category_id), name, null, null, '0'], function (err) {
+//         if (err) {
+//             res.status(500).json({ error: err.message });
+//             return;
+//         }
+//
+//         // 创建布局记录（根据widget类型设置默认大小）
+//         const layoutSql = 'INSERT INTO item_layouts (item_id, category_id, pos_x, pos_y, width, height) VALUES (?, ?, 0, 0, ?, ?)';
+//         db.run(layoutSql, [this.lastID, parseInt(category_id), width, height], function (layoutErr) {
+//             if (layoutErr) {
+//                 // 静默处理布局记录创建失败
+//             }
+//
+//             res.json({
+//                 success: true,
+//                 itemId: this.lastID,
+//                 widget_type,
+//                 message: '小组件创建成功'
+//             });
+//         });
+//     });
+// });
 
 // 更新图标布局（位置和大小）
 router.put('/layout', (req, res) => {

@@ -6,9 +6,10 @@ class CalendarWidget extends BaseWidget {
     /**
      * 构造函数
      * @param {HTMLElement} container - widget 容器元素
+     * @param {number|null} widgetId - icon_widgets.id（数字ID）
      */
-    constructor(container) {
-        super(container);
+    constructor(container, widgetId = null) {
+        super(container, widgetId, 'CalendarWidget');
         // 日历组件只支持 2x2 尺寸
         this.supportedSizes = ['2x2'];
     }

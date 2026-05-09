@@ -7,9 +7,14 @@ class BaseWidget {
     /**
      * 构造函数
      * @param {HTMLElement} container - widget 容器元素
+     * @param {number|null} widgetId - icon_widgets.id（数字ID）
+     * @param {string|null} widgetName - 组件名称，如 "ClockWidget"
      */
-    constructor(container) {
+    constructor(container, widgetId = null, widgetName = null) {
         this.container = container;
+        this.widgetId = widgetId;        // icon_widgets.id（数字ID）
+        this.widgetName = widgetName;    // 如 "ClockWidget"
+        this.title = widgetName;         // 显示标题
         this.intervalId = null;
         this.isDestroyed = false;
         // 默认支持所有尺寸，子类可以覆盖此属性
