@@ -228,8 +228,15 @@ class SettingsModalHandler {
                 
                 <div class="setting-item">
                     <label for="sidebar-width">侧栏宽度</label>
-                    <input type="number" id="sidebar-width" min="4" max="15" value="4">
-                    <div class="setting-description">侧栏宽度百分比（4%-15%）</div>
+                    <select id="sidebar-width">
+                        <option value="50">50px（默认）</option>
+                        <option value="60">60px</option>
+                        <option value="70">70px</option>
+                        <option value="80">80px</option>
+                        <option value="100">100px</option>
+                        <option value="120">120px</option>
+                    </select>
+                    <div class="setting-description">侧栏固定宽度（< 40px 时自动隐藏）</div>
                 </div>
                 
                 <!-- 图标样式 -->
@@ -717,7 +724,7 @@ class SettingsModalHandler {
         document.getElementById('grid-rows').value = settings.gridRows || 5;
         document.getElementById('grid-cols').value = settings.gridCols || 13;
         document.getElementById('grid-gap').value = settings.gridGap || 2;
-        document.getElementById('sidebar-width').value = settings.sidebarWidth || 6;
+        document.getElementById('sidebar-width').value = settings.sidebarWidth || 50;
 
         // 外观主题
         document.getElementById('theme-mode').value = settings.themeMode || 'light';

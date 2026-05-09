@@ -17,11 +17,14 @@ class NavSidebar extends HTMLElement {
 
         const style = document.createElement('style');
         style.id = 'navsidebar-styles';
+
+        // 从 CSS 文件加载样式（这里直接嵌入，因为 Shadow DOM 需要）
         style.textContent = `
 /* ==================== 左侧悬浮侧栏 ==================== */
 .sidebar {
     position: fixed;
     left: 0;
+    /* 默认显示 */
     top: 50%;
     transform: translateY(-50%);
     width: var(--sidebar-width);
@@ -38,17 +41,33 @@ class NavSidebar extends HTMLElement {
     flex-direction: column;
     align-items: center;
     gap: 1rem;
+    transition: left 0.3s ease;
+    /* 平滑滑出动画 */
+}
+
+/* 宽度 < 40px 时自动隐藏 */
+.sidebar.auto-hidden {
+    left: calc(var(--sidebar-width) * -1);
+}
+
+/* 鼠标悬停时显示（用于自动隐藏状态） */
+.sidebar.auto-hidden.visible {
+    left: 0;
 }
 
 /* 头像 */
 .sidebar-avatar {
-    width: 3rem;
-    height: 3rem;
+    width: 2rem;
+    /* 32px */
+    height: 2rem;
+    /* 32px */
     border-radius: 50%;
     overflow: hidden;
     cursor: pointer;
     transition: transform var(--transition-normal);
     border: 2px solid var(--theme-color);
+    flex-shrink: 0;
+    /* 防止被压缩 */
 }
 
 .sidebar-avatar:hover {
@@ -69,37 +88,26 @@ class NavSidebar extends HTMLElement {
     gap: 0.5rem;
     /* 添加滚动功能 - 占据剩余空间 */
     flex: 1;
-    min-height: 0; /* 允许 flex 子元素缩小 */
+    min-height: 0;
+    /* 允许 flex 子元素缩小 */
     overflow-y: auto;
     overflow-x: hidden;
-    /* 自定义滚动条样式 */
-    scrollbar-width: thin;
-    scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+    /* 隐藏滚动条但保留功能 */
+    scrollbar-width: none;
+    /* Firefox */
+    -ms-overflow-style: none;
+    /* IE/Edge */
 }
 
-/* WebKit 浏览器的滚动条样式 */
+/* WebKit 浏览器的滚动条样式 - 隐藏 */
 .sidebar-categories::-webkit-scrollbar {
-    width: 4px;
-}
-
-.sidebar-categories::-webkit-scrollbar-track {
-    background: transparent;
-    border-radius: 2px;
-}
-
-.sidebar-categories::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 2px;
-    transition: background var(--transition-fast);
-}
-
-.sidebar-categories::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.4);
+    display: none;
 }
 
 .sidebar-category {
     width: 100%;
-    padding: 0.75rem 0.5rem;
+    padding: 0.5rem 0;
+    /* 减小padding适应小宽度 */
     text-align: center;
     color: var(--text-secondary);
     cursor: pointer;
@@ -107,8 +115,28 @@ class NavSidebar extends HTMLElement {
     transition: all var(--transition-fast);
     font-size: 0.9rem;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
+    gap: 0.25rem;
+    min-height: 32px;
+    /* 确保最小高度 */
+}
+
+/* 分类项文字 - 默认隐藏 */
+.sidebar-text {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    opacity: 0;
+    max-height: 0;
+    overflow: hidden;
+    transition: all var(--transition-fast);
+}
+
+/* 大宽度时显示文字 */
+.sidebar.wide .sidebar-text {
+    opacity: 1;
+    max-height: 20px;
 }
 
 /* 侧栏 SVG 图标容器 */
@@ -132,15 +160,27 @@ class NavSidebar extends HTMLElement {
     color: var(--text-secondary);
 }
 
-.sidebar-category:hover .sidebar-icon {
+/* 首字母显示 */
+.sidebar-letter {
+    font-size: 1rem;
+    font-weight: bold;
+    color: var(--text-secondary);
+    opacity: 0.8;
+    transition: all var(--transition-fast);
+}
+
+.sidebar-category:hover .sidebar-icon,
+.sidebar-category:hover .sidebar-letter {
     opacity: 1;
     transform: scale(1.1);
 }
 
-.sidebar-category.active .sidebar-icon svg {
+.sidebar-category.active .sidebar-icon svg,
+.sidebar-category.active .sidebar-letter {
     /* 激活状态：使用主题色 */
     fill: white;
     color: white;
+    opacity: 1;
 }
 
 .sidebar-category:hover {
@@ -158,20 +198,6 @@ class NavSidebar extends HTMLElement {
 .sidebar {
     animation: fadeIn 0.3s ease backwards;
 }
-
-/* ==================== 移动端适配 ==================== */
-@media (max-width: 767px) {
-    .sidebar {
-        display: none;
-    }
-}
-
-/* 平板端适配 */
-@media (min-width: 768px) and (max-width: 1023px) {
-    .sidebar {
-        width: 8%;
-    }
-}
         `;
         document.head.appendChild(style);
     }
@@ -185,6 +211,7 @@ class NavSidebar extends HTMLElement {
 
     connectedCallback() {
         this.bindEvents();
+        this.initHoverDetection();
     }
 
     attributeChangedCallback(name, oldValue, newValue) {
@@ -194,153 +221,27 @@ class NavSidebar extends HTMLElement {
     }
 
     render() {
-        const width = this.getAttribute('width') || '6';
+        const width = this.getAttribute('width') || '50';
         const avatarUrl = this.getAttribute('avatar-url') || '';
         const username = this.getAttribute('username') || '用户';
+
+        // 根据宽度决定是否显示文字
+        const sidebarWidth = parseInt(width) || 50;
+        const showText = sidebarWidth >= 60;
 
         this.shadowRoot.innerHTML = `
             <style>
                 :host {
                     display: block;
                     position: fixed;
-                    left: 0;
+                    left: 0; /* 默认显示 */
                     top: 50%;
                     transform: translateY(-50%);
                     z-index: 1000;
-                }
-
-                /* ==================== 左侧悬浮侧栏 ==================== */
-                .sidebar {
-                    width: var(--sidebar-width, ${width}vw);
-                    height: auto;
-                    max-height: 80vh;
-                    background: var(--glass-bg, rgba(255, 255, 255, 0.1));
-                    backdrop-filter: blur(var(--glass-blur, 10px));
-                    -webkit-backdrop-filter: blur(var(--glass-blur, 10px));
-                    border-radius: 1rem;
-                    box-shadow: var(--shadow-lg, 0 4px 16px rgba(0, 0, 0, 0.2));
-                    padding: 1rem 0.5rem;
-                    display: flex;
-                    flex-direction: column;
-                    align-items: center;
-                    gap: 1rem;
-                }
-
-                /* 头像 */
-                .sidebar-avatar {
-                    width: 3rem;
-                    height: 3rem;
-                    border-radius: 50%;
-                    overflow: hidden;
-                    cursor: pointer;
-                    transition: transform var(--transition-normal, 0.3s ease);
-                    border: 2px solid var(--theme-color, #667eea);
-                }
-
-                .sidebar-avatar:hover {
-                    transform: scale(1.1);
-                }
-
-                .sidebar-avatar img {
-                    width: 100%;
-                    height: 100%;
-                    object-fit: cover;
-                }
-
-                /* 分类列表 */
-                .sidebar-categories {
-                    width: 100%;
-                    display: flex;
-                    flex-direction: column;
-                    gap: 0.5rem;
-                    /* 添加滚动功能 - 占据剩余空间 */
-                    flex: 1;
-                    min-height: 0; /* 允许 flex 子元素缩小 */
-                    overflow-y: auto;
-                    overflow-x: hidden;
-                    /* 自定义滚动条样式 */
-                    scrollbar-width: thin;
-                    scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
-                }
-
-                /* WebKit 浏览器的滚动条样式 */
-                .sidebar-categories::-webkit-scrollbar {
-                    width: 4px;
-                }
-
-                .sidebar-categories::-webkit-scrollbar-track {
-                    background: transparent;
-                    border-radius: 2px;
-                }
-
-                .sidebar-categories::-webkit-scrollbar-thumb {
-                    background: rgba(255, 255, 255, 0.2);
-                    border-radius: 2px;
-                    transition: background var(--transition-fast, 0.2s);
-                }
-
-                .sidebar-categories::-webkit-scrollbar-thumb:hover {
-                    background: rgba(255, 255, 255, 0.4);
-                }
-
-                .sidebar-category {
-                    width: 100%;
-                    padding: 0.75rem 0.5rem;
-                    text-align: center;
-                    color: var(--text-secondary, rgba(255, 255, 255, 0.8));
-                    cursor: pointer;
-                    border-radius: 0.5rem;
-                    transition: all var(--transition-fast, 0.2s);
-                    font-size: 0.9rem;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                }
-
-                /* 侧栏 SVG 图标容器 */
-                .sidebar-icon {
-                    width: 1.5rem;
-                    height: 1.5rem;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    opacity: 0.8;
-                    transition: all var(--transition-fast, 0.2s);
-                }
-
-                /* SVG 元素本身 */
-                .sidebar-icon svg {
-                    width: 100%;
-                    height: 100%;
-                    object-fit: contain;
-                    /* 默认浅色模式：深色图标 */
-                    fill: var(--text-secondary, rgba(255, 255, 255, 0.8));
-                    color: var(--text-secondary, rgba(255, 255, 255, 0.8));
-                }
-
-                .sidebar-category:hover .sidebar-icon {
-                    opacity: 1;
-                    transform: scale(1.1);
-                }
-
-                .sidebar-category.active .sidebar-icon svg {
-                    /* 激活状态：使用主题色 */
-                    fill: white;
-                    color: white;
-                }
-
-                .sidebar-category:hover {
-                    background: var(--bg-tertiary, rgba(255, 255, 255, 0.1));
-                    color: var(--text-primary, white);
-                }
-
-                .sidebar-category.active {
-                    background: var(--theme-color, #667eea);
-                    color: white;
-                    font-weight: bold;
+                    transition: left 0.3s ease;
                 }
             </style>
-            <div class="sidebar">
+            <div class="sidebar ${showText ? 'wide' : 'narrow'}">
                 <div class="sidebar-avatar" title="${username}">
                     ${avatarUrl
                 ? `<img src="${avatarUrl}" alt="${username}">`
@@ -348,20 +249,64 @@ class NavSidebar extends HTMLElement {
             }
                 </div>
                 <div class="sidebar-categories">
-                    ${this.categories.map((cat, index) => `
+                    ${this.categories.map((cat, index) => {
+                // 优先使用图标，否则显示首字母
+                let iconContent = '';
+                if (cat.ico) {
+                    iconContent = `<div class="sidebar-icon">${cat.ico}</div>`;
+                } else if (cat.icon) {
+                    iconContent = `<div class="sidebar-icon">${cat.icon}</div>`;
+                } else {
+                    // 显示首字母
+                    const name = cat.name || cat.category_name || '';
+                    const firstLetter = name.charAt(0).toUpperCase();
+                    iconContent = `<span class="sidebar-letter">${firstLetter}</span>`;
+                }
+
+                // 根据宽度决定是否显示文字
+                const textContent = showText ? `<span class="sidebar-text">${cat.name || cat.category_name || ''}</span>` : '';
+
+                return `
                         <div class="sidebar-category ${index === 0 ? 'active' : ''}" data-category-id="${cat.id}">
-                            ${cat.ico ? `
-                                <div class="sidebar-icon">${cat.ico}</div>
-                            ` : cat.icon ? `
-                                <div class="sidebar-icon">${cat.icon}</div>
-                            ` : `
-                                <span>${cat.name || cat.category_name}</span>
-                            `}
+                            ${iconContent}
+                            ${textContent}
                         </div>
-                    `).join('')}
+                    `;
+            }).join('')}
                 </div>
             </div>
         `;
+    }
+
+    /**
+     * 初始化鼠标悬停检测
+     */
+    initHoverDetection() {
+        // 监听鼠标移动
+        this._handleMouseMove = (e) => {
+            const sidebar = this.shadowRoot.querySelector('.sidebar');
+            if (!sidebar) return;
+
+            // 只有在 auto-hidden 状态下才响应悬停
+            if (sidebar.classList.contains('auto-hidden')) {
+                if (e.clientX <= 10) {
+                    // 鼠标在左边缘10px内，显示侧边栏
+                    sidebar.classList.add('visible');
+                } else {
+                    // 鼠标离开，隐藏侧边栏
+                    sidebar.classList.remove('visible');
+                }
+            }
+        };
+
+        document.addEventListener('mousemove', this._handleMouseMove);
+    }
+
+    disconnectedCallback() {
+        // 清理事件监听器
+        if (this._handleMouseMove) {
+            document.removeEventListener('mousemove', this._handleMouseMove);
+        }
     }
 
     bindEvents() {

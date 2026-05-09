@@ -2,6 +2,7 @@
 .sidebar {
     position: fixed;
     left: 0;
+    /* 默认显示 */
     top: 50%;
     transform: translateY(-50%);
     width: var(--sidebar-width);
@@ -18,17 +19,33 @@
     flex-direction: column;
     align-items: center;
     gap: 1rem;
+    transition: left 0.3s ease;
+    /* 平滑滑出动画 */
+}
+
+/* 宽度 < 40px 时自动隐藏 */
+.sidebar.auto-hidden {
+    left: calc(var(--sidebar-width) * -1);
+}
+
+/* 鼠标悬停时显示（用于自动隐藏状态） */
+.sidebar.auto-hidden.visible {
+    left: 0;
 }
 
 /* 头像 */
 .sidebar-avatar {
-    width: 3rem;
-    height: 3rem;
+    width: 2rem;
+    /* 32px */
+    height: 2rem;
+    /* 32px */
     border-radius: 50%;
     overflow: hidden;
     cursor: pointer;
     transition: transform var(--transition-normal);
     border: 2px solid var(--theme-color);
+    flex-shrink: 0;
+    /* 防止被压缩 */
 }
 
 .sidebar-avatar:hover {
@@ -47,11 +64,28 @@
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
+    /* 添加滚动功能 - 占据剩余空间 */
+    flex: 1;
+    min-height: 0;
+    /* 允许 flex 子元素缩小 */
+    overflow-y: auto;
+    overflow-x: hidden;
+    /* 隐藏滚动条但保留功能 */
+    scrollbar-width: none;
+    /* Firefox */
+    -ms-overflow-style: none;
+    /* IE/Edge */
+}
+
+/* WebKit 浏览器的滚动条样式 - 隐藏 */
+.sidebar-categories::-webkit-scrollbar {
+    display: none;
 }
 
 .sidebar-category {
     width: 100%;
-    padding: 0.75rem 0.5rem;
+    padding: 0.5rem 0;
+    /* 减小padding适应小宽度 */
     text-align: center;
     color: var(--text-secondary);
     cursor: pointer;
@@ -59,8 +93,28 @@
     transition: all var(--transition-fast);
     font-size: 0.9rem;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
+    gap: 0.25rem;
+    min-height: 32px;
+    /* 确保最小高度 */
+}
+
+/* 分类项文字 - 默认隐藏 */
+.sidebar-text {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    opacity: 0;
+    max-height: 0;
+    overflow: hidden;
+    transition: all var(--transition-fast);
+}
+
+/* 大宽度时显示文字 */
+.sidebar.wide .sidebar-text {
+    opacity: 1;
+    max-height: 20px;
 }
 
 /* 侧栏 SVG 图标容器 */
@@ -84,15 +138,27 @@
     color: var(--text-secondary);
 }
 
-.sidebar-category:hover .sidebar-icon {
+/* 首字母显示 */
+.sidebar-letter {
+    font-size: 1rem;
+    font-weight: bold;
+    color: var(--text-secondary);
+    opacity: 0.8;
+    transition: all var(--transition-fast);
+}
+
+.sidebar-category:hover .sidebar-icon,
+.sidebar-category:hover .sidebar-letter {
     opacity: 1;
     transform: scale(1.1);
 }
 
-.sidebar-category.active .sidebar-icon svg {
+.sidebar-category.active .sidebar-icon svg,
+.sidebar-category.active .sidebar-letter {
     /* 激活状态：使用主题色 */
     fill: white;
     color: white;
+    opacity: 1;
 }
 
 .sidebar-category:hover {
@@ -104,4 +170,9 @@
     background: var(--theme-color);
     color: white;
     font-weight: bold;
+}
+
+/* 侧栏渐入动画 */
+.sidebar {
+    animation: fadeIn 0.3s ease backwards;
 }

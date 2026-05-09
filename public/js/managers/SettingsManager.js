@@ -8,7 +8,7 @@ class SettingsManager {
         this.defaultSettings = {
             theme_mode: 'light',
             theme_color: '#3b82f6',
-            sidebar_width: '4',
+            sidebar_width: '50',
             cell_base_size: '4',
             cell_gap: '2',
             grid_rows: '5',
@@ -77,8 +77,27 @@ class SettingsManager {
         document.documentElement.style.setProperty('--theme-color', themeColor);
 
         // 应用侧栏宽度
-        const sidebarWidth = this.settings.sidebar_width || '4';
-        document.documentElement.style.setProperty('--sidebar-width', `${sidebarWidth}%`);
+        const sidebarWidth = parseInt(this.settings.sidebar_width) || 50;
+        document.documentElement.style.setProperty('--sidebar-width', `${sidebarWidth}px`);
+
+        // 判断是否需要自动隐藏（宽度 < 40px）
+        const sidebar = document.querySelector('.sidebar');
+        if (sidebar) {
+            if (sidebarWidth < 40) {
+                sidebar.classList.add('auto-hidden');
+            } else {
+                sidebar.classList.remove('auto-hidden');
+            }
+
+            // 判断是否显示文字（宽度 >= 60px）
+            if (sidebarWidth >= 60) {
+                sidebar.classList.add('wide');
+                sidebar.classList.remove('narrow');
+            } else {
+                sidebar.classList.add('narrow');
+                sidebar.classList.remove('wide');
+            }
+        }
 
         // 应用单元格尺寸
         const cellBaseSize = this.settings.cell_base_size || '4';
@@ -259,7 +278,7 @@ class SettingsManager {
             gridRows: parseInt(this.settings.grid_rows) || 5,
             gridCols: parseInt(this.settings.grid_cols) || 13,
             gridGap: parseFloat(this.settings.cell_gap) || 2,
-            sidebarWidth: parseInt(this.settings.sidebar_width) || 4,
+            sidebarWidth: parseInt(this.settings.sidebar_width) || 50,
 
             // 外观主题
             themeMode: this.settings.theme_mode || 'light',

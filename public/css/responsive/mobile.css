@@ -3,23 +3,23 @@
     .sidebar {
         display: none;
     }
-    
+
     .content-area {
         width: 100%;
         margin-left: 0;
     }
-    
+
     .search-container {
         left: 1rem;
         right: 1rem;
     }
-    
+
     .category-panel {
         padding: 1rem;
         min-width: 100%;
         margin-right: 0;
     }
-    
+
     .grid-container {
         /* 在小屏幕上减小单元格最小宽度，增加列数 */
         grid-template-columns: repeat(auto-fit, minmax(calc(var(--cell-base-size) * 0.8), 1fr));
@@ -28,15 +28,11 @@
 
 /* 平板端适配 */
 @media (min-width: 768px) and (max-width: 1023px) {
-    .sidebar {
-        width: 8%;
-    }
-    
     .content-area {
-        width: calc(100% - 8%);
-        margin-left: 8%;
+        width: calc(100% - var(--sidebar-width));
+        margin-left: var(--sidebar-width);
     }
-    
+
     .category-panel {
         min-width: 600px;
     }

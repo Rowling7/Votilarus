@@ -2,8 +2,10 @@
 .content-area {
     position: relative;
     width: calc(100% - var(--sidebar-width));
+    /* 使用 CSS 变量 */
     height: 100vh;
     margin-left: var(--sidebar-width);
+    /* 使用 CSS 变量 */
     overflow: hidden;
 }
 
