@@ -40,6 +40,14 @@ class BaseWidget {
     }
 
     /**
+     * 刷新 widget（子类可以实现具体逻辑）
+     */
+    refresh() {
+        // 默认调用update方法，子类可以覆盖此方法实现特定刷新逻辑
+        this.update();
+    }
+
+    /**
      * 销毁 widget，清理定时器和资源
      */
     destroy() {

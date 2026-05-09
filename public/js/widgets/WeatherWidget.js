@@ -221,6 +221,14 @@ class WeatherWidget extends BaseWidget {
         const index = Math.round(deg / 45) % 8;
         return directions[index];
     }
+
+    /**
+     * 刷新天气显示
+     */
+    refresh() {
+        // 重新获取天气数据并更新显示
+        this.fetchWeatherData();
+    }
 }
 
 export default WeatherWidget;

@@ -414,7 +414,15 @@ class ContextMenuHandler {
                         if (widgetContainer && widgetType) {
                             window.widgetManager.destroy(widgetId);
                             window.widgetManager.create(widgetType, widgetContainer, widgetId);
+
+                            // 重新创建后调用刷新功能
+                            setTimeout(() => {
+                                window.widgetManager.refresh(widgetId);
+                            }, 100);
                         }
+                    } else if (window.widgetManager) {
+                        // 即使尺寸没有改变，也调用刷新功能更新内容
+                        window.widgetManager.refresh(widgetId);
                     }
 
                     ToastNotification.warning(`小组件尺寸已更改为 ${size}（未保存，因为没有有效的 ID）`);
@@ -422,6 +430,10 @@ class ContextMenuHandler {
                 }
 
                 const oldSize = gridItem.dataset.size;
+
+                // 在更新 UI 之前，先保存 widgetContainer 和 widgetType 的引用
+                const widgetContainer = gridItem.querySelector('.widget-content') || gridItem.firstElementChild;
+                const widgetType = gridItem.dataset.widgetType;
 
                 // 更新 UI
                 gridItem.className = `grid-item widget-item widget-${size}`;
@@ -436,13 +448,18 @@ class ContextMenuHandler {
 
                 // 如果尺寸改变，重新渲染 widget
                 if (oldSize !== size && window.widgetManager) {
-                    const widgetContainer = gridItem.querySelector('.widget-content');
-                    const widgetType = gridItem.dataset.widgetType;
-
                     if (widgetContainer && widgetType) {
                         window.widgetManager.destroy(widgetId);
                         window.widgetManager.create(widgetType, widgetContainer, widgetId);
+
+                        // 重新创建后调用刷新功能
+                        setTimeout(() => {
+                            window.widgetManager.refresh(widgetId);
+                        }, 100);
                     }
+                } else if (window.widgetManager) {
+                    // 即使尺寸没有改变，也调用刷新功能更新内容
+                    window.widgetManager.refresh(widgetId);
                 }
 
                 ToastNotification.success(`小组件尺寸已更改为 ${size}`);

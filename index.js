@@ -60,6 +60,10 @@ async function initializeDatabase() {
 async function startServer() {
     try {
         await initDatabase();
+
+        // 设置应用时区为东八区（中国标准时间）
+        process.env.TZ = 'Asia/Shanghai';
+
         await initializeDatabase(); // 初始化数据库和默认设置
 
         // ==================== API 路由 ====================

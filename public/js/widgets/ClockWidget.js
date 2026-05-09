@@ -173,6 +173,13 @@ class ClockWidget extends BaseWidget {
             }
         });
     }
+
+    /**
+     * 刷新时钟显示
+     */
+    refresh() {
+        this.render();
+    }
 }
 
 export default ClockWidget;

@@ -70,6 +70,14 @@ class CalendarWidget extends BaseWidget {
 
         return html;
     }
+
+    /**
+     * 刷新日历显示
+     */
+    refresh() {
+        // 重新渲染整个日历组件
+        this.render();
+    }
 }
 
 export default CalendarWidget;

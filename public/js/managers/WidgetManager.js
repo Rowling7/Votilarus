@@ -117,6 +117,28 @@ class WidgetManager {
     }
 
     /**
+     * 刷新指定 widget
+     * @param {number} widgetId - icon_widgets.id（数字ID）
+     */
+    refresh(widgetId) {
+        const widget = this.activeWidgets.get(widgetId);
+        if (widget && typeof widget.refresh === 'function') {
+            widget.refresh();
+        }
+    }
+
+    /**
+     * 刷新所有 widget
+     */
+    refreshAll() {
+        this.activeWidgets.forEach((widget, widgetId) => {
+            if (typeof widget.refresh === 'function') {
+                widget.refresh();
+            }
+        });
+    }
+
+    /**
      * 获取已注册的 widget 类型列表
      * @returns {Array<string>} widget 类型列表
      */
