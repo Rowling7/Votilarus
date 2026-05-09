@@ -3,6 +3,7 @@ const itemsRoute = require('./icon-routes');
 const layoutsRoute = require('./layout-routes');
 const dockRoute = require('./dock-routes');
 const settingsRoute = require('./settings-routes');
+const searchEngineRoute = require('./search-engine-routes');
 
 /**
  * 注册所有路由到 Express 应用
@@ -16,6 +17,7 @@ function registerRoutes(app, db) {
     layoutsRoute.setDatabase(db);
     dockRoute.setDatabase(db);
     settingsRoute.setDatabase(db);
+    searchEngineRoute.setDatabase(db);
 
     // 注册路由
     app.use('/api/categories', categoriesRoute.router);
@@ -23,6 +25,7 @@ function registerRoutes(app, db) {
     app.use('/api/layout', layoutsRoute.router);
     app.use('/api/dock', dockRoute.router);
     app.use('/api/settings', settingsRoute.router);
+    app.use('/api/search-engines', searchEngineRoute.router);
 }
 
 module.exports = registerRoutes;

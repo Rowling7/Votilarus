@@ -1,6 +1,7 @@
 // ==================== 搜索功能处理器 ====================
 
 import SettingsManager from '../../managers/SettingsManager.js';
+import AddEngineDialog from '../dialogs/AddEngineDialog.js';
 
 class SearchHandler {
     constructor() {
@@ -8,28 +9,16 @@ class SearchHandler {
         this.searchEngineIcon = document.getElementById('searchEngineIcon');
         this.searchEngineBar = document.getElementById('searchEngineBar');
 
-        // 所有可用的搜索引擎（不删减）
-        this.searchEngines = {
-            baidu: { name: '百度', icon: 'static/ico/svg-baidu.svg', url: 'https://www.baidu.com/s?wd=' },
-            bing: { name: 'Bing', icon: 'static/ico/bing.png', url: 'https://www.bing.com/search?q=' },
-            google: { name: '谷歌', icon: 'static/ico/google.png', url: 'https://www.google.com/search?q=' },
-            yahoo: { name: 'Yahoo', icon: 'static/ico/yahoo.png', url: 'https://search.yahoo.com/search?p=' },
-            duckduckgo: { name: 'DuckDuckGo', icon: 'static/ico/duckduckgo.png', url: 'https://duckduckgo.com/?q=' },
-            yandex: { name: 'Yandex', icon: 'static/ico/yandex.png', url: 'https://yandex.com/search/?text=' },
-            xiaoyi: { name: '小艺', icon: 'static/ico/xiaoyi.png', url: 'https://xiaoyi.huawei.com/?q=' },
-            sougou: { name: '搜狗', icon: 'static/ico/sougou.png', url: 'https://www.sogou.com/web?ie={inputEncoding}&query=' },
-            search360: { name: '360搜索', icon: 'static/ico/360search.png', url: 'https://www.so.com/s?ie={inputEncoding}&q=' },
-            zhihu: { name: '知乎', icon: 'static/ico/zhihu.png', url: 'https://www.zhihu.com/search?type=content&q=' },
-            weibo: { name: '微博', icon: 'static/ico/weibo.png', url: 'https://s.weibo.com/weibo?q=' },
-            xiaohongshu: { name: '小红书', icon: 'static/ico/xiaohongshu.png', url: 'https://www.xiaohongshu.com/search_result?keyword=' },
-            douban: { name: '豆瓣', icon: 'static/ico/douban.png', url: 'https://www.douban.com/search?source=suggest&q=' },
-            douyin: { name: '抖音', icon: 'static/ico/douyin.png', url: 'https://www.douyin.com/root/search/' },
-            bilibili: { name: '哔哩哔哩', icon: 'static/ico/bilibili.png', url: 'https://search.bilibili.com/video?keyword=' }
-        };
+        // 所有可用的搜索引擎（从数据库动态加载）
+        this.searchEngines = {};
+
         this.init();
     }
 
-    init() {
+    async init() {
+        // 先加载搜索引擎列表
+        await this.loadSearchEngines();
+
         // 搜索框回车事件
         this.searchBox.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
@@ -37,7 +26,7 @@ class SearchHandler {
             }
         });
 
-        // 搜索引擎图标点击事件（切换快捷栏显示）
+        // 搜索引擎图标点击事件（切换引擎列表显示）
         if (this.searchEngineIcon) {
             this.searchEngineIcon.addEventListener('click', (e) => {
                 e.stopPropagation();
@@ -47,7 +36,7 @@ class SearchHandler {
             console.error('searchEngineIcon element not found');
         }
 
-        // 点击外部关闭快捷栏
+        // 点击外部关闭引擎列表
         document.addEventListener('click', (e) => {
             if (this.searchEngineBar && !this.searchEngineBar.contains(e.target) &&
                 this.searchEngineIcon && !this.searchEngineIcon.contains(e.target)) {
@@ -55,9 +44,41 @@ class SearchHandler {
             }
         });
 
-        // 初始化快捷栏
+        // 初始化引擎列表
         this.renderQuickBar();
         this.updateSearchEngineIcon();
+    }
+
+    // 从 API 加载搜索引擎列表
+    async loadSearchEngines() {
+        try {
+            const response = await fetch('/api/search-engines');
+            if (!response.ok) {
+                throw new Error('Failed to fetch search engines');
+            }
+
+            const engines = await response.json();
+
+            // 将数据库返回的数据转换为前端使用的格式
+            this.searchEngines = {};
+            engines.forEach(engine => {
+                this.searchEngines[engine.title_en] = {
+                    id: engine.id,
+                    name: engine.title,
+                    icon: engine.icon_path || this.getFallbackIcon(),
+                    url: engine.url,
+                    sort_order: engine.sort_order
+                };
+            });
+        } catch (error) {
+            console.error('Error loading search engines:', error);
+            // 如果加载失败，使用默认的硬编码数据作为后备
+            this.searchEngines = {
+                baidu: { name: '百度', icon: 'static/ico/svg-baidu.svg', url: 'https://www.baidu.com/s?wd=' },
+                bing: { name: 'Bing', icon: 'static/ico/bing.png', url: 'https://www.bing.com/search?q=' },
+                google: { name: '谷歌', icon: 'static/ico/google.png', url: 'https://www.google.com/search?q=' }
+            };
+        }
     }
 
     performSearch() {
@@ -66,28 +87,38 @@ class SearchHandler {
 
         const engine = SettingsManager.get('search_engine') || 'baidu';
         const engineConfig = this.searchEngines[engine];
+        if (!engineConfig) {
+            console.error('Search engine not found:', engine);
+            return;
+        }
+
         const url = engineConfig.url + encodeURIComponent(query);
 
         window.open(url, '_blank');
         this.searchBox.value = '';
     }
 
-    // 切换快捷栏显示/隐藏
+    // 切换引擎列表显示/隐藏
     toggleQuickBar() {
         this.searchEngineBar.classList.toggle('visible');
     }
 
-    // 关闭快捷栏
+    // 关闭引擎列表
     closeQuickBar() {
         this.searchEngineBar.classList.remove('visible');
     }
 
-    // 渲染快捷栏
+    // 渲染引擎列表
     renderQuickBar() {
         const currentEngine = SettingsManager.get('search_engine') || 'baidu';
         const fallbackIcon = this.getFallbackIcon();
 
-        let html = Object.entries(this.searchEngines).map(([key, config]) => {
+        // 按 sort_order 排序引擎列表
+        const sortedEngines = Object.entries(this.searchEngines).sort((a, b) => {
+            return (a[1].sort_order || 999) - (b[1].sort_order || 999);
+        });
+
+        let html = sortedEngines.map(([key, config]) => {
             return `
                 <button class="search-engine-item ${key === currentEngine ? 'active' : ''}" data-engine="${key}">
                     <img src="${config.icon}" alt="${config.name}" onerror="this.src='${fallbackIcon}'">
@@ -106,36 +137,44 @@ class SearchHandler {
 
         this.searchEngineBar.innerHTML = html;
 
-        // 绑定点击事件
-        this.searchEngineBar.querySelectorAll('.search-engine-item[data-engine]').forEach(item => {
-            item.addEventListener('click', () => {
-                const engine = item.dataset.engine;
-                this.setSearchEngine(engine);
+        // 延迟绑定事件，确保 DOM 已更新
+        setTimeout(() => {
+            // 绑定搜索引擎选择事件
+            this.searchEngineBar.querySelectorAll('.search-engine-item[data-engine]').forEach(item => {
+                item.addEventListener('click', () => {
+                    const engine = item.dataset.engine;
+                    this.setSearchEngine(engine);
+                });
             });
-        });
 
-        // 添加按钮点击事件
-        const addBtn = document.getElementById('addEngineBtn');
-        if (addBtn) {
-            addBtn.addEventListener('click', () => {
-                this.showAddEngineDialog();
-            });
-        }
+            // 绑定添加按钮事件
+            const addBtn = document.getElementById('addEngineBtn');
+            if (addBtn) {
+                addBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    console.log('Add button clicked!');
+                    this.showAddEngineDialog();
+                });
+            }
+        }, 0);
     }
 
     // 设置搜索引擎
     setSearchEngine(engine) {
         SettingsManager.set('search_engine', engine);
 
-        // 更新快捷栏的激活状态
-        this.searchEngineBar.querySelectorAll('.search-engine-item[data-engine]').forEach(item => {
-            item.classList.toggle('active', item.dataset.engine === engine);
+        // 更新引擎列表的激活状态
+        this.searchEngineBar.querySelectorAll('.search-engine-item').forEach(item => {
+            const itemEngine = item.dataset.engine;
+            if (itemEngine) {
+                item.classList.toggle('active', itemEngine === engine);
+            }
         });
 
         // 更新搜索框左侧图标
         this.updateSearchEngineIcon();
 
-        // 关闭快捷栏
+        // 关闭引擎列表
         this.closeQuickBar();
     }
 
@@ -153,10 +192,17 @@ class SearchHandler {
         return 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22%233B82F6%22%3E%3Cpath d=%22M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z%22/%3E%3C/svg%3E';
     }
 
-    // 显示添加搜索引擎对话框（占位功能）
+    // 显示添加搜索引擎对话框
     showAddEngineDialog() {
-        // TODO: 实现添加搜索引擎的对话框
-        alert('添加搜索引擎功能开发中...');
+        console.log('showAddEngineDialog called');
+
+        // 使用新的对话框组件
+        AddEngineDialog.show(async () => {
+            // 成功回调：重新加载搜索引擎列表
+            await this.loadSearchEngines();
+            // 重新渲染引擎列表
+            this.renderQuickBar();
+        });
     }
 }
 
