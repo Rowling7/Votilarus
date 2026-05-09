@@ -271,10 +271,20 @@ class ContextMenuHandler {
 
         // 优先从 DOM 获取当前实际尺寸（确保实时更新）
         let currentSize = '1x1';
-        const className = gridItem.className;
-        const match = className.match(/size-(\d+)x(\d+)/);
-        if (match) {
-            currentSize = `${match[1]}x${match[2]}`;
+
+        // 判断是图标还是 widget
+        const isWidget = gridItem.dataset.type === 'widget';
+
+        if (isWidget) {
+            // Widget 从 dataset.size 获取
+            currentSize = gridItem.dataset.size || '2x2';
+        } else {
+            // 图标从 className 获取
+            const className = gridItem.className;
+            const match = className.match(/size-(\d+)x(\d+)/);
+            if (match) {
+                currentSize = `${match[1]}x${match[2]}`;
+            }
         }
 
         const menuItems = sizes.map(size => ({
