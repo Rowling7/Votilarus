@@ -2,6 +2,7 @@
 
 import ClockWidget from '../widgets/ClockWidget.js';
 import CalendarWidget from '../widgets/CalendarWidget.js';
+import WeatherWidget from '../widgets/WeatherWidget.js';
 
 class WidgetManager {
     constructor() {
@@ -16,6 +17,7 @@ class WidgetManager {
     registerDefaultWidgets() {
         this.register('clock', ClockWidget);
         this.register('calendar', CalendarWidget);
+        this.register('weather', WeatherWidget);
     }
 
     /**

@@ -80,14 +80,17 @@ router.post('/widget', (req, res) => {
     // 生成 UUID
     const uuid = require('crypto').randomUUID();
 
-    // 小组件名称映射
-    const widgetNames = {
-        'clock': '时钟',
-        'calendar': '日历',
-        'weather': '天气'
+    // 小组件名称和默认大小映射
+    const widgetConfigs = {
+        'clock': { name: '时钟', width: 2, height: 2 },
+        'calendar': { name: '日历', width: 2, height: 2 },
+        'weather': { name: '天气', width: 2, height: 4 }
     };
 
-    const name = widgetNames[widget_type] || widget_type;
+    const config = widgetConfigs[widget_type] || { name: widget_type, width: 2, height: 2 };
+    const name = config.name;
+    const width = config.width;
+    const height = config.height;
 
     // 插入 icon_items 表（小组件是特殊的图标，link_url 为空）
     const insertSql = 'INSERT INTO icon_items (category_id, title, link_url, icon_path, deleted_flag) VALUES (?, ?, ?, ?, ?)';
@@ -97,9 +100,9 @@ router.post('/widget', (req, res) => {
             return;
         }
 
-        // 创建布局记录（默认位置，大小为 2x2）
-        const layoutSql = 'INSERT INTO item_layouts (item_id, category_id, pos_x, pos_y, width, height) VALUES (?, ?, 0, 0, 2, 2)';
-        db.run(layoutSql, [this.lastID, parseInt(category_id)], function (layoutErr) {
+        // 创建布局记录（根据widget类型设置默认大小）
+        const layoutSql = 'INSERT INTO item_layouts (item_id, category_id, pos_x, pos_y, width, height) VALUES (?, ?, 0, 0, ?, ?)';
+        db.run(layoutSql, [this.lastID, parseInt(category_id), width, height], function (layoutErr) {
             if (layoutErr) {
                 // 静默处理布局记录创建失败
             }

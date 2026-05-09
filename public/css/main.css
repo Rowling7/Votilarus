@@ -19,6 +19,7 @@
 /* Widgets */
 @import 'widgets/clock-widget.css';
 @import 'widgets/calendar-widget.css';
+@import 'widgets/weather-widget.css';
 
 /* Effects */
 @import 'effects/glassmorphism.css';

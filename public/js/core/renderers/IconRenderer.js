@@ -249,6 +249,15 @@ class IconRenderer {
             return null;
         }
 
+        // 检查是否是 widget（link_url 为空）
+        const isWidget = !item.link_url || item.link_url.trim() === '';
+
+        if (isWidget) {
+            // 创建 widget
+            return this.createWidgetItem(item, layout);
+        }
+
+        // 创建普通图标
         const gridItem = document.createElement('div');
         gridItem.className = `grid-item size-${layout.width}x${layout.height}`;
         gridItem.dataset.itemId = item.id;
@@ -302,6 +311,33 @@ class IconRenderer {
         });
 
         return gridItem;
+    }
+
+    /**
+     * 创建 widget 元素
+     */
+    createWidgetItem(item, layout) {
+        // 根据标题判断 widget 类型
+        const widgetTypeMap = {
+            '时钟': 'clock',
+            '日历': 'calendar',
+            '天气': 'weather'
+        };
+
+        const widgetType = widgetTypeMap[item.title] || 'clock';
+        const size = `${layout.width}x${layout.height}`;
+        const uuid = `widget-${item.id}`;
+
+        // 使用 WidgetManager 创建 widget 元素
+        const widgetElement = WidgetManager.createWidgetElement(widgetType, size, uuid);
+
+        // 设置 itemId
+        widgetElement.dataset.itemId = item.id;
+
+        // 启用拖拽
+        DragHandler.enableDrag(widgetElement);
+
+        return widgetElement;
     }
 
     getFirstLetter(name) {
