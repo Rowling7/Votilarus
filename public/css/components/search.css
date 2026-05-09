@@ -6,16 +6,24 @@
     transform: translateX(-50%);
     z-index: 100;
     display: flex;
+    flex-direction: column;
     align-items: center;
     gap: 1rem;
+    width: 90%;
+    max-width: 700px;
+}
+
+/* 搜索输入框容器 */
+.search-input-wrapper {
+    width: 100%;
+    position: relative;
 }
 
 .search-box {
-    flex: 1;
-    min-width: 76px !important;
-    padding: 0.75rem 1.5rem;
+    width: 100%;
+    padding: 1rem 1.5rem 1rem 3.5rem;
     border: 2px solid var(--border-color);
-    border-radius: 2rem;
+    border-radius: 1rem;
     background: var(--glass-bg);
     backdrop-filter: blur(var(--glass-blur));
     -webkit-backdrop-filter: blur(var(--glass-blur));
@@ -34,27 +42,116 @@
     color: var(--text-tertiary);
 }
 
-/* 搜索引擎切换按钮 */
-.search-engine-btn {
-    width: 40px;
-    height: 40px;
-    border: none;
-    border-radius: 50%;
+/* 搜索引擎图标（在输入框内左侧） */
+.search-engine-icon {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 1.5rem;
+    height: 1.5rem;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    z-index: 10;
+    pointer-events: auto;
+}
+
+.search-engine-icon:hover {
+    transform: translateY(-50%) scale(1.1);
+}
+
+.search-engine-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+/* 搜索引擎快捷选择栏 */
+.search-engine-bar {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(9, 1fr);
+    gap: 0.5rem;
+    padding: 0.75rem;
     background: var(--glass-bg);
     backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border-radius: 1rem;
+    box-shadow: var(--shadow-md);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all var(--transition-fast);
+    margin-top: 0.5rem;
+}
+
+.search-engine-bar.visible {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.search-engine-bar::-webkit-scrollbar {
+    height: 6px;
+}
+
+.search-engine-bar::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.search-engine-bar::-webkit-scrollbar-thumb {
+    background: var(--theme-color);
+    border-radius: 3px;
+}
+
+.search-engine-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25rem;
+    padding: 0.5rem 0.25rem;
+    border-radius: 0.75rem;
     cursor: pointer;
+    transition: all var(--transition-fast);
+    background: transparent;
+    border: none;
+    color: var(--text-primary);
+    min-width: unset;
+    flex-shrink: 0;
+}
+
+.search-engine-item:hover {
+    background: var(--bg-tertiary);
+    transform: translateY(-2px);
+}
+
+.search-engine-item.active {
+    background: var(--theme-color);
+    color: white;
+}
+
+.search-engine-item img {
+    width: 1.75rem;
+    height: 1.75rem;
+    object-fit: contain;
+}
+
+.search-engine-item span {
+    font-size: 0.75rem;
+    white-space: nowrap;
+}
+
+.search-engine-item .add-icon {
+    width: 1.75rem;
+    height: 1.75rem;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all var(--transition-fast);
+    font-size: 1.25rem;
+    color: var(--text-secondary);
 }
 
-.search-engine-btn:hover {
-    background: var(--bg-tertiary);
-    transform: scale(1.1);
-}
-
-.search-engine-btn img {
-    width: 24px;
-    height: 24px;
+.search-engine-item:hover .add-icon {
+    color: var(--theme-color);
 }
