@@ -38,6 +38,9 @@ class App {
             // 将 SettingsManager 暴露到全局，供其他模块使用
             window.settingsManager = SettingsManager;
 
+            // 初始化搜索处理器（需要在 SettingsManager 之后）
+            await SearchHandler.init();
+
             // 初始化分类和数据
             const dataLoadStart = performance.now();
             await CategoryManager.init();

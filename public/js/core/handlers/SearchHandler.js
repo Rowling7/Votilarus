@@ -12,12 +12,20 @@ class SearchHandler {
         // 所有可用的搜索引擎（从数据库动态加载）
         this.searchEngines = {};
 
-        this.init();
+        // 延迟初始化，等待 DOM 和 SettingsManager 准备好
+        this.initialized = false;
     }
 
     async init() {
+        if (this.initialized) {
+            return;
+        }
+
         // 先加载搜索引擎列表
         await this.loadSearchEngines();
+
+        // 从数据库应用搜索框设置
+        this.applySearchSettings();
 
         // 搜索框回车事件
         this.searchBox.addEventListener('keypress', (e) => {
@@ -47,6 +55,8 @@ class SearchHandler {
         // 初始化引擎列表
         this.renderQuickBar();
         this.updateSearchEngineIcon();
+
+        this.initialized = true;
     }
 
     // 从 API 加载搜索引擎列表
@@ -78,6 +88,72 @@ class SearchHandler {
                 bing: { name: 'Bing', icon: 'static/ico/bing.png', url: 'https://www.bing.com/search?q=' },
                 google: { name: '谷歌', icon: 'static/ico/google.png', url: 'https://www.google.com/search?q=' }
             };
+        }
+    }
+
+    // 获取备用图标
+    getFallbackIcon() {
+        return 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22%233B82F6%22%3E%3Cpath d=%22M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z%22/%3E%3C/svg%3E';
+    }
+
+    // 从数据库应用搜索框设置
+    applySearchSettings() {
+        // 1. 应用默认搜索引擎（已在 renderQuickBar 和 updateSearchEngineIcon 中使用 SettingsManager.get）
+        const searchEngine = SettingsManager.get('search_engine');
+        // 这个设置在 setSearchEngine 和 performSearch 中已经通过 SettingsManager.get('search_engine') 读取
+
+        // 2. 应用搜索框位置
+        const position = SettingsManager.get('search_box_position') || 'center';
+        this.applySearchBoxPosition(position);
+
+        // 3. 应用搜索框圆角样式
+        const style = SettingsManager.get('search_box_style') || 'rounded';
+        this.applySearchBoxStyle(style);
+    }
+
+    // 应用搜索框位置
+    applySearchBoxPosition(position) {
+        const searchContainer = document.querySelector('.search-container');
+        if (!searchContainer) return;
+
+        // 移除所有位置类
+        searchContainer.classList.remove('position-left', 'position-center', 'position-right');
+
+        // 根据设置应用位置
+        switch (position) {
+            case 'left':
+                searchContainer.style.left = '2rem';
+                searchContainer.style.transform = 'none';
+                break;
+            case 'right':
+                searchContainer.style.left = 'auto';
+                searchContainer.style.right = '2rem';
+                searchContainer.style.transform = 'none';
+                break;
+            case 'center':
+            default:
+                searchContainer.style.left = '50%';
+                searchContainer.style.right = 'auto';
+                searchContainer.style.transform = 'translateX(-50%)';
+                break;
+        }
+    }
+
+    // 应用搜索框圆角样式
+    applySearchBoxStyle(style) {
+        const searchBox = document.getElementById('searchBox');
+        const searchEngineBar = document.getElementById('searchEngineBar');
+
+        if (!searchBox || !searchEngineBar) return;
+
+        // 根据设置应用圆角
+        if (style === 'square') {
+            searchBox.style.borderRadius = '0.5rem';
+            searchEngineBar.style.borderRadius = '0.5rem';
+        } else {
+            // rounded
+            searchBox.style.borderRadius = '2rem';
+            searchEngineBar.style.borderRadius = '2rem';
         }
     }
 
@@ -187,11 +263,6 @@ class SearchHandler {
         this.searchEngineIcon.innerHTML = `<img src="${config.icon}" alt="${config.name}" onerror="this.src='${this.getFallbackIcon()}'">`;
     }
 
-    // 获取备用图标
-    getFallbackIcon() {
-        return 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22%233B82F6%22%3E%3Cpath d=%22M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z%22/%3E%3C/svg%3E';
-    }
-
     // 显示添加搜索引擎对话框
     showAddEngineDialog() {
         console.log('showAddEngineDialog called');
@@ -202,6 +273,8 @@ class SearchHandler {
             await this.loadSearchEngines();
             // 重新渲染引擎列表
             this.renderQuickBar();
+            // 更新搜索框图标
+            this.updateSearchEngineIcon();
         });
     }
 }

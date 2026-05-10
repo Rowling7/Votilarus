@@ -3,6 +3,7 @@
 import SettingsManager from '../../managers/SettingsManager.js';
 import ConfirmModal from '../../components/ConfirmModal.js';
 import ToastNotification from '../../utils/ToastNotification.js';
+import SearchHandler from './SearchHandler.js';
 
 class SettingsModalHandler {
     constructor() {
@@ -924,13 +925,16 @@ class SettingsModalHandler {
         // 6. 应用搜索框样式
         this.applySearchBoxStyle(settings.searchBoxStyle);
 
-        // 7. 应用网格设置
+        // 7. 更新搜索引擎图标（如果默认搜索引擎改变）
+        this.updateSearchEngineIcon();
+
+        // 8. 应用网格设置
         this.applyGridSettings(settings);
 
-        // 8. 应用 Dock 设置
+        // 9. 应用 Dock 设置
         this.applyDockSettings(settings);
 
-        // 9. 应用背景设置（包括开关状态）
+        // 10. 应用背景设置（包括开关状态）
         this.applyBackgroundSettings(settings);
     }
 
@@ -973,15 +977,33 @@ class SettingsModalHandler {
      */
     applySearchBoxStyle(style) {
         const searchBox = document.querySelector('.search-box');
+        const searchEngineBar = document.querySelector('.search-engine-bar');
+
         if (!searchBox) return;
 
         switch (style) {
             case 'rounded':
                 searchBox.style.borderRadius = '2rem';
+                if (searchEngineBar) {
+                    searchEngineBar.style.borderRadius = '2rem';
+                }
                 break;
             case 'square':
                 searchBox.style.borderRadius = '0.5rem';
+                if (searchEngineBar) {
+                    searchEngineBar.style.borderRadius = '0.5rem';
+                }
                 break;
+        }
+    }
+
+    /**
+     * 更新搜索引擎图标
+     */
+    updateSearchEngineIcon() {
+        // 调用 SearchHandler 的 updateSearchEngineIcon 方法
+        if (SearchHandler && SearchHandler.updateSearchEngineIcon) {
+            SearchHandler.updateSearchEngineIcon();
         }
     }
 
