@@ -23,7 +23,7 @@
     width: 100%;
     padding: 1rem 1.5rem 1rem 3.5rem;
     border: 2px solid var(--border-color);
-    border-radius: 2rem;
+    border-radius: 1.4rem;
     background: var(--glass-bg);
     backdrop-filter: blur(var(--glass-blur));
     -webkit-backdrop-filter: blur(var(--glass-blur));
@@ -76,7 +76,7 @@
     background: var(--glass-bg);
     backdrop-filter: blur(var(--glass-blur));
     -webkit-backdrop-filter: blur(var(--glass-blur));
-    border-radius: 2rem;
+    border-radius: 1.4rem;
     box-shadow: var(--shadow-md);
     max-height: 0;
     overflow: hidden;
@@ -106,7 +106,7 @@
 
 .search-engine-bar::-webkit-scrollbar-thumb {
     background: var(--theme-color);
-    border-radius: 3px;
+    border-radius: 1.4rem;
 }
 
 .search-engine-item {
@@ -116,7 +116,7 @@
     justify-content: center;
     gap: 0.25rem;
     padding: 0.5rem 0.25rem;
-    border-radius: 0.75rem;
+    border-radius: 1.4rem;
     cursor: pointer;
     transition: all var(--transition-fast);
     background: transparent;

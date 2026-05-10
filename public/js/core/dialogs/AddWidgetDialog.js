@@ -11,7 +11,7 @@ class AddWidgetDialogHandler {
         // 可用的小组件列表
         this.availableWidgets = [
             { id: 'clock', name: 'ClockWidget', icon: '⏰', description: '显示当前时间' },
-            { id: 'calendar', name: 'CalendarWidget', icon: '📅', description: '显示日期和月历' },
+            { id: 'calendar', name: 'CalendarWidget', icon: '📅', description: '显示日期、周数、农历信息' },
             { id: 'weather', name: 'WeatherWidget', icon: '🌤️', description: '显示天气信息' }
         ];
     }

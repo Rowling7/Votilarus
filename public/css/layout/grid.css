@@ -71,7 +71,7 @@
 .category-panel.drag-over {
     background: rgba(var(--theme-color-rgb), 0.05);
     border: 2px dashed var(--theme-color);
-    border-radius: 1rem;
+    border-radius: 1.4rem;
 }
 
 /* 图标基础样式 */
@@ -82,7 +82,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    border-radius: var(--icon-radius);
+    border-radius: 1.4rem;
     background: var(--bg-secondary);
     box-shadow: var(--shadow-md);
     transition: all var(--transition-normal);

@@ -11,7 +11,7 @@
     background: var(--glass-bg);
     backdrop-filter: blur(var(--glass-blur));
     -webkit-backdrop-filter: blur(var(--glass-blur));
-    border-radius: 1rem;
+    border-radius: 1.4rem;
     box-shadow: var(--shadow-lg);
     z-index: 1000;
     padding: 1rem 0.5rem;
@@ -89,7 +89,7 @@
     text-align: center;
     color: var(--text-secondary);
     cursor: pointer;
-    border-radius: 0.5rem;
+    border-radius: 1.4rem;
     transition: all var(--transition-fast);
     font-size: 0.9rem;
     display: flex;
