@@ -1,6 +1,6 @@
 /* ==================== 日历小组件样式 ==================== */
 
-.calendar-widget {
+.grid-item[data-widget-type="calendar"] .calendar-widget {
     display: flex;
     flex-direction: column;
     height: 100%;

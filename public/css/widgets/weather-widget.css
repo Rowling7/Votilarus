@@ -154,7 +154,7 @@
 
 .weather-icon-desc {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
     gap: 0.25rem;
 }
@@ -186,6 +186,7 @@
     gap: 0.75rem;
     margin-bottom: 0.5rem;
     justify-content: center;
+    flex-direction: column;
 }
 
 .grid-item[data-size="2x2"][data-widget-type="weather"] .widget-container .weather-temp-large {
@@ -393,9 +394,12 @@
     min-height: 0;
 }
 
-.grid-item[data-size="2x3"][data-widget-type="weather"] .widget-container .weather-temp-large,
+.grid-item[data-size="2x3"][data-widget-type="weather"] .widget-container .weather-temp-large {
+    font-size: 3.5rem;
+}
+
 .grid-item[data-size="2x4"][data-widget-type="weather"] .widget-container .weather-temp-large {
-    font-size: 2rem;
+    font-size: 4rem;
 }
 
 .grid-item[data-size="2x3"][data-widget-type="weather"] .widget-container .weather-icon,
@@ -407,11 +411,6 @@
 .grid-item[data-size="2x3"][data-widget-type="weather"] .widget-container .weather-desc,
 .grid-item[data-size="2x4"][data-widget-type="weather"] .widget-container .weather-desc {
     font-size: 0.75rem;
-}
-
-/* 2x4 特殊调整 */
-.grid-item[data-size="2x4"][data-widget-type="weather"] .widget-container .weather-temp-large {
-    font-size: 3rem;
 }
 
 /* ===== 风向箭头样式 ===== */
