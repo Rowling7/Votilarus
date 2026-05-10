@@ -63,6 +63,9 @@
     --transition-bounce: 400ms cubic-bezier(0.68, -0.55, 0.265, 1.55);
     /*侧边栏宽度*/
     --sidebar-width: 60px;
+
+    --weather-hover: rgb(59 130 246 / 8%);
+    --border-color: rgba(0, 0, 0, 0.1);
 }
 
 /* 暗黑模式 */
@@ -86,4 +89,7 @@
     --glass-border: rgba(255, 255, 255, 0.1);
 
     --theme-color-rgb: 59, 130, 246;
+
+    --weather-hover: rgb(59 130 246 / 3%);
+    --border-color: rgba(255, 255, 255, 0.1);
 }

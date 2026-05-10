@@ -1,6 +1,6 @@
 /* ==================== 天气小组件样式 ==================== */
 
-/* 天气类型 widget-container */
+/* ===== 基础容器样式 ===== */
 .grid-item[data-widget-type="weather"] .widget-container {
     display: flex;
     flex-direction: column;
@@ -18,12 +18,19 @@
     overflow: hidden;
 }
 
-/* 位置区域 */
+/* 统一内边距 */
+.grid-item[data-size="2x2"][data-widget-type="weather"] .widget-container,
+.grid-item[data-size="2x3"][data-widget-type="weather"] .widget-container,
+.grid-item[data-size="2x4"][data-widget-type="weather"] .widget-container {
+    padding: 0.5rem;
+}
+
+/* ===== 位置区域 ===== */
 .weather-location {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 0.5rem;
+    margin: 0 0.5rem 0.5rem;
     flex-shrink: 0;
     padding-bottom: 0.5rem;
     border-bottom: 1px solid var(--glass-border, rgba(255, 255, 255, 0.15));
@@ -73,7 +80,49 @@
     transform: translateX(-50%);
 }
 
-/* 主体区域 */
+/* 2x2 位置区域调整 */
+.grid-item[data-size="2x2"][data-widget-type="weather"] .widget-container .weather-location {
+    margin-bottom: 0.25rem;
+}
+
+.grid-item[data-size="2x2"][data-widget-type="weather"] .widget-container .location-name {
+    font-size: 0.85rem;
+}
+
+.grid-item[data-size="2x2"][data-widget-type="weather"] .widget-container .location-icon {
+    width: 0.75rem;
+    height: 0.75rem;
+}
+
+.grid-item[data-size="2x2"][data-widget-type="weather"] .widget-container .location-pin {
+    width: 0.7rem;
+    height: 0.9rem;
+}
+
+.grid-item[data-size="2x2"][data-widget-type="weather"] .widget-container .location-pin::before {
+    width: 0.7rem;
+    height: 0.7rem;
+}
+
+.grid-item[data-size="2x2"][data-widget-type="weather"] .widget-container .location-pin::after {
+    width: 0.25rem;
+    height: 0.25rem;
+    top: 0.15rem;
+}
+
+/* 2x3/2x4 位置区域调整 */
+.grid-item[data-size="2x3"][data-widget-type="weather"] .widget-container .weather-location,
+.grid-item[data-size="2x4"][data-widget-type="weather"] .widget-container .weather-location {
+    margin-bottom: 0.3rem;
+    padding-bottom: 0.3rem;
+}
+
+.grid-item[data-size="2x3"][data-widget-type="weather"] .widget-container .location-name,
+.grid-item[data-size="2x4"][data-widget-type="weather"] .widget-container .location-name {
+    font-size: 0.9rem;
+}
+
+/* ===== 主体区域 ===== */
 .weather-main {
     display: flex;
     align-items: center;
@@ -130,47 +179,13 @@
     letter-spacing: 0.3px;
 }
 
-/* 2x2 尺寸特有样式 */
-.grid-item[data-size="2x2"][data-widget-type="weather"] .widget-container {
-    padding: 0.5rem;
-}
-
-.grid-item[data-size="2x2"][data-widget-type="weather"] .widget-container .weather-location {
-    margin-bottom: 0.25rem;
-}
-
-.grid-item[data-size="2x2"][data-widget-type="weather"] .widget-container .location-name {
-    font-size: 0.85rem;
-}
-
-.grid-item[data-size="2x2"][data-widget-type="weather"] .widget-container .location-icon {
-    width: 0.75rem;
-    height: 0.75rem;
-}
-
-.grid-item[data-size="2x2"][data-widget-type="weather"] .widget-container .location-pin {
-    width: 0.7rem;
-    height: 0.9rem;
-}
-
-.grid-item[data-size="2x2"][data-widget-type="weather"] .widget-container .location-pin::before {
-    width: 0.7rem;
-    height: 0.7rem;
-}
-
-.grid-item[data-size="2x2"][data-widget-type="weather"] .widget-container .location-pin::after {
-    width: 0.25rem;
-    height: 0.25rem;
-    top: 0.15rem;
-}
-
+/* 2x2 主体区域调整 */
 .grid-item[data-size="2x2"][data-widget-type="weather"] .widget-container .weather-main {
     display: flex;
     align-items: center;
     gap: 0.75rem;
     margin-bottom: 0.5rem;
     justify-content: center;
-    align-items: center;
 }
 
 .grid-item[data-size="2x2"][data-widget-type="weather"] .widget-container .weather-temp-large {
@@ -186,77 +201,59 @@
     font-size: 0.75rem;
 }
 
-/* 2x2 紧凑详情 - 体感温度、风速、风向 */
-.grid-item[data-size="2x2"][data-widget-type="weather"] .widget-container .weather-details-compact {
-    display: flex;
-    justify-content: space-between;
-    gap: 0.2rem;
-    margin-top: auto;
-    padding-top: 0.3rem;
-    border-top: 1px solid var(--glass-border, rgba(255, 255, 255, 0.1));
-    perspective: 1000px;
-    min-height: 4.5rem;
-}
-
-.grid-item[data-size="2x2"][data-widget-type="weather"] .widget-container .weather-details-compact .flip-card {
+/* ===== 翻转卡片通用样式 ===== */
+.weather-details-compact .flip-card {
     width: 100%;
     height: 100%;
     position: relative;
     cursor: pointer;
 }
 
-.grid-item[data-size="2x2"][data-widget-type="weather"] .widget-container .weather-details-compact .flip-card-inner {
+.weather-details-compact .flip-card-inner {
     position: relative;
     width: 100%;
-    height: 63%;
+    height: 100%;
     transition: transform 0.6s;
     transform-style: preserve-3d;
 }
 
-.grid-item[data-size="2x2"][data-widget-type="weather"] .widget-container .weather-details-compact .flip-card.flipped .flip-card-inner {
+.weather-details-compact .flip-card.flipped .flip-card-inner {
     transform: rotateY(180deg);
 }
 
-.grid-item[data-size="2x2"][data-widget-type="weather"] .widget-container .weather-details-compact .flip-card-front,
-.grid-item[data-size="2x2"][data-widget-type="weather"] .widget-container .weather-details-compact .flip-card-back {
+.weather-details-compact .flip-card-front,
+.weather-details-compact .flip-card-back {
     position: absolute;
     width: 100%;
     height: 100%;
     backface-visibility: hidden;
-    display: flex;
-    justify-content: space-between;
-    gap: 0.2rem;
 }
 
-.grid-item[data-size="2x2"][data-widget-type="weather"] .widget-container .weather-details-compact .flip-card-back {
+.weather-details-compact .flip-card-back {
     transform: rotateY(180deg);
 }
 
-.grid-item[data-size="2x2"][data-widget-type="weather"] .widget-container .weather-details-compact .detail-item {
+/* 详情项通用样式 */
+.weather-details-compact .detail-item {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 0.3rem 0.2rem;
-    background: var(--bg-hover, rgba(255, 255, 255, 0.08));
-    border-radius: 0.5rem;
+    background: var(--weather-hover, rgba(255, 255, 255, 0.08));
+    border-radius: 0.8rem;
     border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.1));
     transition: all var(--transition-fast);
     position: relative;
     overflow: hidden;
-    flex: 1;
-    min-width: 0;
 }
 
-.grid-item[data-size="2x2"][data-widget-type="weather"] .widget-container .weather-details-compact .flip-card:hover .detail-item {
+.weather-details-compact .flip-card:hover .detail-item {
     background: rgba(255, 255, 255, 0.12);
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
-.grid-item[data-size="2x2"][data-widget-type="weather"] .widget-container .weather-details-compact .detail-label {
-    font-size: 0.65rem;
-    margin-bottom: 0.15rem;
+.weather-details-compact .detail-label {
     opacity: 0.8;
     color: var(--text-tertiary, rgba(255, 255, 255, 0.7));
     text-align: center;
@@ -264,8 +261,7 @@
     white-space: nowrap;
 }
 
-.grid-item[data-size="2x2"][data-widget-type="weather"] .widget-container .weather-details-compact .detail-value {
-    font-size: 0.7rem;
+.weather-details-compact .detail-value {
     font-weight: 600;
     color: var(--text-primary, white);
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
@@ -278,29 +274,90 @@
     gap: 0.2rem;
 }
 
-/* 2x3 和 2x4 尺寸特有样式 */
-.grid-item[data-size="2x3"][data-widget-type="weather"] .widget-container,
-.grid-item[data-size="2x4"][data-widget-type="weather"] .widget-container {
-    padding: 0.5rem;
+/* ===== 2x2 详情区域 ===== */
+.grid-item[data-size="2x2"][data-widget-type="weather"] .widget-container .weather-details-compact {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.2rem;
+    margin-top: auto;
+    padding-top: 0.3rem;
+    border-top: 1px solid var(--glass-border, rgba(255, 255, 255, 0.1));
+    perspective: 1000px;
+    min-height: 4.5rem;
 }
 
-.grid-item[data-size="2x3"][data-widget-type="weather"] .widget-container .weather-location,
-.grid-item[data-size="2x4"][data-widget-type="weather"] .widget-container .weather-location {
-    margin-bottom: 0.3rem;
-    padding-bottom: 0.3rem;
+.grid-item[data-size="2x2"][data-widget-type="weather"] .widget-container .weather-details-compact .flip-card-inner {
+    height: 63%;
 }
 
-.grid-item[data-size="2x3"][data-widget-type="weather"] .widget-container .location-name,
-.grid-item[data-size="2x4"][data-widget-type="weather"] .widget-container .location-name {
-    font-size: 0.9rem;
+.grid-item[data-size="2x2"][data-widget-type="weather"] .widget-container .weather-details-compact .flip-card-front,
+.grid-item[data-size="2x2"][data-widget-type="weather"] .widget-container .weather-details-compact .flip-card-back {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.2rem;
 }
 
-.grid-item[data-size="2x3"][data-widget-type="weather"] .widget-container .location-icon,
-.grid-item[data-size="2x4"][data-widget-type="weather"] .widget-container .location-icon {
-    font-size: 0.9rem;
+.grid-item[data-size="2x2"][data-widget-type="weather"] .widget-container .weather-details-compact .detail-item {
+    padding: 0.3rem 0.2rem;
+    flex: 1;
+    min-width: 0;
 }
 
-/* 天气内容容器 */
+.grid-item[data-size="2x2"][data-widget-type="weather"] .widget-container .weather-details-compact .detail-label {
+    font-size: 0.65rem;
+    margin-bottom: 0.15rem;
+}
+
+.grid-item[data-size="2x2"][data-widget-type="weather"] .widget-container .weather-details-compact .detail-value {
+    font-size: 0.7rem;
+}
+
+/* ===== 2x3/2x4 详情区域 ===== */
+.grid-item[data-size="2x3"][data-widget-type="weather"] .widget-container .weather-details-compact,
+.grid-item[data-size="2x4"][data-widget-type="weather"] .widget-container .weather-details-compact {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    flex: 1;
+    min-height: 0;
+    perspective: 1000px;
+}
+
+.grid-item[data-size="2x3"][data-widget-type="weather"] .widget-container .weather-details-compact .flip-card-front,
+.grid-item[data-size="2x4"][data-widget-type="weather"] .widget-container .weather-details-compact .flip-card-front,
+.grid-item[data-size="2x3"][data-widget-type="weather"] .widget-container .weather-details-compact .flip-card-back,
+.grid-item[data-size="2x4"][data-widget-type="weather"] .widget-container .weather-details-compact .flip-card-back {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+
+.grid-item[data-size="2x3"][data-widget-type="weather"] .widget-container .weather-details-compact .flip-card-front .detail-item,
+.grid-item[data-size="2x4"][data-widget-type="weather"] .widget-container .weather-details-compact .flip-card-front .detail-item {
+    flex: 1;
+}
+
+.grid-item[data-size="2x3"][data-widget-type="weather"] .widget-container .weather-details-compact .detail-item,
+.grid-item[data-size="2x4"][data-widget-type="weather"] .widget-container .weather-details-compact .detail-item {
+    padding: 0.4rem 0.3rem;
+    flex: 1;
+    min-height: 0;
+}
+
+.grid-item[data-size="2x3"][data-widget-type="weather"] .widget-container .weather-details-compact .detail-label,
+.grid-item[data-size="2x4"][data-widget-type="weather"] .widget-container .weather-details-compact .detail-label {
+    font-size: 0.6rem;
+    margin-bottom: 0.2rem;
+    opacity: 0.7;
+    font-weight: 500;
+}
+
+.grid-item[data-size="2x3"][data-widget-type="weather"] .widget-container .weather-details-compact .detail-value,
+.grid-item[data-size="2x4"][data-widget-type="weather"] .widget-container .weather-details-compact .detail-value {
+    font-size: 0.8rem;
+}
+
+/* ===== 天气内容容器 ===== */
 .weather-content {
     display: flex;
     flex: 1;
@@ -312,7 +369,7 @@
     gap: 0;
 }
 
-/* 2x3 和 2x4 横向排列 */
+/* 2x3/2x4 横向排列 */
 .grid-item[data-size="2x3"][data-widget-type="weather"] .widget-container .weather-content,
 .grid-item[data-size="2x4"][data-widget-type="weather"] .widget-container .weather-content {
     flex-direction: row;
@@ -332,7 +389,7 @@
     width: 55%;
     margin-bottom: 0;
     padding: 0.5rem 0.3rem;
-    border-right: 1px solid var(--glass-border, rgba(255, 255, 255, 0.1));
+    border-right: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
     min-height: 0;
 }
 
@@ -352,106 +409,12 @@
     font-size: 0.75rem;
 }
 
-/* 2x3 和 2x4 竖向详情 - 上下堆叠 */
-.grid-item[data-size="2x3"][data-widget-type="weather"] .widget-container .weather-details-compact,
-.grid-item[data-size="2x4"][data-widget-type="weather"] .widget-container .weather-details-compact {
-    display: flex;
-    flex-direction: column;
-    gap: 0.3rem;
-    flex: 1;
-    min-height: 0;
-    perspective: 1000px;
+/* 2x4 特殊调整 */
+.grid-item[data-size="2x4"][data-widget-type="weather"] .widget-container .weather-temp-large {
+    font-size: 3rem;
 }
 
-.grid-item[data-size="2x3"][data-widget-type="weather"] .widget-container .weather-details-compact .flip-card,
-.grid-item[data-size="2x4"][data-widget-type="weather"] .widget-container .weather-details-compact .flip-card {
-    width: 100%;
-    height: 100%;
-    position: relative;
-    cursor: pointer;
-}
-
-.grid-item[data-size="2x3"][data-widget-type="weather"] .widget-container .weather-details-compact .flip-card-inner,
-.grid-item[data-size="2x4"][data-widget-type="weather"] .widget-container .weather-details-compact .flip-card-inner {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    transition: transform 0.6s;
-    transform-style: preserve-3d;
-}
-
-.grid-item[data-size="2x3"][data-widget-type="weather"] .widget-container .weather-details-compact .flip-card.flipped .flip-card-inner,
-.grid-item[data-size="2x4"][data-widget-type="weather"] .widget-container .weather-details-compact .flip-card.flipped .flip-card-inner {
-    transform: rotateY(180deg);
-}
-
-.grid-item[data-size="2x3"][data-widget-type="weather"] .widget-container .weather-details-compact .flip-card-front,
-.grid-item[data-size="2x4"][data-widget-type="weather"] .widget-container .weather-details-compact .flip-card-front,
-.grid-item[data-size="2x3"][data-widget-type="weather"] .widget-container .weather-details-compact .flip-card-back,
-.grid-item[data-size="2x4"][data-widget-type="weather"] .widget-container .weather-details-compact .flip-card-back {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    backface-visibility: hidden;
-    display: flex;
-    flex-direction: column;
-    gap: 0.3rem;
-}
-
-.grid-item[data-size="2x3"][data-widget-type="weather"] .widget-container .weather-details-compact .flip-card-back,
-.grid-item[data-size="2x4"][data-widget-type="weather"] .widget-container .weather-details-compact .flip-card-back {
-    transform: rotateY(180deg);
-}
-
-.grid-item[data-size="2x3"][data-widget-type="weather"] .widget-container .weather-details-compact .detail-item,
-.grid-item[data-size="2x4"][data-widget-type="weather"] .widget-container .weather-details-compact .detail-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 0.4rem 0.3rem;
-    text-align: center;
-    background: rgba(255, 255, 255, 0.08);
-    border-radius: 0.5rem;
-    border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.1));
-    transition: all var(--transition-fast);
-    position: relative;
-    overflow: hidden;
-    flex: 1;
-    min-height: 0;
-}
-
-.grid-item[data-size="2x3"][data-widget-type="weather"] .widget-container .weather-details-compact .flip-card-front .detail-item,
-.grid-item[data-size="2x4"][data-widget-type="weather"] .widget-container .weather-details-compact .flip-card-front .detail-item {
-    flex: 1;
-}
-
-.grid-item[data-size="2x3"][data-widget-type="weather"] .widget-container .weather-details-compact .flip-card:hover .detail-item,
-.grid-item[data-size="2x4"][data-widget-type="weather"] .widget-container .weather-details-compact .flip-card:hover .detail-item {
-    background: rgba(255, 255, 255, 0.12);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-.grid-item[data-size="2x3"][data-widget-type="weather"] .widget-container .weather-details-compact .detail-label,
-.grid-item[data-size="2x4"][data-widget-type="weather"] .widget-container .weather-details-compact .detail-label {
-    font-size: 0.6rem;
-    margin-bottom: 0.2rem;
-    opacity: 0.7;
-    color: var(--text-tertiary, rgba(255, 255, 255, 0.7));
-    text-align: center;
-    font-weight: 500;
-}
-
-.grid-item[data-size="2x3"][data-widget-type="weather"] .widget-container .weather-details-compact .detail-value,
-.grid-item[data-size="2x4"][data-widget-type="weather"] .widget-container .weather-details-compact .detail-value {
-    font-size: 0.8rem;
-    font-weight: 600;
-    color: var(--text-primary, white);
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-}
-
-/* 风向箭头样式 */
+/* ===== 风向箭头样式 ===== */
 .wind-arrow {
     display: inline-block;
     margin-right: 0.3rem;
@@ -469,14 +432,4 @@
     50% {
         transform: rotate(10deg);
     }
-}
-
-/* 2x4 特殊调整 */
-.grid-item[data-size="2x4"][data-widget-type="weather"] .widget-container .weather-temp-large {
-    font-size: 3rem;
-}
-
-.grid-item[data-size="2x4"][data-widget-type="weather"] .widget-container .weather-icon {
-    width: 2.5rem;
-    height: 2.5rem;
 }
