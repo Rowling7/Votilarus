@@ -29,13 +29,15 @@ class WeatherWidget extends BaseWidget {
 
     /**
      * 根据尺寸获取当前 widget 的大小
-     * @returns {string} 尺寸字符串，如 '2x2' 或 '2x4'
+     * @returns {string} 尺寸字符串，如 '2x2'、'2x3' 或 '2x4'
      */
     getSize() {
         // 从 container 的 class 或 style 中推断尺寸
-        // 2x2 约 200px 高, 2x4 约 400px 高
+        // 2x2 约 200px 高, 2x3 约 300px 高, 2x4 约 400px 高
         const height = this.container.offsetHeight;
-        return height > 250 ? '2x4' : '2x2';
+        if (height <= 250) return '2x2';
+        if (height <= 350) return '2x3';
+        return '2x4';
     }
 
     /**
@@ -43,20 +45,6 @@ class WeatherWidget extends BaseWidget {
      */
     render() {
         this.updateLayout();
-
-        // 添加翻转交互(仅 2x4)
-        const flipCard = this.container.querySelector('.flip-card');
-        const detailsFlip = this.container.querySelector('.weather-details-flip');
-
-        if (detailsFlip && flipCard) {
-            detailsFlip.addEventListener('mouseenter', () => {
-                flipCard.classList.add('flipped');
-            });
-
-            detailsFlip.addEventListener('mouseleave', () => {
-                flipCard.classList.remove('flipped');
-            });
-        }
 
         // 获取天气数据
         this.fetchWeatherData();
@@ -78,7 +66,7 @@ class WeatherWidget extends BaseWidget {
         const size = this.getSize();
 
         if (size === '2x2') {
-            // 2x2 简化布局
+            // 2x2 简化布局 - 体感温度、风速、风向
             this.container.innerHTML = `
                 <div class="weather-widget size-2x2">
                     <div class="weather-location">
@@ -92,54 +80,50 @@ class WeatherWidget extends BaseWidget {
                             <div class="weather-desc">--</div>
                         </div>
                     </div>
+                    <div class="weather-details-compact">
+                        <div class="detail-item">
+                            <span class="detail-label">体感温度</span>
+                            <span class="detail-value">--°C</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">风速 m/s</span>
+                            <span class="detail-value">--</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">风向</span>
+                            <span class="detail-value">--</span>
+                        </div>
+                    </div>
                 </div>
             `;
-        } else {
-            // 2x4 完整布局
+        } else if (size === '2x3' || size === '2x4') {
+            // 2x3 和 2x4 布局 - 右侧竖向排列体感温度、风速、风向
             this.container.innerHTML = `
-                <div class="weather-widget size-2x4">
+                <div class="weather-widget size-${size}">
                     <div class="weather-location">
                         <span class="location-name">--</span>
                         <span class="location-icon location-pin"></span>
                     </div>
-                    <div class="weather-main">
-                        <div class="weather-temp-large">--°</div>
-                        <div class="weather-icon-desc">
-                            <img class="weather-icon" src="" alt="天气">
-                            <div class="weather-desc">--</div>
+                    <div class="weather-content">
+                        <div class="weather-main">
+                            <div class="weather-temp-large">--°</div>
+                            <div class="weather-icon-desc">
+                                <img class="weather-icon" src="" alt="天气">
+                                <div class="weather-desc">--</div>
+                            </div>
                         </div>
-                    </div>
-                    <div class="weather-details-flip">
-                        <div class="flip-card">
-                            <div class="flip-card-inner">
-                                <div class="flip-card-front">
-                                    <div class="detail-item">
-                                        <span class="detail-label">体感温度</span>
-                                        <span class="detail-value">--°C</span>
-                                    </div>
-                                    <div class="detail-item">
-                                        <span class="detail-label">风速</span>
-                                        <span class="detail-value">-- m/s</span>
-                                    </div>
-                                    <div class="detail-item">
-                                        <span class="detail-label">风向</span>
-                                        <span class="detail-value">--</span>
-                                    </div>
-                                </div>
-                                <div class="flip-card-back">
-                                    <div class="detail-item">
-                                        <span class="detail-label">湿度</span>
-                                        <span class="detail-value">--%</span>
-                                    </div>
-                                    <div class="detail-item">
-                                        <span class="detail-label">大气压</span>
-                                        <span class="detail-value">-- hPa</span>
-                                    </div>
-                                    <div class="detail-item">
-                                        <span class="detail-label">云量</span>
-                                        <span class="detail-value">--%</span>
-                                    </div>
-                                </div>
+                        <div class="weather-details-vertical">
+                            <div class="detail-item">
+                                <span class="detail-label">体感温度</span>
+                                <span class="detail-value">--°C</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">风速 m/s</span>
+                                <span class="detail-value">--</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">风向</span>
+                                <span class="detail-value">--</span>
                             </div>
                         </div>
                     </div>
@@ -275,51 +259,46 @@ class WeatherWidget extends BaseWidget {
         }
 
         // 更新正面数据 - 体感温度
-        const feelsLikeEl = this.container.querySelector('.flip-card-front .detail-item:nth-child(1) .detail-value');
+        const feelsLikeEl = this.container.querySelector('.weather-details-compact .detail-item:nth-child(1) .detail-value, .weather-details-vertical .detail-item:nth-child(1) .detail-value');
         if (feelsLikeEl) {
             feelsLikeEl.textContent = `${Math.round(weatherData.main.feels_like)}°C`;
         }
 
         // 更新正面数据 - 风速
-        const windSpeedEl = this.container.querySelector('.flip-card-front .detail-item:nth-child(2) .detail-value');
+        const windSpeedEl = this.container.querySelector('.weather-details-compact .detail-item:nth-child(2) .detail-value, .weather-details-vertical .detail-item:nth-child(2) .detail-value');
         if (windSpeedEl) {
-            windSpeedEl.textContent = `${weatherData.wind.speed} m/s`;
+            windSpeedEl.textContent = `${weatherData.wind.speed}`;
         }
 
         // 更新正面数据 - 风向
-        const windDegEl = this.container.querySelector('.flip-card-front .detail-item:nth-child(3) .detail-value');
+        const windDegEl = this.container.querySelector('.weather-details-compact .detail-item:nth-child(3) .detail-value, .weather-details-vertical .detail-item:nth-child(3) .detail-value');
         if (windDegEl) {
-            windDegEl.textContent = this.getWindDirection(weatherData.wind.deg);
-        }
-
-        // 更新背面数据 - 湿度
-        const humidityEl = this.container.querySelector('.flip-card-back .detail-item:nth-child(1) .detail-value');
-        if (humidityEl) {
-            humidityEl.textContent = `${weatherData.main.humidity}%`;
-        }
-
-        // 更新背面数据 - 大气压
-        const pressureEl = this.container.querySelector('.flip-card-back .detail-item:nth-child(2) .detail-value');
-        if (pressureEl) {
-            pressureEl.textContent = `${weatherData.main.pressure} hPa`;
-        }
-
-        // 更新背面数据 - 云量
-        const cloudsEl = this.container.querySelector('.flip-card-back .detail-item:nth-child(3) .detail-value');
-        if (cloudsEl) {
-            cloudsEl.textContent = `${weatherData.clouds.all}%`;
+            const windInfo = this.getWindDirection(weatherData.wind.deg);
+            windDegEl.innerHTML = `<span class="wind-arrow">${windInfo.arrow}</span> ${windInfo.name}`;
         }
     }
 
     /**
-     * 根据风向角度获取风向名称
+     * 根据风向角度获取风向名称和箭头
      * @param {number} deg - 风向角度
-     * @returns {string} 风向名称
+     * @returns {Object} 包含名称和箭头的对象
      */
     getWindDirection(deg) {
-        const directions = ['北', '东北', '东', '东南', '南', '西南', '西', '西北'];
+        const directions = [
+            { name: '北', arrow: '↑' },
+            { name: '东北', arrow: '↗' },
+            { name: '东', arrow: '→' },
+            { name: '东南', arrow: '↘' },
+            { name: '南', arrow: '↓' },
+            { name: '西南', arrow: '↙' },
+            { name: '西', arrow: '←' },
+            { name: '西北', arrow: '↖' }
+        ];
         const index = Math.round(deg / 45) % 8;
-        return directions[index];
+        return {
+            name: directions[index].name,
+            arrow: directions[index].arrow
+        };
     }
 
     /**
