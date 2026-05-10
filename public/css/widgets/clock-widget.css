@@ -16,7 +16,6 @@
             #d9d6f2 0%,
             #fce3fa 80%,
             #fbfff3 100%);
-    ;
     border-radius: 1.4rem;
     box-shadow: var(--shadow-md, 0 4px 6px rgba(0, 0, 0, 0.1));
     transition: all var(--transition-normal);
@@ -58,7 +57,7 @@
 .clock-seconds {
     font-size: 1.5rem;
     font-weight: bold;
-    color: var(--theme-color-light, #93c5fd);
+    color: var(--theme-color, #667eea);
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     line-height: 1.2;
     margin-bottom: 0.5rem;
@@ -66,22 +65,6 @@
     display: flex;
     align-items: center;
     justify-content: center;
-}
-
-.clock-date {
-    font-size: 0.9rem;
-    margin-top: 0.25rem;
-    opacity: 0.8;
-    color: var(--text-secondary, rgba(255, 255, 255, 0.8));
-    line-height: 1.2;
-}
-
-.clock-weekday {
-    font-size: 0.85rem;
-    margin-top: 0.25rem;
-    opacity: 0.6;
-    color: var(--text-tertiary, rgba(255, 255, 255, 0.6));
-    line-height: 1.2;
 }
 
 /* ==================== 宽屏布局样式（时分秒在一行） ==================== */
@@ -114,4 +97,49 @@
 .clock-time-wide .highlight-seven {
     color: #9c27b0 !important;
     text-shadow: 0 0 8px rgba(156, 39, 176, 0.5);
+}
+
+/* ==================== 时间格式切换按钮 ==================== */
+
+.clock-format-toggle {
+    margin-top: 0.5rem;
+    padding: 0.4rem 0.8rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-primary, white);
+    background: rgba(var(--theme-color-rgb), 0.1);
+    border: 0px solid var(--theme-color, #667eea);
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: all var(--transition-normal);
+    backdrop-filter: blur(5px);
+}
+
+.clock-format-toggle:hover {
+    background: rgba(var(--theme-color-rgb), 0.2);
+    border-color: var(--theme-color-light, #93c5fd);
+    transform: scale(1.05);
+}
+
+.clock-format-toggle:active {
+    transform: scale(0.95);
+}
+
+/* ==================== 暗黑模式适配 ==================== */
+
+[data-theme="dark"] .clock-widget {
+    background: linear-gradient(135deg,
+            #d9d6f2 0%,
+            #fce3fa 80%,
+            #fbfff3 100%);
+}
+
+[data-theme="dark"] .clock-time,
+[data-theme="dark"] .clock-seconds,
+[data-theme="dark"] .clock-time-wide {
+    color: var(--theme-color, #667eea);
+}
+
+[data-theme="dark"] .clock-format-toggle {
+    color: var(--text-primary, white);
 }

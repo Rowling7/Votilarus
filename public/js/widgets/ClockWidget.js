@@ -12,6 +12,8 @@ class ClockWidget extends BaseWidget {
         super(container, widgetId, 'ClockWidget');
         // 时钟组件只支持 2x2,2x3 和 2x4 尺寸
         this.supportedSizes = ['2x2', '2x3', '2x4'];
+        // 默认使用24小时制
+        this.is24HourFormat = true;
     }
 
     /**
@@ -37,8 +39,7 @@ class ClockWidget extends BaseWidget {
                         <span class="time-digit">0</span>
                         <span class="time-digit">0</span>
                     </div>
-                    <div class="clock-date">YYYY-MM-DD</div>
-                    <div class="clock-weekday">星期X</div>
+                    <button class="clock-format-toggle" title="切换12/24小时制">24H</button>
                 </div>
             `;
         } else {
@@ -56,10 +57,17 @@ class ClockWidget extends BaseWidget {
                         <span class="time-digit">0</span>
                         <span class="time-digit">0</span>
                     </div>
-                    <div class="clock-date">YYYY-MM-DD</div>
-                    <div class="clock-weekday">星期X</div>
+                    <button class="clock-format-toggle" title="切换12/24小时制">24H</button>
                 </div>
             `;
+        }
+
+        // 绑定切换按钮事件
+        const toggleBtn = this.container.querySelector('.clock-format-toggle');
+        if (toggleBtn) {
+            toggleBtn.addEventListener('click', () => {
+                this.toggleTimeFormat();
+            });
         }
 
         // 立即更新一次
@@ -82,20 +90,28 @@ class ClockWidget extends BaseWidget {
         if (this.isDestroyed) return;
 
         const now = new Date();
+        let hours = now.getHours();
+
+        // 根据格式调整小时显示
+        let displayHours = hours;
+        if (!this.is24HourFormat) {
+            displayHours = hours % 12 || 12; // 12小时制：0点显示为12
+        }
+
+        const hoursStr = String(displayHours).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        const seconds = String(now.getSeconds()).padStart(2, '0');
 
         // 检查是否使用宽屏布局
         const timeWideEl = this.container.querySelector('.clock-time-wide');
 
         if (timeWideEl) {
             // 宽屏布局：时分秒在一行
-            const hours = String(now.getHours()).padStart(2, '0');
-            const minutes = String(now.getMinutes()).padStart(2, '0');
-            const seconds = String(now.getSeconds()).padStart(2, '0');
             const digits = timeWideEl.querySelectorAll('.time-digit');
 
             // 设置小时数字
-            digits[0].textContent = hours[0];
-            digits[1].textContent = hours[1];
+            digits[0].textContent = hoursStr[0];
+            digits[1].textContent = hoursStr[1];
 
             // 设置分钟数字
             digits[2].textContent = minutes[0];
@@ -112,13 +128,11 @@ class ClockWidget extends BaseWidget {
             // 更新时:分
             const timeEl = this.container.querySelector('.clock-time');
             if (timeEl) {
-                const hours = String(now.getHours()).padStart(2, '0');
-                const minutes = String(now.getMinutes()).padStart(2, '0');
                 const digits = timeEl.querySelectorAll('.time-digit');
 
                 // 设置小时数字
-                digits[0].textContent = hours[0];
-                digits[1].textContent = hours[1];
+                digits[0].textContent = hoursStr[0];
+                digits[1].textContent = hoursStr[1];
 
                 // 设置分钟数字
                 digits[2].textContent = minutes[0];
@@ -131,7 +145,6 @@ class ClockWidget extends BaseWidget {
             // 更新秒数
             const secondsEl = this.container.querySelector('.clock-seconds');
             if (secondsEl) {
-                const seconds = String(now.getSeconds()).padStart(2, '0');
                 const secDigits = secondsEl.querySelectorAll('.time-digit');
 
                 secDigits[0].textContent = seconds[0];
@@ -142,22 +155,20 @@ class ClockWidget extends BaseWidget {
             }
         }
 
-        // 更新日期
-        const dateEl = this.container.querySelector('.clock-date');
-        if (dateEl) {
-            dateEl.textContent = now.toLocaleDateString('zh-CN', {
-                year: 'numeric',
-                month: '2-digit',
-                day: '2-digit'
-            });
+        // 更新日期格式按钮文本
+        const toggleBtn = this.container.querySelector('.clock-format-toggle');
+        if (toggleBtn) {
+            toggleBtn.textContent = this.is24HourFormat ? '24H' : '12H';
         }
+    }
 
-        // 更新星期
-        const weekdayEl = this.container.querySelector('.clock-weekday');
-        if (weekdayEl) {
-            const weekdays = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
-            weekdayEl.textContent = weekdays[now.getDay()];
-        }
+    /**
+     * 切换时间格式（12/24小时制）
+     */
+    toggleTimeFormat() {
+        this.is24HourFormat = !this.is24HourFormat;
+        // 立即刷新显示
+        this.updateClock();
     }
 
     /**
