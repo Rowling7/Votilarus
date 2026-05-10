@@ -13,6 +13,34 @@ class NavIcon extends HTMLElement {
 
     connectedCallback() {
         this.bindEvents();
+        // 监听 CSS 变量变化
+        this.observeCSSVariables();
+    }
+
+    /**
+     * 观察 CSS 变量变化并重新渲染
+     */
+    observeCSSVariables() {
+        // 创建一个 MutationObserver 来监听 document.documentElement 的 style 属性变化
+        const observer = new MutationObserver(() => {
+            // 当 CSS 变量变化时，重新渲染组件
+            this.render();
+        });
+
+        observer.observe(document.documentElement, {
+            attributes: true,
+            attributeFilter: ['style']
+        });
+
+        // 保存 observer 引用以便后续清理
+        this.cssObserver = observer;
+    }
+
+    disconnectedCallback() {
+        // 清理 observer
+        if (this.cssObserver) {
+            this.cssObserver.disconnect();
+        }
     }
 
     attributeChangedCallback(name, oldValue, newValue) {
@@ -117,6 +145,7 @@ class NavIcon extends HTMLElement {
                     max-width: 100%;
                     overflow: hidden;
                     text-overflow: ellipsis;
+                    display: var(--show-title, block);
                     ${titlePositionStyle}
                 }
             </style>

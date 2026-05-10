@@ -118,6 +118,34 @@ class SettingsManager {
         const iconRadius = this.settings.icon_radius || '0.5';
         document.documentElement.style.setProperty('--icon-radius', `${iconRadius}rem`);
 
+        // 应用图标阴影
+        const iconShadow = this.settings.icon_shadow === '1';
+        if (iconShadow) {
+            document.documentElement.style.setProperty('--icon-shadow', '0 2px 8px rgba(0, 0, 0, 0.2)');
+        } else {
+            document.documentElement.style.setProperty('--icon-shadow', 'none');
+        }
+
+        // 应用标题显示设置
+        const showTitle = this.settings.show_title === '1';
+        document.documentElement.style.setProperty('--show-title', showTitle ? 'block' : 'none');
+
+        // 应用标题位置
+        const titlePosition = this.settings.title_position || 'bottom';
+        document.documentElement.style.setProperty('--title-position', titlePosition);
+
+        // 应用标题字体大小
+        const titleFontSize = this.settings.title_font_size || '12';
+        document.documentElement.style.setProperty('--title-font-size', `${titleFontSize}px`);
+
+        // 应用标题字体颜色
+        const titleFontColor = this.settings.title_font_color || '#ffffff';
+        document.documentElement.style.setProperty('--title-color', titleFontColor);
+
+        // 应用标题最大长度
+        const titleMaxLength = this.settings.title_max_length || '8';
+        document.documentElement.style.setProperty('--title-max-length', titleMaxLength);
+
         // 应用头像
         const avatarUrl = this.settings.avatar_url || this.defaultSettings.avatar_url;
         const avatarImg = document.getElementById('avatar');

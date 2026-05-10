@@ -3,6 +3,7 @@
 import CategoryManager from '../../managers/CategoryManager.js';
 import DragHandler from '../handlers/DragHandler.js';
 import WidgetManager from '../../managers/WidgetManager.js';
+import SettingsManager from '../../managers/SettingsManager.js';
 
 class IconRenderer {
     constructor() {
@@ -347,14 +348,28 @@ class IconRenderer {
         // 启用拖拽
         DragHandler.enableDrag(gridItem);
 
-        // 添加标题
-        const showTitle = true; // 从设置中获取
+        // 添加标题 - 从设置中获取
+        const showTitle = SettingsManager.get('show_title') === '1';
         if (showTitle) {
             const titleDiv = document.createElement('div');
             titleDiv.className = 'nav-icon-title';
-            titleDiv.textContent = item.title;
-            titleDiv.title = item.title;
-            gridItem.appendChild(titleDiv);
+
+            // 获取标题最大长度
+            const titleMaxLength = parseInt(SettingsManager.get('title_max_length')) || 8;
+            const displayTitle = item.title.length > titleMaxLength
+                ? item.title.substring(0, titleMaxLength) + '...'
+                : item.title;
+
+            titleDiv.textContent = displayTitle;
+            titleDiv.title = item.title; // 完整标题作为 tooltip
+
+            // 根据标题位置调整布局
+            const titlePosition = SettingsManager.get('title_position') || 'bottom';
+            if (titlePosition === 'top') {
+                gridItem.insertBefore(titleDiv, iconDiv);
+            } else {
+                gridItem.appendChild(titleDiv);
+            }
         }
 
         // 点击事件 - 使用事件委托优化
