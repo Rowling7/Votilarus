@@ -218,8 +218,11 @@ class DockRenderer {
                 const translateY = (scale - 1) * -20; // 向上移动
 
                 item.style.transform = `scale(${scale}) translateY(${translateY}px)`;
+                // 为放大的图标设置更高的z-index
+                item.style.zIndex = 10 - distance;
             } else {
                 item.style.transform = 'scale(1) translateY(0)';
+                item.style.zIndex = 1;
             }
         });
     }

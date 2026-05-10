@@ -27,7 +27,7 @@ class NavDock extends HTMLElement {
         const maxItems = this.getAttribute('max-items') || '10';
 
         let positionStyles = '';
-        switch(position) {
+        switch (position) {
             case 'left':
                 positionStyles = 'left: 1rem; top: 50%; transform: translateY(-50%); flex-direction: column;';
                 break;
@@ -75,7 +75,7 @@ class NavDock extends HTMLElement {
         container.addEventListener('mousemove', (e) => {
             const items = Array.from(container.querySelectorAll('::slotted(*)'));
             const hoveredItem = e.target.closest('::slotted(*)');
-            
+
             if (hoveredItem) {
                 this.applyFisheyeEffect(hoveredItem, items);
             }
@@ -102,8 +102,11 @@ class NavDock extends HTMLElement {
                 const scale = 1 + (fisheyeScale - 1) * (1 - distance / (fisheyeRange + 1));
                 const translateY = (scale - 1) * -20;
                 item.style.transform = `scale(${scale}) translateY(${translateY}px)`;
+                // 为放大的图标设置更高的z-index
+                item.style.zIndex = 10 - distance;
             } else {
                 item.style.transform = 'scale(1) translateY(0)';
+                item.style.zIndex = 1;
             }
         });
     }
@@ -112,7 +115,7 @@ class NavDock extends HTMLElement {
     addItem(itemElement) {
         const container = this.shadowRoot.querySelector('.dock-container');
         const maxItems = parseInt(this.getAttribute('max-items')) || 10;
-        
+
         if (container.children.length >= maxItems) {
             return false;
         }
