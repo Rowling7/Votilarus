@@ -1076,7 +1076,7 @@ class SettingsModalHandler {
 
         // 更新 Dock 位置
         dock.style.bottom = '';
-        dock.style.left = '';
+        dock.style.left = 'auto';  // 显式设置为 auto 以覆盖 CSS 默认值
         dock.style.right = '';
         dock.style.top = '';
         dock.style.transform = '';

@@ -16,8 +16,20 @@ class DockRenderer {
      * 初始化 Dock 栏
      */
     async init() {
+        // 从 SettingsManager 读取 Dock 设置
+        const SettingsManager = (await import('../../managers/SettingsManager.js')).default;
+        const dockPosition = SettingsManager.get('dock_position');
+        const dockMaxIcons = SettingsManager.get('dock_max_icons');
+
+        // 应用设置
+        this.maxItems = parseInt(dockMaxIcons) || 10;
+
         // 创建 Dock DOM
         this.createDockElement();
+
+        // 应用位置设置
+        const position = dockPosition || 'bottom';
+        this.applyDockPosition(position);
 
         // 加载 Dock 数据
         await this.loadDockItems();
@@ -33,6 +45,42 @@ class DockRenderer {
 
         // 添加到页面
         document.body.appendChild(this.dockContainer);
+    }
+
+    /**
+     * 应用 Dock 位置设置
+     */
+    applyDockPosition(position) {
+        if (!this.dockContainer) return;
+
+        // 重置所有位置属性
+        this.dockContainer.style.bottom = '';
+        this.dockContainer.style.left = 'auto';
+        this.dockContainer.style.right = '';
+        this.dockContainer.style.top = '';
+        this.dockContainer.style.transform = '';
+        this.dockContainer.style.flexDirection = '';
+
+        switch (position) {
+            case 'bottom':
+                this.dockContainer.style.bottom = '2rem';
+                this.dockContainer.style.left = '50%';
+                this.dockContainer.style.transform = 'translateX(-50%)';
+                this.dockContainer.style.flexDirection = 'row';
+                break;
+            case 'left':
+                this.dockContainer.style.left = '1rem';
+                this.dockContainer.style.top = '50%';
+                this.dockContainer.style.transform = 'translateY(-50%)';
+                this.dockContainer.style.flexDirection = 'column';
+                break;
+            case 'right':
+                this.dockContainer.style.right = '1rem';
+                this.dockContainer.style.top = '50%';
+                this.dockContainer.style.transform = 'translateY(-50%)';
+                this.dockContainer.style.flexDirection = 'column';
+                break;
+        }
     }
 
     /**
