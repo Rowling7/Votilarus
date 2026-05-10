@@ -5,6 +5,7 @@
     from {
         opacity: 0;
     }
+
     to {
         opacity: 1;
     }
@@ -21,17 +22,51 @@
 }
 
 /* 为每个图标设置不同的延迟，创造级联效果 */
-.grid-container .grid-item:nth-child(1) { animation-delay: 0.02s; }
-.grid-container .grid-item:nth-child(2) { animation-delay: 0.04s; }
-.grid-container .grid-item:nth-child(3) { animation-delay: 0.06s; }
-.grid-container .grid-item:nth-child(4) { animation-delay: 0.08s; }
-.grid-container .grid-item:nth-child(5) { animation-delay: 0.10s; }
-.grid-container .grid-item:nth-child(6) { animation-delay: 0.12s; }
-.grid-container .grid-item:nth-child(7) { animation-delay: 0.14s; }
-.grid-container .grid-item:nth-child(8) { animation-delay: 0.16s; }
-.grid-container .grid-item:nth-child(9) { animation-delay: 0.18s; }
-.grid-container .grid-item:nth-child(10) { animation-delay: 0.20s; }
-.grid-container .grid-item:nth-child(n+11) { animation-delay: 0.22s; }
+.grid-container .grid-item:nth-child(1) {
+    animation-delay: 0.02s;
+    box-shadow: var(--shadow-md, 0 4px 6px rgba(0, 0, 0, 0.1));
+}
+
+.grid-container .grid-item:nth-child(2) {
+    animation-delay: 0.04s;
+    box-shadow: var(--shadow-md, 0 4px 6px rgba(0, 0, 0, 0.1));
+}
+
+.grid-container .grid-item:nth-child(3) {
+    animation-delay: 0.06s;
+}
+
+.grid-container .grid-item:nth-child(4) {
+    animation-delay: 0.08s;
+}
+
+.grid-container .grid-item:nth-child(5) {
+    animation-delay: 0.10s;
+}
+
+.grid-container .grid-item:nth-child(6) {
+    animation-delay: 0.12s;
+}
+
+.grid-container .grid-item:nth-child(7) {
+    animation-delay: 0.14s;
+}
+
+.grid-container .grid-item:nth-child(8) {
+    animation-delay: 0.16s;
+}
+
+.grid-container .grid-item:nth-child(9) {
+    animation-delay: 0.18s;
+}
+
+.grid-container .grid-item:nth-child(10) {
+    animation-delay: 0.20s;
+}
+
+.grid-container .grid-item:nth-child(n+11) {
+    animation-delay: 0.22s;
+}
 
 /* 侧边栏渐入 */
 .sidebar {
@@ -50,6 +85,7 @@
 
 /* 减少动画偏好设置支持 */
 @media (prefers-reduced-motion: reduce) {
+
     *,
     *::before,
     *::after {
