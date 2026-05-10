@@ -11,7 +11,7 @@ class CalendarWidget extends BaseWidget {
     constructor(container, widgetId = null) {
         super(container, widgetId, 'CalendarWidget');
         // 日历组件支持多种尺寸
-        this.supportedSizes = ['1x1', '1x2', '2x1', '2x2'];
+        this.supportedSizes = ['2x2', '2x3', '2x4'];
         // 当前显示的年月
         this.currentYear = new Date().getFullYear();
         this.currentMonth = new Date().getMonth();

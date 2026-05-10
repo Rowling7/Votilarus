@@ -6,14 +6,14 @@ class WeatherWidget extends BaseWidget {
     /**
      * 构造函数
      * @param {HTMLElement} container - widget 容器元素
-     * @param {number|null} widgetId - icon_widgets.id（数字ID）
+     * @param {number|null} widgetId - icon_widgets.id(数字ID)
      * @param {Object} options - 配置选项
      */
     constructor(container, widgetId = null, options = {}) {
         super(container, widgetId, 'WeatherWidget');
 
         // 从 container 的 dataset 中读取配置
-        const city = container.dataset.city || 'Beijing';
+        const city = container.dataset.city || 'Weihai';
         const apiKey = container.dataset.apiKey || '269d058c99d1f3cdcd9232f62910df1d';
 
         this.options = {
@@ -22,78 +22,46 @@ class WeatherWidget extends BaseWidget {
             ...options
         };
         this.weatherData = null;
-        this.isHovered = false;
 
-        // 天气组件只支持 2x4 尺寸
-        this.supportedSizes = ['2x4'];
+        // 天气组件支持 2x2 和 2x4 尺寸
+        this.supportedSizes = ['2x2', '2x3', '2x4'];
+    }
+
+    /**
+     * 根据尺寸获取当前 widget 的大小
+     * @returns {string} 尺寸字符串，如 '2x2' 或 '2x4'
+     */
+    getSize() {
+        // 从 container 的 class 或 style 中推断尺寸
+        // 2x2 约 200px 高, 2x4 约 400px 高
+        const height = this.container.offsetHeight;
+        return height > 250 ? '2x4' : '2x2';
     }
 
     /**
      * 渲染天气小组件
      */
     render() {
-        // 创建天气 DOM 结构
-        this.container.innerHTML = `
-            <div class="weather-widget">
-                <div class="weather-header">
-                    <div class="weather-city-cn">--</div>
-                    <div class="weather-city-en">--</div>
-                </div>
-                <div class="weather-main">
-                    <div class="weather-icon-container">
-                        <img class="weather-icon" src="" alt="天气图标">
-                    </div>
-                    <div class="weather-info">
-                        <div class="weather-temp">--°C</div>
-                        <div class="weather-desc">--</div>
-                    </div>
-                </div>
-                <div class="weather-details-group group-1 active">
-                    <div class="weather-detail-item">
-                        <span class="detail-label">🌡️ 体感温度</span>
-                        <span class="detail-value">--°C</span>
-                    </div>
-                    <div class="weather-detail-item">
-                        <span class="detail-label">💨 风速</span>
-                        <span class="detail-value">-- m/s</span>
-                    </div>
-                    <div class="weather-detail-item">
-                        <span class="detail-label">🧭 风向</span>
-                        <span class="detail-value">--</span>
-                    </div>
-                </div>
-                <div class="weather-details-group group-2">
-                    <div class="weather-detail-item">
-                        <span class="detail-label">💧 湿度</span>
-                        <span class="detail-value">--%</span>
-                    </div>
-                    <div class="weather-detail-item">
-                        <span class="detail-label">☁️ 云量</span>
-                        <span class="detail-value">--%</span>
-                    </div>
-                    <div class="weather-detail-item">
-                        <span class="detail-label">📊 气压</span>
-                        <span class="detail-value">-- hPa</span>
-                    </div>
-                </div>
-            </div>
-        `;
+        this.updateLayout();
 
-        // 添加鼠标悬停事件
-        this.container.addEventListener('mouseenter', () => {
-            this.isHovered = true;
-            this.switchDetailsGroup();
-        });
+        // 添加翻转交互(仅 2x4)
+        const flipCard = this.container.querySelector('.flip-card');
+        const detailsFlip = this.container.querySelector('.weather-details-flip');
 
-        this.container.addEventListener('mouseleave', () => {
-            this.isHovered = false;
-            this.switchDetailsGroup();
-        });
+        if (detailsFlip && flipCard) {
+            detailsFlip.addEventListener('mouseenter', () => {
+                flipCard.classList.add('flipped');
+            });
+
+            detailsFlip.addEventListener('mouseleave', () => {
+                flipCard.classList.remove('flipped');
+            });
+        }
 
         // 获取天气数据
         this.fetchWeatherData();
 
-        // 设置定时器，每10分钟更新一次天气数据
+        // 设置定时器,每10分钟更新一次天气数据
         this.setInterval(() => {
             this.fetchWeatherData();
         }, 10 * 60 * 1000);
@@ -104,20 +72,149 @@ class WeatherWidget extends BaseWidget {
     }
 
     /**
-     * 切换详情组显示
+     * 根据尺寸更新布局
      */
-    switchDetailsGroup() {
-        const group1 = this.container.querySelector('.group-1');
-        const group2 = this.container.querySelector('.group-2');
+    updateLayout() {
+        const size = this.getSize();
 
-        if (group1 && group2) {
-            if (this.isHovered) {
-                group1.classList.remove('active');
-                group2.classList.add('active');
-            } else {
-                group1.classList.add('active');
-                group2.classList.remove('active');
-            }
+        if (size === '2x2') {
+            // 2x2 简化布局
+            this.container.innerHTML = `
+                <div class="weather-widget size-2x2">
+                    <div class="weather-location">
+                        <span class="location-name">--</span>
+                        <span class="location-icon location-pin"></span>
+                    </div>
+                    <div class="weather-main">
+                        <div class="weather-temp-large">--°</div>
+                        <div class="weather-icon-desc">
+                            <img class="weather-icon" src="" alt="天气">
+                            <div class="weather-desc">--</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        } else {
+            // 2x4 完整布局
+            this.container.innerHTML = `
+                <div class="weather-widget size-2x4">
+                    <div class="weather-location">
+                        <span class="location-name">--</span>
+                        <span class="location-icon location-pin"></span>
+                    </div>
+                    <div class="weather-main">
+                        <div class="weather-temp-large">--°</div>
+                        <div class="weather-icon-desc">
+                            <img class="weather-icon" src="" alt="天气">
+                            <div class="weather-desc">--</div>
+                        </div>
+                    </div>
+                    <div class="weather-details-flip">
+                        <div class="flip-card">
+                            <div class="flip-card-inner">
+                                <div class="flip-card-front">
+                                    <div class="detail-item">
+                                        <span class="detail-label">体感温度</span>
+                                        <span class="detail-value">--°C</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <span class="detail-label">风速</span>
+                                        <span class="detail-value">-- m/s</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <span class="detail-label">风向</span>
+                                        <span class="detail-value">--</span>
+                                    </div>
+                                </div>
+                                <div class="flip-card-back">
+                                    <div class="detail-item">
+                                        <span class="detail-label">湿度</span>
+                                        <span class="detail-value">--%</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <span class="detail-label">大气压</span>
+                                        <span class="detail-value">-- hPa</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <span class="detail-label">云量</span>
+                                        <span class="detail-value">--%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+    }
+
+    /**
+     * 从天气图标提取主色调
+     * @param {string} iconUrl - 图标 URL
+     * @returns {Promise<string>} RGB 颜色字符串
+     */
+    async extractIconColor(iconUrl) {
+        return new Promise((resolve) => {
+            const img = new Image();
+            img.crossOrigin = 'Anonymous';
+
+            img.onload = () => {
+                try {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+
+                    ctx.drawImage(img, 0, 0);
+
+                    // 获取所有像素数据
+                    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                    const data = imageData.data;
+
+                    let r = 0, g = 0, b = 0, count = 0;
+
+                    // 计算平均颜色,忽略透明像素
+                    for (let i = 0; i < data.length; i += 4) {
+                        const alpha = data[i + 3];
+                        if (alpha > 128) { // 只计算不透明的像素
+                            r += data[i];
+                            g += data[i + 1];
+                            b += data[i + 2];
+                            count++;
+                        }
+                    }
+
+                    if (count > 0) {
+                        r = Math.round(r / count);
+                        g = Math.round(g / count);
+                        b = Math.round(b / count);
+                        resolve(`rgb(${r}, ${g}, ${b})`);
+                    } else {
+                        resolve('rgba(102, 126, 234, 0.3)'); // 默认颜色
+                    }
+                } catch (error) {
+                    console.error('提取图标颜色失败:', error);
+                    resolve('rgba(102, 126, 234, 0.3)'); // 默认颜色
+                }
+            };
+
+            img.onerror = () => {
+                resolve('rgba(102, 126, 234, 0.3)'); // 默认颜色
+            };
+
+            img.src = iconUrl;
+        });
+    }
+
+    /**
+     * 应用背景色到组件
+     * @param {string} color - RGB 颜色字符串
+     */
+    applyBackgroundColor(color) {
+        const widget = this.container.querySelector('.weather-widget');
+        if (widget) {
+            // 将颜色转换为低透明度的背景
+            widget.style.background = color.replace('rgb', 'rgba').replace(')', ', 0.15)');
         }
     }
 
@@ -134,6 +231,11 @@ class WeatherWidget extends BaseWidget {
             if (data.cod === 200) {
                 this.weatherData = data;
                 this.updateWeatherDisplay(data);
+
+                // 提取并应用图标颜色
+                const iconUrl = `https://openweathermap.org/themes/openweathermap/assets/vendor/owm/img/widgets/${data.weather[0].icon}.png`;
+                const color = await this.extractIconColor(iconUrl);
+                this.applyBackgroundColor(color);
             } else {
                 console.error('获取天气数据失败:', data.message);
             }
@@ -147,16 +249,10 @@ class WeatherWidget extends BaseWidget {
      * @param {Object} weatherData - 天气数据
      */
     updateWeatherDisplay(weatherData) {
-        // 更新城市名（中文）
-        const cityCnEl = this.container.querySelector('.weather-city-cn');
-        if (cityCnEl) {
-            cityCnEl.textContent = weatherData.name;
-        }
-
-        // 更新城市名（英文）
-        const cityEnEl = this.container.querySelector('.weather-city-en');
-        if (cityEnEl) {
-            cityEnEl.textContent = weatherData.sys.country;
+        // 更新位置名称
+        const locationNameEl = this.container.querySelector('.location-name');
+        if (locationNameEl) {
+            locationNameEl.textContent = weatherData.name;
         }
 
         // 更新天气图标
@@ -166,10 +262,10 @@ class WeatherWidget extends BaseWidget {
             iconEl.src = iconUrl;
         }
 
-        // 更新温度
-        const tempEl = this.container.querySelector('.weather-temp');
-        if (tempEl) {
-            tempEl.textContent = `${Math.round(weatherData.main.temp)}°C`;
+        // 更新大温度
+        const tempLargeEl = this.container.querySelector('.weather-temp-large');
+        if (tempLargeEl) {
+            tempLargeEl.textContent = `${Math.round(weatherData.main.temp)}°`;
         }
 
         // 更新天气描述
@@ -178,36 +274,40 @@ class WeatherWidget extends BaseWidget {
             descEl.textContent = weatherData.weather[0].description;
         }
 
-        // 更新第一组详情
-        const feelsLikeEl = this.container.querySelector('.group-1 .weather-detail-item:nth-child(1) .detail-value');
+        // 更新正面数据 - 体感温度
+        const feelsLikeEl = this.container.querySelector('.flip-card-front .detail-item:nth-child(1) .detail-value');
         if (feelsLikeEl) {
             feelsLikeEl.textContent = `${Math.round(weatherData.main.feels_like)}°C`;
         }
 
-        const windSpeedEl = this.container.querySelector('.group-1 .weather-detail-item:nth-child(2) .detail-value');
+        // 更新正面数据 - 风速
+        const windSpeedEl = this.container.querySelector('.flip-card-front .detail-item:nth-child(2) .detail-value');
         if (windSpeedEl) {
             windSpeedEl.textContent = `${weatherData.wind.speed} m/s`;
         }
 
-        const windDegEl = this.container.querySelector('.group-1 .weather-detail-item:nth-child(3) .detail-value');
+        // 更新正面数据 - 风向
+        const windDegEl = this.container.querySelector('.flip-card-front .detail-item:nth-child(3) .detail-value');
         if (windDegEl) {
             windDegEl.textContent = this.getWindDirection(weatherData.wind.deg);
         }
 
-        // 更新第二组详情
-        const humidityEl = this.container.querySelector('.group-2 .weather-detail-item:nth-child(1) .detail-value');
+        // 更新背面数据 - 湿度
+        const humidityEl = this.container.querySelector('.flip-card-back .detail-item:nth-child(1) .detail-value');
         if (humidityEl) {
             humidityEl.textContent = `${weatherData.main.humidity}%`;
         }
 
-        const cloudsEl = this.container.querySelector('.group-2 .weather-detail-item:nth-child(2) .detail-value');
-        if (cloudsEl) {
-            cloudsEl.textContent = `${weatherData.clouds.all}%`;
-        }
-
-        const pressureEl = this.container.querySelector('.group-2 .weather-detail-item:nth-child(3) .detail-value');
+        // 更新背面数据 - 大气压
+        const pressureEl = this.container.querySelector('.flip-card-back .detail-item:nth-child(2) .detail-value');
         if (pressureEl) {
             pressureEl.textContent = `${weatherData.main.pressure} hPa`;
+        }
+
+        // 更新背面数据 - 云量
+        const cloudsEl = this.container.querySelector('.flip-card-back .detail-item:nth-child(3) .detail-value');
+        if (cloudsEl) {
+            cloudsEl.textContent = `${weatherData.clouds.all}%`;
         }
     }
 
