@@ -722,4 +722,17 @@ VALUES
     '0'
   );
 
+INSERT INTO
+  "settings"
+VALUES
+  (
+    54,
+    'widget_border_radius',
+    '1.4',
+    'personal',
+    '组件圆角半径（rem单位，0-3）',
+    '1',
+    '0'
+  );
+
 PRAGMA foreign_keys = true;

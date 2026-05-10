@@ -179,9 +179,11 @@ router.post('/reset', (req, res) => {
         scroll_animation_speed: '300',
         drag_sensitivity: '5',
         enable_context_menu: '1',
+        widget_border_radius: '1.4',
         avatar_url: 'static/ico/loading2.gif\n',
         username: 'Votilarus',
-        bio: 'Everything will be OK!'
+        bio: 'Everything will be OK!',
+        widget_border_radius: '1.4'
     };
 
     const promises = [];

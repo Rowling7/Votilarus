@@ -48,6 +48,9 @@
 
     /* 图标样式 */
     --icon-radius: 0.5rem;
+
+    /* 组件样式 */
+    --widget-border-radius: 1.4rem;
     --icon-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 
     /* 标题样式 */

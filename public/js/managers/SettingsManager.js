@@ -51,7 +51,9 @@ class SettingsManager {
             // 交互行为
             scroll_animation_speed: '300',
             drag_sensitivity: '5',
-            enable_context_menu: '1'
+            enable_context_menu: '1',
+            // 组件设置
+            widget_border_radius: '1.4'
         };
     }
 
@@ -152,6 +154,10 @@ class SettingsManager {
         if (avatarImg) {
             avatarImg.querySelector('img').src = avatarUrl;
         }
+
+        // 应用组件圆角
+        const widgetBorderRadius = this.settings.widget_border_radius || '1.4';
+        document.documentElement.style.setProperty('--widget-border-radius', `${widgetBorderRadius}rem`);
 
         // 应用背景设置
         this.applyBackgroundSettings();
@@ -353,6 +359,9 @@ class SettingsManager {
             searchBoxPosition: this.settings.search_box_position || 'center',
             searchBoxStyle: this.settings.search_box_style || 'rounded',
 
+            // 组件设置
+            widgetBorderRadius: parseFloat(this.settings.widget_border_radius) || 1.4,
+
             // 交互行为
             scrollAnimationSpeed: parseInt(this.settings.scroll_animation_speed) || 300,
             dragSensitivity: parseInt(this.settings.drag_sensitivity) || 5,
@@ -418,6 +427,9 @@ class SettingsManager {
             scroll_animation_speed: newSettings.scrollAnimationSpeed,
             drag_sensitivity: newSettings.dragSensitivity,
             enable_context_menu: newSettings.enableContextMenu ? '1' : '0',
+
+            // 组件设置
+            widget_border_radius: newSettings.widgetBorderRadius,
 
             // 个人信息
             avatar_url: newSettings.avatarUrl,

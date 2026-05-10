@@ -146,6 +146,11 @@ class DockRenderer {
 
         dockItem.appendChild(icon);
 
+        // 保存 URL 到 data 属性，供右键菜单使用
+        if (item.link_url) {
+            dockItem.dataset.url = item.link_url;
+        }
+
         // 点击事件 - 打开链接
         dockItem.addEventListener('click', () => {
             if (item.link_url) {

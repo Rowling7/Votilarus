@@ -46,6 +46,7 @@ class SettingsModalHandler {
                 <button class="tab-btn" data-tab="icon">🖼️ 图标设置</button>
                 <button class="tab-btn" data-tab="dock">⚓ Dock 设置</button>
                 <button class="tab-btn" data-tab="search">🔍 搜索设置</button>
+                <button class="tab-btn" data-tab="widget">🧩 组件设置</button>
                 <button class="tab-btn" data-tab="advanced">⚙️ 高级设置</button>
             </div>
             <div class="modal-body">
@@ -60,6 +61,9 @@ class SettingsModalHandler {
                 </div>
                 <div class="tab-content" id="tab-search">
                     ${this.generateSearchSection()}
+                </div>
+                <div class="tab-content" id="tab-widget">
+                    ${this.generateWidgetSection()}
                 </div>
                 <div class="tab-content" id="tab-advanced">
                     ${this.generateAdvancedSettingsSections()}
@@ -394,6 +398,25 @@ class SettingsModalHandler {
     }
 
     /**
+     * 生成组件设置部分
+     */
+    generateWidgetSection() {
+        return `
+            <!-- 1. 组件设置 -->
+            <div class="settings-section">
+                <h3>🧩 组件设置</h3>
+                
+                <div class="setting-item">
+                    <label for="widget-border-radius">组件圆角半径</label>
+                    <input type="range" id="widget-border-radius" min="0" max="3" step="0.1" value="1.4">
+                    <span class="range-value" id="widget-border-radius-value">1.4rem</span>
+                    <div class="setting-description">rem 单位，影响所有 Widget 组件的圆角</div>
+                </div>
+            </div>
+        `;
+    }
+
+    /**
      * 从 API 加载搜索引擎列表并填充到下拉框
      */
     async populateSearchEngines() {
@@ -611,15 +634,27 @@ class SettingsModalHandler {
             { input: 'dock-opacity', display: 'dock-opacity-value' }
         ];
 
-        rangeInputs.forEach(({ input, display }) => {
+        rangeInputs.forEach(({ input, display, unit = '' }) => {
             const inputEl = document.getElementById(input);
             const displayEl = document.getElementById(display);
             if (inputEl && displayEl) {
                 inputEl.addEventListener('input', (e) => {
-                    displayEl.textContent = e.target.value;
+                    displayEl.textContent = e.target.value + unit;
                 });
             }
         });
+
+        // 组件圆角滑块 - 添加实时预览功能
+        const widgetBorderRadiusInput = document.getElementById('widget-border-radius');
+        const widgetBorderRadiusDisplay = document.getElementById('widget-border-radius-value');
+        if (widgetBorderRadiusInput && widgetBorderRadiusDisplay) {
+            widgetBorderRadiusInput.addEventListener('input', (e) => {
+                const value = parseFloat(e.target.value);
+                widgetBorderRadiusDisplay.textContent = value + 'rem';
+                // 实时应用样式
+                this.applyWidgetBorderRadius(value);
+            });
+        }
     }
 
     /**
@@ -700,6 +735,12 @@ class SettingsModalHandler {
      * 关闭设置 Modal
      */
     close() {
+        // 恢复表单字段到原始值（撤销实时预览的更改）
+        this.fillFormFields();
+
+        // 恢复页面上的样式到原始值
+        this.applySettings(this.currentSettings);
+
         this.overlay.classList.remove('active');
         this.modal.classList.remove('active');
     }
@@ -790,6 +831,10 @@ class SettingsModalHandler {
         document.getElementById('search-box-position').value = settings.searchBoxPosition || 'center';
         document.getElementById('search-box-style').value = settings.searchBoxStyle || 'rounded';
 
+        // 组件设置
+        document.getElementById('widget-border-radius').value = settings.widgetBorderRadius || 1.4;
+        document.getElementById('widget-border-radius-value').textContent = (settings.widgetBorderRadius || 1.4) + 'rem';
+
         // 交互行为
         document.getElementById('scroll-animation-speed').value = settings.scrollAnimationSpeed || 300;
         document.getElementById('drag-sensitivity').value = settings.dragSensitivity || 5;
@@ -823,6 +868,9 @@ class SettingsModalHandler {
 
         try {
             await SettingsManager.saveAllSettings(newSettings);
+
+            // 更新 currentSettings 为新值，确保 close() 时使用正确的值
+            this.currentSettings = newSettings;
 
             // 应用设置
             this.applySettings(newSettings);
@@ -886,6 +934,9 @@ class SettingsModalHandler {
             searchBoxPosition: document.getElementById('search-box-position').value,
             searchBoxStyle: document.getElementById('search-box-style').value,
 
+            // 组件设置
+            widgetBorderRadius: parseFloat(document.getElementById('widget-border-radius').value),
+
             // 交互行为
             scrollAnimationSpeed: parseInt(document.getElementById('scroll-animation-speed').value),
             dragSensitivity: parseInt(document.getElementById('drag-sensitivity').value),
@@ -934,7 +985,10 @@ class SettingsModalHandler {
         // 9. 应用 Dock 设置
         this.applyDockSettings(settings);
 
-        // 10. 应用背景设置（包括开关状态）
+        // 10. 应用组件圆角
+        this.applyWidgetBorderRadius(settings.widgetBorderRadius);
+
+        // 11. 应用背景设置（包括开关状态）
         this.applyBackgroundSettings(settings);
     }
 
@@ -1013,6 +1067,9 @@ class SettingsModalHandler {
     applyIconRadius(radius) {
         const radiusValue = radius || 0.5;
         document.documentElement.style.setProperty('--icon-radius', `${radiusValue}rem`);
+
+        // 触发所有图标重新渲染以应用新圆角
+        this.refreshAllIcons();
     }
 
     /**
@@ -1043,13 +1100,38 @@ class SettingsModalHandler {
      * 刷新所有图标以应用新设置
      */
     refreshAllIcons() {
-        const icons = document.querySelectorAll('nav-icon');
-        icons.forEach(icon => {
-            // 触发重新渲染
-            const title = icon.getAttribute('title');
-            if (title) {
-                icon.setAttribute('title', title);
-            }
+        // 获取所有图标容器
+        const iconContainers = document.querySelectorAll('.nav-icon');
+
+        // 如果没找到，尝试其他可能的选择器
+        if (iconContainers.length === 0) {
+            iconContainers = document.querySelectorAll('.grid-item');
+        }
+
+        // 获取当前的图标圆角值
+        const currentRadius = getComputedStyle(document.documentElement).getPropertyValue('--icon-radius').trim();
+
+        iconContainers.forEach((container) => {
+            // 直接设置内联样式，强制覆盖
+            container.style.borderRadius = currentRadius;
+
+            // 强制触发重排
+            void container.offsetHeight;
+        });
+    }
+
+    /**
+     * 应用组件圆角
+     */
+    applyWidgetBorderRadius(radius) {
+        const borderRadius = radius || 1.4;
+        // 设置 CSS 变量
+        document.documentElement.style.setProperty('--widget-border-radius', `${borderRadius}rem`);
+
+        // 立即应用到所有现有的 Widget 组件
+        const widgetContainers = document.querySelectorAll('.widget-container');
+        widgetContainers.forEach(container => {
+            container.style.borderRadius = `${borderRadius}rem`;
         });
     }
 
