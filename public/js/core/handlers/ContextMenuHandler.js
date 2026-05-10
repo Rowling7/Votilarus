@@ -511,7 +511,8 @@ class ContextMenuHandler {
 
         for (const category of categories) {
             const items = categoryManager.getItems(category.id);
-            const item = items.find(i => i.id === itemId);
+            // 使用 == 而不是 ===，因为 itemId 是字符串，而 item.id 可能是数字
+            const item = items.find(i => i.id == itemId);
             if (item) {
                 iconData = {
                     uuid: item.id,

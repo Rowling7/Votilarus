@@ -145,7 +145,11 @@ class IconEditorHandler {
         previewName.textContent = name;
 
         if (imageUrl) {
-            previewIcon.style.backgroundImage = `url(${imageUrl})`;
+            // 将 Windows 路径分隔符 \ 转换为 URL 友好的 /
+            const formattedUrl = imageUrl.replace(/\\/g, '/');
+            // 如果路径不是以 / 开头，添加 /
+            const finalUrl = formattedUrl.startsWith('/') ? formattedUrl : `/${formattedUrl}`;
+            previewIcon.style.backgroundImage = `url(${finalUrl})`;
             previewIcon.textContent = '';
         } else {
             previewIcon.style.backgroundImage = '';
