@@ -377,7 +377,7 @@ VALUES
   (
     27,
     'overlay_color',
-    '#ffffff',
+    '#000000',
     'personal',
     '遮罩层颜色',
     '1',

@@ -753,7 +753,7 @@ class SettingsModalHandler {
         // 遮罩层颜色开关和值
         const overlayColorEnabled = settings.overlayColorEnabled === true; // 默认关闭（根据SQL）
         this.setSwitchState('overlay-color-switch', overlayColorEnabled);
-        document.getElementById('overlay-color').value = settings.overlayColor || '#ffffff';
+        document.getElementById('overlay-color').value = settings.overlayColor || '#000000';
         document.getElementById('overlay-color').disabled = !overlayColorEnabled;
 
         // 遮罩层透明度开关和值
@@ -906,7 +906,8 @@ class SettingsModalHandler {
 
         // 2. 更新背景（默认为空）
         if (settings.bgImageUrl) {
-            document.body.style.backgroundImage = `url(${settings.bgImageUrl})`;
+            const imageUrl = settings.bgImageUrl.startsWith('/') ? settings.bgImageUrl : `/${settings.bgImageUrl}`;
+            document.body.style.backgroundImage = `url(${imageUrl})`;
         } else {
             document.body.style.backgroundImage = 'none';
         }
@@ -1110,7 +1111,8 @@ class SettingsModalHandler {
         // 应用背景图片（根据开关状态）
         const bgImageEnabled = settings.bgImageEnabled === true;
         if (bgImageEnabled && settings.bgImageUrl) {
-            document.body.style.backgroundImage = `url(${settings.bgImageUrl})`;
+            const imageUrl = settings.bgImageUrl.startsWith('/') ? settings.bgImageUrl : `/${settings.bgImageUrl}`;
+            document.body.style.backgroundImage = `url(${imageUrl})`;
             document.body.style.backgroundSize = 'cover';
             document.body.style.backgroundPosition = 'center';
             document.body.style.backgroundRepeat = 'no-repeat';
@@ -1130,7 +1132,7 @@ class SettingsModalHandler {
 
         // 应用遮罩层颜色（根据开关状态）
         const overlayColorEnabled = settings.overlayColorEnabled === true;
-        const overlayColor = overlayColorEnabled ? (settings.overlayColor || '#ffffff') : 'transparent';
+        const overlayColor = overlayColorEnabled ? (settings.overlayColor || '#000000') : 'transparent';
         document.documentElement.style.setProperty('--overlay-color', overlayColor);
 
         // 应用遮罩层透明度（根据开关状态）

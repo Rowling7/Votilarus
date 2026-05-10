@@ -155,7 +155,7 @@ router.post('/reset', (req, res) => {
         bg_opacity_enabled: '0',
         bg_opacity: '0.8',
         overlay_color_enabled: '0',
-        overlay_color: '#ffffff',
+        overlay_color: '#000000',
         overlay_opacity_enabled: '0',
         overlay_opacity: '0.3',
         icon_radius: '0.5',

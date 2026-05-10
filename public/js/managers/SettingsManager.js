@@ -21,11 +21,15 @@ class SettingsManager {
             // 背景样式开关（默认关闭）
             bg_image_enabled: '0',
             bg_blur_enabled: '0',
+            bg_blur: '5',
             bg_opacity_enabled: '0',
+            bg_opacity: '0.8',
             overlay_color_enabled: '0',
+            overlay_color: '#000000',
             overlay_opacity_enabled: '0',
+            overlay_opacity: '0.3',
             // 图标样式
-            icon_radius: '0.5',
+            icon_radius: '1',
             icon_shadow: '1',
             icon_hover_effect: 'scale',
             show_title: '1',
@@ -132,8 +136,11 @@ class SettingsManager {
         // 应用背景图片（根据开关状态）
         const bgImageEnabled = this.settings.bg_image_enabled !== '0';
         const bgImageUrl = this.settings.bg_image_url || '';
+
         if (bgImageEnabled && bgImageUrl) {
-            document.body.style.backgroundImage = `url(/data/${bgImageUrl})`;
+            // 如果路径已经以 / 开头，直接使用；否则添加 / 前缀
+            const imageUrl = bgImageUrl.startsWith('/') ? bgImageUrl : `/${bgImageUrl}`;
+            document.body.style.backgroundImage = `url(${imageUrl})`;
             document.body.style.backgroundSize = 'cover';
             document.body.style.backgroundPosition = 'center';
             document.body.style.backgroundRepeat = 'no-repeat';
@@ -153,7 +160,7 @@ class SettingsManager {
 
         // 应用遮罩层颜色（根据开关状态）
         const overlayColorEnabled = this.settings.overlay_color_enabled !== '0';
-        const overlayColor = overlayColorEnabled ? (this.settings.overlay_color || '#ffffff') : 'transparent';
+        const overlayColor = overlayColorEnabled ? (this.settings.overlay_color || '#000000') : 'transparent';
         document.documentElement.style.setProperty('--overlay-color', overlayColor);
 
         // 应用遮罩层透明度（根据开关状态）
@@ -290,7 +297,7 @@ class SettingsManager {
             bgOpacityEnabled: this.settings.bg_opacity_enabled !== '0',
             bgOpacity: parseFloat(this.settings.bg_opacity) || 0.8,
             overlayColorEnabled: this.settings.overlay_color_enabled !== '0',
-            overlayColor: this.settings.overlay_color || '#ffffff',
+            overlayColor: this.settings.overlay_color || '#000000',
             overlayOpacityEnabled: this.settings.overlay_opacity_enabled !== '0',
             overlayOpacity: parseFloat(this.settings.overlay_opacity) || 0.3,
 
