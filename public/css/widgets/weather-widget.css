@@ -184,69 +184,94 @@
 
 /* 2x2 紧凑详情 - 体感温度、风速、风向 */
 .weather-widget.size-2x2 .weather-details-compact {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 0.15rem;
+    display: flex;
+    justify-content: space-between;
+    gap: 0.2rem;
     margin-top: auto;
-    padding-top: 0.25rem;
+    padding-top: 0.3rem;
     border-top: 1px solid var(--glass-border, rgba(255, 255, 255, 0.1));
+    perspective: 1000px;
+    min-height: 4.5rem;
+}
+
+.weather-widget.size-2x2 .weather-details-compact .flip-card {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    cursor: pointer;
+}
+
+.weather-widget.size-2x2 .weather-details-compact .flip-card-inner {
+    position: relative;
+    width: 100%;
+    height: 63%;
+    transition: transform 0.6s;
+    transform-style: preserve-3d;
+}
+
+.weather-widget.size-2x2 .weather-details-compact .flip-card.flipped .flip-card-inner {
+    transform: rotateY(180deg);
+}
+
+.weather-widget.size-2x2 .weather-details-compact .flip-card-front,
+.weather-widget.size-2x2 .weather-details-compact .flip-card-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    display: flex;
+    justify-content: space-between;
+    gap: 0.2rem;
+}
+
+.weather-widget.size-2x2 .weather-details-compact .flip-card-back {
+    transform: rotateY(180deg);
 }
 
 .weather-widget.size-2x2 .weather-details-compact .detail-item {
-    padding: 0.2rem 0.15rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 0.3rem 0.2rem;
     background: var(--bg-hover, rgba(255, 255, 255, 0.08));
-    border-radius: 0.8rem;
+    border-radius: 0.5rem;
     border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.1));
     transition: all var(--transition-fast);
     position: relative;
     overflow: hidden;
+    flex: 1;
     min-width: 0;
 }
 
-.weather-widget.size-2x2 .weather-details-compact .detail-item::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 2px;
-    background: linear-gradient(90deg, var(--theme-color, #667eea), transparent);
-    opacity: 0;
-    transition: opacity 0.3s ease;
-}
-
-.weather-widget.size-2x2 .weather-details-compact .detail-item:hover {
+.weather-widget.size-2x2 .weather-details-compact .flip-card:hover .detail-item {
     background: rgba(255, 255, 255, 0.12);
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
-.weather-widget.size-2x2 .weather-details-compact .detail-item:hover::before {
-    opacity: 1;
-}
-
 .weather-widget.size-2x2 .weather-details-compact .detail-label {
-    font-size: 0.6rem;
-    margin-bottom: 0.1rem;
-    opacity: 0.7;
-    color: var(--text-tertiary, rgba(255, 255, 255, 0.6));
+    font-size: 0.65rem;
+    margin-bottom: 0.15rem;
+    opacity: 0.8;
+    color: var(--text-tertiary, rgba(255, 255, 255, 0.7));
     text-align: center;
     line-height: 1.2;
+    white-space: nowrap;
 }
 
 .weather-widget.size-2x2 .weather-details-compact .detail-value {
-    font-size: 0.6rem;
+    font-size: 0.7rem;
     font-weight: 600;
     color: var(--text-primary, white);
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    line-height: 1.2;
     white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 0.15rem;
-    line-height: 1.2;
+    gap: 0.2rem;
 }
 
 /* 2x3 和 2x4 尺寸特有样式 */

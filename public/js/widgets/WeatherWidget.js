@@ -46,6 +46,18 @@ class WeatherWidget extends BaseWidget {
     render() {
         this.updateLayout();
 
+        // 添加翻转交互（2x2 尺寸）
+        const flipCard = this.container.querySelector('.weather-details-compact .flip-card');
+        if (flipCard) {
+            flipCard.addEventListener('mouseenter', () => {
+                flipCard.classList.add('flipped');
+            });
+
+            flipCard.addEventListener('mouseleave', () => {
+                flipCard.classList.remove('flipped');
+            });
+        }
+
         // 获取天气数据
         this.fetchWeatherData();
 
@@ -81,17 +93,37 @@ class WeatherWidget extends BaseWidget {
                         </div>
                     </div>
                     <div class="weather-details-compact">
-                        <div class="detail-item">
-                            <span class="detail-label">体感温度</span>
-                            <span class="detail-value">--°C</span>
-                        </div>
-                        <div class="detail-item">
-                            <span class="detail-label">风速 m/s</span>
-                            <span class="detail-value">--</span>
-                        </div>
-                        <div class="detail-item">
-                            <span class="detail-label">风向</span>
-                            <span class="detail-value">--</span>
+                        <div class="flip-card">
+                            <div class="flip-card-inner">
+                                <div class="flip-card-front">
+                                    <div class="detail-item">
+                                        <span class="detail-label">体感温度</span>
+                                        <span class="detail-value">--°C</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <span class="detail-label">风速 m/s</span>
+                                        <span class="detail-value">--</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <span class="detail-label">风向</span>
+                                        <span class="detail-value">--</span>
+                                    </div>
+                                </div>
+                                <div class="flip-card-back">
+                                    <div class="detail-item">
+                                        <span class="detail-label">湿度</span>
+                                        <span class="detail-value">--%</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <span class="detail-label">大气压</span>
+                                        <span class="detail-value">-- hPa</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <span class="detail-label">云量</span>
+                                        <span class="detail-value">--%</span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -264,18 +296,59 @@ class WeatherWidget extends BaseWidget {
             feelsLikeEl.textContent = `${Math.round(weatherData.main.feels_like)}°C`;
         }
 
-        // 更新正面数据 - 风速
-        const windSpeedEl = this.container.querySelector('.weather-details-compact .detail-item:nth-child(2) .detail-value, .weather-details-vertical .detail-item:nth-child(2) .detail-value');
+        // 更新正面数据 - 风速（添加风力等级）
+        const windSpeedEl = this.container.querySelector('.weather-details-compact .flip-card-front .detail-item:nth-child(2) .detail-value, .weather-details-vertical .detail-item:nth-child(2) .detail-value');
         if (windSpeedEl) {
-            windSpeedEl.textContent = `${weatherData.wind.speed}`;
+            const windSpeed = weatherData.wind.speed;
+            const windLevel = this.getWindLevel(windSpeed);
+            windSpeedEl.textContent = `${windLevel} | ${windSpeed.toFixed(2)}`;
         }
 
         // 更新正面数据 - 风向
-        const windDegEl = this.container.querySelector('.weather-details-compact .detail-item:nth-child(3) .detail-value, .weather-details-vertical .detail-item:nth-child(3) .detail-value');
+        const windDegEl = this.container.querySelector('.weather-details-compact .flip-card-front .detail-item:nth-child(3) .detail-value, .weather-details-vertical .detail-item:nth-child(3) .detail-value');
         if (windDegEl) {
             const windInfo = this.getWindDirection(weatherData.wind.deg);
             windDegEl.innerHTML = `<span class="wind-arrow">${windInfo.arrow}</span> ${windInfo.name}`;
         }
+
+        // 更新背面数据 - 湿度
+        const humidityEl = this.container.querySelector('.weather-details-compact .flip-card-back .detail-item:nth-child(1) .detail-value');
+        if (humidityEl) {
+            humidityEl.textContent = `${weatherData.main.humidity}%`;
+        }
+
+        // 更新背面数据 - 大气压
+        const pressureEl = this.container.querySelector('.weather-details-compact .flip-card-back .detail-item:nth-child(2) .detail-value');
+        if (pressureEl) {
+            pressureEl.textContent = `${weatherData.main.pressure} hPa`;
+        }
+
+        // 更新背面数据 - 云量
+        const cloudsEl = this.container.querySelector('.weather-details-compact .flip-card-back .detail-item:nth-child(3) .detail-value');
+        if (cloudsEl) {
+            cloudsEl.textContent = `${weatherData.clouds.all}%`;
+        }
+    }
+
+    /**
+     * 根据风速（m/s）计算风力等级
+     * @param {number} speed - 风速 m/s
+     * @returns {number} 风力等级
+     */
+    getWindLevel(speed) {
+        if (speed < 0.3) return 0;
+        if (speed < 1.6) return 1;
+        if (speed < 3.4) return 2;
+        if (speed < 5.5) return 3;
+        if (speed < 8.0) return 4;
+        if (speed < 10.8) return 5;
+        if (speed < 13.9) return 6;
+        if (speed < 17.2) return 7;
+        if (speed < 20.8) return 8;
+        if (speed < 24.5) return 9;
+        if (speed < 28.5) return 10;
+        if (speed < 32.7) return 11;
+        return 12;
     }
 
     /**
