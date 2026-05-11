@@ -1083,7 +1083,24 @@ class SettingsModalHandler {
 
         // 2. 应用标题字体颜色
         const fontColor = settings.titleFontColor || '#ffffff';
-        document.documentElement.style.setProperty('--title-color', fontColor);
+        const currentTheme = document.documentElement.getAttribute('data-theme');
+
+        // 判断是否手动设置了颜色（不等于默认值 #ffffff）
+        const isCustomColor = fontColor !== '#ffffff';
+
+        if (isCustomColor) {
+            // 如果用户手动设置了颜色，使用手动设置的颜色
+            document.documentElement.style.setProperty('--title-color', fontColor);
+        } else {
+            // 否则根据主题自动适配
+            if (currentTheme === 'dark') {
+                // 暗黑模式使用专门的深色主题颜色
+                document.documentElement.style.setProperty('--title-color', 'var(--title-color-dark)');
+            } else {
+                // 浅色模式使用深黑色
+                document.documentElement.style.setProperty('--title-color', '#0a0a0a');
+            }
+        }
 
         // 3. 应用标题位置
         const position = settings.titlePosition || 'bottom';

@@ -61,10 +61,14 @@ class SettingsManager {
         try {
             this.settings = await fetchSettings();
             this.applySettings();
+            // 设置主题变化监听器
+            this.setupThemeChangeListener();
         } catch (error) {
             // 使用默认设置
             this.settings = { ...this.defaultSettings };
             this.applySettings();
+            // 设置主题变化监听器
+            this.setupThemeChangeListener();
         }
     }
 
@@ -142,7 +146,24 @@ class SettingsManager {
 
         // 应用标题字体颜色
         const titleFontColor = this.settings.title_font_color || '#ffffff';
-        document.documentElement.style.setProperty('--title-color', titleFontColor);
+        const currentTheme = document.documentElement.getAttribute('data-theme');
+
+        // 判断是否手动设置了颜色（不等于默认值 #ffffff）
+        const isCustomColor = titleFontColor !== '#ffffff';
+
+        if (isCustomColor) {
+            // 如果用户手动设置了颜色，使用手动设置的颜色
+            document.documentElement.style.setProperty('--title-color', titleFontColor);
+        } else {
+            // 否则根据主题自动适配
+            if (currentTheme === 'dark') {
+                // 暗黑模式使用专门的深色主题颜色
+                document.documentElement.style.setProperty('--title-color', 'var(--title-color-dark)');
+            } else {
+                // 浅色模式使用深黑色
+                document.documentElement.style.setProperty('--title-color', '#0a0a0a');
+            }
+        }
 
         // 应用标题最大长度
         const titleMaxLength = this.settings.title_max_length || '8';
@@ -162,6 +183,51 @@ class SettingsManager {
         // 应用背景设置
         this.applyBackgroundSettings();
     } // 结束 applySettings 方法
+
+    /**
+     * 设置主题变化监听器
+     */
+    setupThemeChangeListener() {
+        // 监听主题模式变化
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                if (mutation.type === 'attributes' && mutation.attributeName === 'data-theme') {
+                    // 主题发生变化，重新应用标题颜色
+                    this.applyTitleColor();
+                }
+            });
+        });
+
+        observer.observe(document.documentElement, {
+            attributes: true,
+            attributeFilter: ['data-theme']
+        });
+    }
+
+    /**
+     * 应用标题字体颜色（单独提取出来供主题变化时调用）
+     */
+    applyTitleColor() {
+        const titleFontColor = this.settings.title_font_color || '#ffffff';
+        const currentTheme = document.documentElement.getAttribute('data-theme');
+
+        // 判断是否手动设置了颜色（不等于默认值 #ffffff）
+        const isCustomColor = titleFontColor !== '#ffffff';
+
+        if (isCustomColor) {
+            // 如果用户手动设置了颜色，使用手动设置的颜色
+            document.documentElement.style.setProperty('--title-color', titleFontColor);
+        } else {
+            // 否则根据主题自动适配
+            if (currentTheme === 'dark') {
+                // 暗黑模式使用专门的深色主题颜色
+                document.documentElement.style.setProperty('--title-color', 'var(--title-color-dark)');
+            } else {
+                // 浅色模式使用深黑色
+                document.documentElement.style.setProperty('--title-color', '#0a0a0a');
+            }
+        }
+    }
 
     /**
      * 应用背景设置
