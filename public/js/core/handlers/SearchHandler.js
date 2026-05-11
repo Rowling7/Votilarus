@@ -72,10 +72,22 @@ class SearchHandler {
             // 将数据库返回的数据转换为前端使用的格式
             this.searchEngines = {};
             engines.forEach(engine => {
+                let iconPath = engine.icon_path || this.getFallbackIcon();
+
+                // 如果提供了图片路径且不是完整URL，则添加 static/ico/ 前缀
+                if (iconPath && !iconPath.startsWith('http://') && !iconPath.startsWith('https://') && !iconPath.startsWith('data:')) {
+                    // 将 Windows 路径分隔符 \ 转换为 /
+                    iconPath = iconPath.replace(/\\/g, '/');
+                    // 如果路径不以 static/ 开头，则添加 static/ico/ 前缀
+                    if (!iconPath.startsWith('static/')) {
+                        iconPath = 'static/ico/' + iconPath;
+                    }
+                }
+
                 this.searchEngines[engine.title_en] = {
                     id: engine.id,
                     name: engine.title,
-                    icon: engine.icon_path || this.getFallbackIcon(),
+                    icon: iconPath,
                     url: engine.url,
                     sort_order: engine.sort_order
                 };

@@ -143,7 +143,7 @@ class AddIconDialogHandler {
      */
     updatePreview() {
         const name = document.getElementById('add-icon-name').value || '图标名称';
-        const imageUrl = document.getElementById('add-icon-image').value;
+        let imageUrl = document.getElementById('add-icon-image').value;
 
         const previewIcon = document.getElementById('add-preview-icon');
         const previewName = document.getElementById('add-preview-name');
@@ -151,7 +151,13 @@ class AddIconDialogHandler {
         previewName.textContent = name;
 
         if (imageUrl) {
-            previewIcon.style.backgroundImage = `url(${imageUrl})`;
+            // 将 Windows 路径分隔符 \ 转换为 URL 友好的 /
+            let formattedUrl = imageUrl.replace(/\\/g, '/');
+            // 如果路径不是完整URL且不以 static/ 开头，则添加 static/ico/ 前缀
+            if (!formattedUrl.startsWith('http://') && !formattedUrl.startsWith('https://') && !formattedUrl.startsWith('data:') && !formattedUrl.startsWith('static/')) {
+                formattedUrl = 'static/ico/' + formattedUrl;
+            }
+            previewIcon.style.backgroundImage = `url(${formattedUrl})`;
             previewIcon.textContent = '';
         } else {
             previewIcon.style.backgroundImage = '';
@@ -165,7 +171,7 @@ class AddIconDialogHandler {
     async save() {
         const name = document.getElementById('add-icon-name').value.trim();
         const target = document.getElementById('add-icon-url').value.trim();
-        const bgimage = document.getElementById('add-icon-image').value.trim();
+        let bgimage = document.getElementById('add-icon-image').value.trim();
 
         if (!name) {
             ToastNotification.warning('请输入图标名称');
@@ -175,6 +181,16 @@ class AddIconDialogHandler {
         if (!target) {
             ToastNotification.warning('请输入链接地址');
             return;
+        }
+
+        // 如果提供了图片路径且不是完整URL，则添加 static/ico/ 前缀
+        if (bgimage && !bgimage.startsWith('http://') && !bgimage.startsWith('https://') && !bgimage.startsWith('data:')) {
+            // 将 Windows 路径分隔符 \ 转换为 /
+            bgimage = bgimage.replace(/\\/g, '/');
+            // 如果路径不以 static/ 开头，则添加 static/ico/ 前缀
+            if (!bgimage.startsWith('static/')) {
+                bgimage = 'static/ico/' + bgimage;
+            }
         }
 
         try {

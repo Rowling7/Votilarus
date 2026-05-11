@@ -327,7 +327,11 @@ class IconRenderer {
             const bgDiv = document.createElement('div');
             bgDiv.className = 'nav-icon-bg';
             // 将 Windows 路径分隔符 \ 转换为 URL 友好的 /
-            const imageUrl = item.icon_path.replace(/\\/g, '/');
+            let imageUrl = item.icon_path.replace(/\\/g, '/');
+            // 如果路径不是完整URL且不以 static/ 开头，则添加 static/ico/ 前缀
+            if (!imageUrl.startsWith('http://') && !imageUrl.startsWith('https://') && !imageUrl.startsWith('data:') && !imageUrl.startsWith('static/')) {
+                imageUrl = 'static/ico/' + imageUrl;
+            }
             bgDiv.dataset.lazySrc = imageUrl; // 标记为懒加载
             iconDiv.appendChild(bgDiv);
 

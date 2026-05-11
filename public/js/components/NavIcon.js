@@ -53,8 +53,18 @@ class NavIcon extends HTMLElement {
         const title = this.getAttribute('title') || '';
         const url = this.getAttribute('url') || '';
         const size = this.getAttribute('size') || '1x1';
-        const image = this.getAttribute('image') || '';
+        let image = this.getAttribute('image') || '';
         const uuid = this.getAttribute('uuid') || '';
+
+        // 如果提供了图片路径且不是完整URL，则添加 static/ico/ 前缀
+        if (image && !image.startsWith('http://') && !image.startsWith('https://') && !image.startsWith('data:')) {
+            // 将 Windows 路径分隔符 \ 转换为 /
+            image = image.replace(/\\/g, '/');
+            // 如果路径不以 static/ 开头，则添加 static/ico/ 前缀
+            if (!image.startsWith('static/')) {
+                image = 'static/ico/' + image;
+            }
+        }
 
         const [width, height] = size.split('x').map(Number);
 

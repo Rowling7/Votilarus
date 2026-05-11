@@ -137,7 +137,11 @@ class DockRenderer {
         icon.className = 'dock-item-icon';
 
         if (item.icon_path) {
-            const imageUrl = item.icon_path.replace(/\\/g, '/');
+            let imageUrl = item.icon_path.replace(/\\/g, '/');
+            // 如果路径不是完整URL且不以 static/ 开头，则添加 static/ico/ 前缀
+            if (!imageUrl.startsWith('http://') && !imageUrl.startsWith('https://') && !imageUrl.startsWith('data:') && !imageUrl.startsWith('static/')) {
+                imageUrl = 'static/ico/' + imageUrl;
+            }
             icon.style.backgroundImage = `url(${imageUrl})`;
         } else {
             // 使用默认图标或首字母

@@ -137,7 +137,7 @@ class IconEditorHandler {
      */
     updatePreview() {
         const name = document.getElementById('edit-icon-name').value || '图标名称';
-        const imageUrl = document.getElementById('edit-icon-image').value;
+        let imageUrl = document.getElementById('edit-icon-image').value;
 
         const previewIcon = document.getElementById('preview-icon');
         const previewName = document.getElementById('preview-name');
@@ -146,7 +146,11 @@ class IconEditorHandler {
 
         if (imageUrl) {
             // 将 Windows 路径分隔符 \ 转换为 URL 友好的 /
-            const formattedUrl = imageUrl.replace(/\\/g, '/');
+            let formattedUrl = imageUrl.replace(/\\/g, '/');
+            // 如果路径不是完整URL且不以 static/ 开头，则添加 static/ico/ 前缀
+            if (!formattedUrl.startsWith('http://') && !formattedUrl.startsWith('https://') && !formattedUrl.startsWith('data:') && !formattedUrl.startsWith('static/')) {
+                formattedUrl = 'static/ico/' + formattedUrl;
+            }
             // 如果路径不是以 / 开头，添加 /
             const finalUrl = formattedUrl.startsWith('/') ? formattedUrl : `/${formattedUrl}`;
             previewIcon.style.backgroundImage = `url(${finalUrl})`;
@@ -165,7 +169,7 @@ class IconEditorHandler {
 
         const name = document.getElementById('edit-icon-name').value.trim();
         const target = document.getElementById('edit-icon-url').value.trim();
-        const bgimage = document.getElementById('edit-icon-image').value.trim();
+        let bgimage = document.getElementById('edit-icon-image').value.trim();
 
         console.log('=== 开始保存图标 ===');
         console.log('当前图标数据:', this.currentItem);
@@ -176,6 +180,16 @@ class IconEditorHandler {
         if (!name) {
             ToastNotification.warning('请输入图标名称');
             return;
+        }
+
+        // 如果提供了图片路径且不是完整URL，则添加 static/ico/ 前缀
+        if (bgimage && !bgimage.startsWith('http://') && !bgimage.startsWith('https://') && !bgimage.startsWith('data:')) {
+            // 将 Windows 路径分隔符 \ 转换为 /
+            bgimage = bgimage.replace(/\\/g, '/');
+            // 如果路径不以 static/ 开头，则添加 static/ico/ 前缀
+            if (!bgimage.startsWith('static/')) {
+                bgimage = 'static/ico/' + bgimage;
+            }
         }
 
         try {
@@ -246,9 +260,14 @@ class IconEditorHandler {
 
         if (bgimage) {
             console.log('[updateIconInDOM] 设置背景图:', bgimage);
+            // 将 Windows 路径分隔符 \ 转换为 URL 友好的 /
+            let imageUrl = bgimage.replace(/\\/g, '/');
+            // 如果路径不是完整URL且不以 static/ 开头，则添加 static/ico/ 前缀
+            if (!imageUrl.startsWith('http://') && !imageUrl.startsWith('https://') && !imageUrl.startsWith('data:') && !imageUrl.startsWith('static/')) {
+                imageUrl = 'static/ico/' + imageUrl;
+            }
+
             if (bgElement) {
-                // 将 Windows 路径分隔符 \ 转换为 URL 友好的 /
-                const imageUrl = bgimage.replace(/\\/g, '/');
                 bgElement.style.backgroundImage = `url(${imageUrl})`;
                 bgElement.style.display = 'block';
                 console.log('[updateIconInDOM] 背景图元素已更新');
@@ -257,7 +276,6 @@ class IconEditorHandler {
                 // 如果不存在背景图元素，需要创建
                 const newBgDiv = document.createElement('div');
                 newBgDiv.className = 'nav-icon-bg';
-                const imageUrl = bgimage.replace(/\\/g, '/');
                 newBgDiv.style.backgroundImage = `url(${imageUrl})`;
                 newBgDiv.style.display = 'block';
                 iconElement.insertBefore(newBgDiv, iconElement.firstChild);
