@@ -182,7 +182,7 @@ class IconEditorHandler {
             const { updateItem } = await import('../api-client.js');
 
             console.log('调用 API 更新数据库...');
-            await updateItem(this.currentItem.id, {
+            await updateItem(this.currentItem.uuid, {
                 name,
                 target,
                 bgimage
@@ -207,10 +207,10 @@ class IconEditorHandler {
      * 直接更新 DOM 中的图标元素
      */
     updateIconInDOM(name, target, bgimage) {
-        console.log('[updateIconInDOM] 查找图标元素, ID:', this.currentItem.id);
+        console.log('[updateIconInDOM] 查找图标元素, UUID:', this.currentItem.uuid);
 
         // 找到对应的 grid-item 元素（注意：是 .grid-item 而不是 nav-icon）
-        const gridItem = document.querySelector(`.grid-item[data-item-id="${this.currentItem.id}"]`);
+        const gridItem = document.querySelector(`.grid-item[data-item-id="${this.currentItem.uuid}"]`);
         if (!gridItem) {
             console.warn('[updateIconInDOM] 未找到对应的图标元素!');
             console.log('[updateIconInDOM] 尝试查找所有 grid-item 元素:');
