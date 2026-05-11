@@ -1,6 +1,7 @@
 // ==================== 日历小组件 ====================
 
 import BaseWidget from './BaseWidget.js';
+import CalendarModal from '../core/dialogs/CalendarModal.js';
 
 class CalendarWidget extends BaseWidget {
     /**
@@ -36,12 +37,27 @@ class CalendarWidget extends BaseWidget {
             </div>
         `;
 
+        // 绑定点击事件，打开日历模态弹窗
+        this.bindClickEvent();
+
         // 启动定时更新
         this.startAutoUpdate();
 
         return {
             destroy: () => this.destroy()
         };
+    }
+
+    /**
+     * 绑定点击事件
+     */
+    bindClickEvent() {
+        const widgetEl = this.container.querySelector('.calendar-widget');
+        if (widgetEl) {
+            widgetEl.addEventListener('click', () => {
+                CalendarModal.open();
+            });
+        }
     }
 
     /**

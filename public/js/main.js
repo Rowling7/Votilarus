@@ -15,6 +15,7 @@ import IconEditorHandler from './core/handlers/IconEditorHandler.js';
 import TooltipManager from './managers/TooltipManager.js';
 import AddIconDialog from './core/dialogs/AddIconDialog.js';
 import AddWidgetDialog from './core/dialogs/AddWidgetDialog.js';
+import CalendarModal from './core/dialogs/CalendarModal.js';
 import NavSidebar from './components/NavSidebar.js';
 
 class App {
@@ -83,6 +84,9 @@ class App {
 
             // 初始化添加小组件对话框
             AddWidgetDialog.init();
+
+            // 初始化日历模态弹窗
+            CalendarModal.init();
 
             // 绑定头像点击事件（打开设置）
             this.bindAvatarClick();
