@@ -148,6 +148,7 @@ router.post('/reset', (req, res) => {
         sidebar_width: '4',
         theme_mode: 'light',
         theme_color: '#3b82f6',
+        global_font: 'NotoSansSC-Regular',
         bg_image_enabled: '0',
         bg_image_url: 'static/background/image061.png',
         bg_blur_enabled: '0',

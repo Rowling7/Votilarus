@@ -119,6 +119,16 @@ class SettingsModalHandler {
                     <input type="color" id="theme-color" value="#3B82F6">
                 </div>
                 
+                <div class="setting-item">
+                    <label for="global-font">全局字体</label>
+                    <select id="global-font">
+                        <option value="NotoSansSC-Regular">JetBrains Mono Regular</option>
+                        <option value="NotoSansSC-Bold">JetBrains Mono Bold</option>
+                        <option value="Segoe UI">Segoe UI</option>
+                    </select>
+                    <div class="setting-description">设置整个应用的默认字体</div>
+                </div>
+                
                 <!-- 背景样式 -->
                 <h4 style="margin: 1.5rem 0 1rem 0; color: var(--text-primary); font-size: 1.1rem; padding-bottom: 0.5rem; border-bottom: 2px solid var(--theme-color);">🖼️ 背景样式</h4>
                 
@@ -771,6 +781,7 @@ class SettingsModalHandler {
         // 外观主题
         document.getElementById('theme-mode').value = settings.themeMode || 'light';
         document.getElementById('theme-color').value = settings.themeColor || '#3b82f6';
+        document.getElementById('global-font').value = settings.globalFont || 'NotoSansSC-Regular';
 
         // 背景图片开关和值
         const bgImageEnabled = settings.bgImageEnabled === true; // 默认关闭（根据SQL）
@@ -900,6 +911,7 @@ class SettingsModalHandler {
             // 外观主题
             themeMode: document.getElementById('theme-mode').value,
             themeColor: document.getElementById('theme-color').value,
+            globalFont: document.getElementById('global-font').value,
             bgImageEnabled: document.getElementById('bg-image-switch').classList.contains('active'),
             bgImageUrl: document.getElementById('bg-image-url').value,
             bgBlurEnabled: document.getElementById('bg-blur-switch').classList.contains('active'),
@@ -957,7 +969,10 @@ class SettingsModalHandler {
         // 1. 更新主题色
         document.documentElement.style.setProperty('--theme-color', settings.themeColor);
 
-        // 2. 更新背景（默认为空）
+        // 2. 应用全局字体
+        this.applyGlobalFont(settings.globalFont);
+
+        // 3. 更新背景（默认为空）
         if (settings.bgImageUrl) {
             const imageUrl = settings.bgImageUrl.startsWith('/') ? settings.bgImageUrl : `/${settings.bgImageUrl}`;
             document.body.style.backgroundImage = `url(${imageUrl})`;
@@ -1060,6 +1075,30 @@ class SettingsModalHandler {
         if (SearchHandler && SearchHandler.updateSearchEngineIcon) {
             SearchHandler.updateSearchEngineIcon();
         }
+    }
+
+    /**
+     * 应用全局字体
+     */
+    applyGlobalFont(fontName) {
+        // 根据字体名称设置对应的 font-family
+        let fontFamily;
+        switch (fontName) {
+            case 'NotoSansSC-Regular':
+                fontFamily = "'Noto Sans SC', sans-serif";
+                break;
+            case 'NotoSansSC-Bold':
+                fontFamily = "'Noto Sans SC Bold', sans-serif";
+                break;
+            case 'Segoe UI':
+                fontFamily = "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif";
+                break;
+            default:
+                fontFamily = "'Noto Sans SC', sans-serif";
+        }
+
+        // 应用到 body 元素
+        document.body.style.fontFamily = fontFamily;
     }
 
     /**

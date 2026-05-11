@@ -8,6 +8,7 @@ class SettingsManager {
         this.defaultSettings = {
             theme_mode: 'light',
             theme_color: '#3b82f6',
+            global_font: 'NotoSansSC-Regular',
             sidebar_width: '50',
             cell_base_size: '4',
             cell_gap: '2',
@@ -85,6 +86,10 @@ class SettingsManager {
         // 应用主题色
         const themeColor = this.settings.theme_color || '#3b82f6';
         document.documentElement.style.setProperty('--theme-color', themeColor);
+
+        // 应用全局字体
+        const globalFont = this.settings.global_font || 'NotoSansSC-Regular';
+        this.applyGlobalFont(globalFont);
 
         // 应用侧栏宽度
         const sidebarWidth = parseInt(this.settings.sidebar_width) || 50;
@@ -227,6 +232,30 @@ class SettingsManager {
                 document.documentElement.style.setProperty('--title-color', '#0a0a0a');
             }
         }
+    }
+
+    /**
+     * 应用全局字体
+     */
+    applyGlobalFont(fontName) {
+        // 根据字体名称设置对应的 font-family
+        let fontFamily;
+        switch (fontName) {
+            case 'NotoSansSC-Regular':
+                fontFamily = "'Noto Sans SC', sans-serif";
+                break;
+            case 'NotoSansSC-Bold':
+                fontFamily = "'Noto Sans SC Bold', sans-serif";
+                break;
+            case 'Segoe UI':
+                fontFamily = "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif";
+                break;
+            default:
+                fontFamily = "'Noto Sans SC', sans-serif";
+        }
+
+        // 应用到 body 元素
+        document.body.style.fontFamily = fontFamily;
     }
 
     /**
@@ -390,6 +419,7 @@ class SettingsManager {
             // 外观主题
             themeMode: this.settings.theme_mode || 'light',
             themeColor: this.settings.theme_color || '#3b82f6',
+            globalFont: this.settings.global_font || 'NotoSansSC-Regular',
             bgImageEnabled: this.settings.bg_image_enabled === '1',
             bgImageUrl: this.settings.bg_image_url || '',
             bgBlurEnabled: this.settings.bg_blur_enabled === '1',
@@ -454,6 +484,7 @@ class SettingsManager {
             // 外观主题
             theme_mode: newSettings.themeMode,
             theme_color: newSettings.themeColor,
+            global_font: newSettings.globalFont,
             bg_image_enabled: newSettings.bgImageEnabled ? '1' : '0',
             bg_image_url: newSettings.bgImageUrl,
             bg_blur_enabled: newSettings.bgBlurEnabled ? '1' : '0',
