@@ -167,12 +167,12 @@ class SettingsManager {
      * 应用背景设置
      */
     applyBackgroundSettings() {
-        // 应用背景图片（根据开关状态）
-        const bgImageEnabled = this.settings.bg_image_enabled !== '0';
+        // 应用背景图片(根据开关状态)
+        const bgImageEnabled = this.settings.bg_image_enabled === '1' || this.settings.bg_image_enabled === true;
         const bgImageUrl = this.settings.bg_image_url || '';
 
         if (bgImageEnabled && bgImageUrl) {
-            // 如果路径已经以 / 开头，直接使用；否则添加 / 前缀
+            // 如果路径已经以 / 开头,直接使用;否则添加 / 前缀
             const imageUrl = bgImageUrl.startsWith('/') ? bgImageUrl : `/${bgImageUrl}`;
             document.body.style.backgroundImage = `url(${imageUrl})`;
             document.body.style.backgroundSize = 'cover';
@@ -182,23 +182,23 @@ class SettingsManager {
             document.body.style.backgroundImage = 'none';
         }
 
-        // 应用背景模糊度（根据开关状态）
-        const bgBlurEnabled = this.settings.bg_blur_enabled !== '0';
+        // 应用背景模糊度(根据开关状态)
+        const bgBlurEnabled = this.settings.bg_blur_enabled === '1' || this.settings.bg_blur_enabled === true;
         const bgBlur = bgBlurEnabled ? (parseInt(this.settings.bg_blur) || 5) : 0;
         document.documentElement.style.setProperty('--bg-blur', `${bgBlur}px`);
 
-        // 应用背景透明度（根据开关状态）
-        const bgOpacityEnabled = this.settings.bg_opacity_enabled !== '0';
+        // 应用背景透明度(根据开关状态)
+        const bgOpacityEnabled = this.settings.bg_opacity_enabled === '1' || this.settings.bg_opacity_enabled === true;
         const bgOpacity = bgOpacityEnabled ? (parseFloat(this.settings.bg_opacity) || 0.8) : 1;
         document.documentElement.style.setProperty('--bg-opacity', bgOpacity);
 
-        // 应用遮罩层颜色（根据开关状态）
-        const overlayColorEnabled = this.settings.overlay_color_enabled !== '0';
+        // 应用遮罩层颜色(根据开关状态)
+        const overlayColorEnabled = this.settings.overlay_color_enabled === '1' || this.settings.overlay_color_enabled === true;
         const overlayColor = overlayColorEnabled ? (this.settings.overlay_color || '#000000') : 'transparent';
         document.documentElement.style.setProperty('--overlay-color', overlayColor);
 
-        // 应用遮罩层透明度（根据开关状态）
-        const overlayOpacityEnabled = this.settings.overlay_opacity_enabled !== '0';
+        // 应用遮罩层透明度(根据开关状态)
+        const overlayOpacityEnabled = this.settings.overlay_opacity_enabled === '1' || this.settings.overlay_opacity_enabled === true;
         const overlayOpacity = overlayOpacityEnabled ? (parseFloat(this.settings.overlay_opacity) || 0.3) : 0;
         document.documentElement.style.setProperty('--overlay-opacity', overlayOpacity);
 
@@ -311,7 +311,7 @@ class SettingsManager {
     }
 
     /**
-     * 获取所有设置（用于 Modal）
+     * 获取所有设置(用于 Modal)
      */
     getAllSettings() {
         return {
@@ -324,15 +324,15 @@ class SettingsManager {
             // 外观主题
             themeMode: this.settings.theme_mode || 'light',
             themeColor: this.settings.theme_color || '#3b82f6',
-            bgImageEnabled: this.settings.bg_image_enabled !== '0',
+            bgImageEnabled: this.settings.bg_image_enabled === '1',
             bgImageUrl: this.settings.bg_image_url || '',
-            bgBlurEnabled: this.settings.bg_blur_enabled !== '0',
+            bgBlurEnabled: this.settings.bg_blur_enabled === '1',
             bgBlur: parseInt(this.settings.bg_blur) || 5,
-            bgOpacityEnabled: this.settings.bg_opacity_enabled !== '0',
+            bgOpacityEnabled: this.settings.bg_opacity_enabled === '1',
             bgOpacity: parseFloat(this.settings.bg_opacity) || 0.8,
-            overlayColorEnabled: this.settings.overlay_color_enabled !== '0',
+            overlayColorEnabled: this.settings.overlay_color_enabled === '1',
             overlayColor: this.settings.overlay_color || '#000000',
-            overlayOpacityEnabled: this.settings.overlay_opacity_enabled !== '0',
+            overlayOpacityEnabled: this.settings.overlay_opacity_enabled === '1',
             overlayOpacity: parseFloat(this.settings.overlay_opacity) || 0.3,
 
             // 图标样式

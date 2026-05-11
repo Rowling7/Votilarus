@@ -881,6 +881,7 @@ class SettingsModalHandler {
             // 显示成功提示
             ToastNotification.success('设置已保存！');
         } catch (error) {
+            console.error('保存设置失败:', error);
             ToastNotification.error('保存设置失败，请重试');
         }
     }
@@ -1101,7 +1102,7 @@ class SettingsModalHandler {
      */
     refreshAllIcons() {
         // 获取所有图标容器
-        const iconContainers = document.querySelectorAll('.nav-icon');
+        let iconContainers = document.querySelectorAll('.nav-icon');
 
         // 如果没找到，尝试其他可能的选择器
         if (iconContainers.length === 0) {
@@ -1209,11 +1210,11 @@ class SettingsModalHandler {
     }
 
     /**
-     * 应用背景设置（包括开关状态）
+     * 应用背景设置(包括开关状态)
      */
     applyBackgroundSettings(settings) {
-        // 应用背景图片（根据开关状态）
-        const bgImageEnabled = settings.bgImageEnabled === true;
+        // 应用背景图片(根据开关状态)
+        const bgImageEnabled = settings.bgImageEnabled === true || settings.bgImageEnabled === '1';
         if (bgImageEnabled && settings.bgImageUrl) {
             const imageUrl = settings.bgImageUrl.startsWith('/') ? settings.bgImageUrl : `/${settings.bgImageUrl}`;
             document.body.style.backgroundImage = `url(${imageUrl})`;
@@ -1224,23 +1225,23 @@ class SettingsModalHandler {
             document.body.style.backgroundImage = 'none';
         }
 
-        // 应用背景模糊度（根据开关状态）
-        const bgBlurEnabled = settings.bgBlurEnabled === true;
+        // 应用背景模糊度(根据开关状态)
+        const bgBlurEnabled = settings.bgBlurEnabled === true || settings.bgBlurEnabled === '1';
         const bgBlur = bgBlurEnabled ? (settings.bgBlur || 5) : 0;
         document.documentElement.style.setProperty('--bg-blur', `${bgBlur}px`);
 
-        // 应用背景透明度（根据开关状态）
-        const bgOpacityEnabled = settings.bgOpacityEnabled === true;
+        // 应用背景透明度(根据开关状态)
+        const bgOpacityEnabled = settings.bgOpacityEnabled === true || settings.bgOpacityEnabled === '1';
         const bgOpacity = bgOpacityEnabled ? (settings.bgOpacity || 0.8) : 1;
         document.documentElement.style.setProperty('--bg-opacity', bgOpacity);
 
-        // 应用遮罩层颜色（根据开关状态）
-        const overlayColorEnabled = settings.overlayColorEnabled === true;
+        // 应用遮罩层颜色(根据开关状态)
+        const overlayColorEnabled = settings.overlayColorEnabled === true || settings.overlayColorEnabled === '1';
         const overlayColor = overlayColorEnabled ? (settings.overlayColor || '#000000') : 'transparent';
         document.documentElement.style.setProperty('--overlay-color', overlayColor);
 
-        // 应用遮罩层透明度（根据开关状态）
-        const overlayOpacityEnabled = settings.overlayOpacityEnabled === true;
+        // 应用遮罩层透明度(根据开关状态)
+        const overlayOpacityEnabled = settings.overlayOpacityEnabled === true || settings.overlayOpacityEnabled === '1';
         const overlayOpacity = overlayOpacityEnabled ? (settings.overlayOpacity || 0.3) : 0;
         document.documentElement.style.setProperty('--overlay-opacity', overlayOpacity);
 
