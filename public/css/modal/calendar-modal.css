@@ -61,26 +61,17 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
+    position: relative;
 }
 
 .calendar-modal-month-year {
     font-size: 2rem;
     font-weight: bold;
     color: var(--text-primary, #1a1a1a);
-    cursor: pointer;
     display: flex;
     align-items: center;
     gap: 0.5rem;
     user-select: none;
-}
-
-.calendar-modal-month-year:hover {
-    opacity: 0.8;
-}
-
-.calendar-modal-dropdown-icon {
-    font-size: 0.8rem;
-    opacity: 0.6;
 }
 
 .calendar-modal-nav-buttons {
@@ -356,59 +347,39 @@
     color: var(--text-secondary-dark, rgba(255, 255, 255, 0.5));
 }
 
-/* 年份选择下拉框 */
-.calendar-modal-year-picker {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    margin-top: 0.5rem;
-    background: var(--glass-bg, rgba(255, 255, 255, 0.95));
-    backdrop-filter: blur(20px);
-    border-radius: 16px;
+/* 年月选择器 */
+.calendar-modal-year-select,
+.calendar-modal-month-select {
+    background: var(--glass-bg-secondary, rgba(0, 0, 0, 0.05));
     border: 1px solid var(--glass-border, rgba(0, 0, 0, 0.1));
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-    padding: 1rem;
-    z-index: 10;
-    display: none;
-}
-
-.calendar-modal-year-picker.active {
-    display: block;
-}
-
-.calendar-modal-year-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 0.5rem;
-    max-height: 300px;
-    overflow-y: auto;
-}
-
-.calendar-modal-year-item {
-    padding: 0.5rem;
-    text-align: center;
     border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.2s ease;
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
     color: var(--text-primary, #1a1a1a);
+    cursor: pointer;
+    outline: none;
+    transition: all 0.2s ease;
 }
 
-.calendar-modal-year-item:hover {
-    background: var(--theme-color, #3b82f6);
-    color: white;
+.calendar-modal-year-select:hover,
+.calendar-modal-month-select:hover {
+    border-color: var(--theme-color, #3b82f6);
 }
 
-.calendar-modal-year-item.current {
-    background: var(--theme-color, #3b82f6);
-    color: white;
-    font-weight: bold;
+.calendar-modal-year-select:focus,
+.calendar-modal-month-select:focus {
+    border-color: var(--theme-color, #3b82f6);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
-[data-theme="dark"] .calendar-modal-year-picker {
-    background: var(--glass-bg-dark, rgba(0, 0, 0, 0.95));
-    border-color: var(--glass-border-dark, rgba(255, 255, 255, 0.15));
-}
-
-[data-theme="dark"] .calendar-modal-year-item {
+[data-theme="dark"] .calendar-modal-year-select,
+[data-theme="dark"] .calendar-modal-month-select {
+    background: var(--glass-bg-dark, rgba(255, 255, 255, 0.05));
+    border-color: var(--glass-border-dark, rgba(255, 255, 255, 0.1));
     color: var(--text-primary-dark, #ffffff);
+}
+
+[data-theme="dark"] .calendar-modal-year-select:hover,
+[data-theme="dark"] .calendar-modal-month-select:hover {
+    border-color: var(--theme-color, #3b82f6);
 }
