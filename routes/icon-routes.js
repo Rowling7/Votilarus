@@ -179,14 +179,25 @@ router.put('/reorder', (req, res) => {
 
 // 移动图标到另一个分类（更新 category_id）
 router.put('/move', (req, res) => {
-    const { itemId, new_category_id } = req.body;
+    const { item_id, new_category_id } = req.body;
+
+    if (!item_id || !new_category_id) {
+        res.status(400).json({ error: '缺少必要参数' });
+        return;
+    }
 
     const sql = 'UPDATE icon_items SET category_id = ? WHERE id = ?';
-    db.run(sql, [new_category_id, itemId], function (err) {
+    db.run(sql, [new_category_id, item_id], function (err) {
         if (err) {
             res.status(500).json({ error: err.message });
             return;
         }
+
+        if (this.changes === 0) {
+            res.status(404).json({ error: '图标不存在' });
+            return;
+        }
+
         res.json({ success: true, changes: this.changes });
     });
 });

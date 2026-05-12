@@ -314,7 +314,10 @@ class IconRenderer {
 
         // 创建普通图标
         const gridItem = document.createElement('div');
-        gridItem.className = `grid-item size-${layout.width}x${layout.height}`;
+        // 确保 width 和 height 有默认值，避免 size-nullxnull
+        const width = layout.width || 1;
+        const height = layout.height || 1;
+        gridItem.className = `grid-item size-${width}x${height}`;
         gridItem.dataset.itemId = item.id;
         gridItem.dataset.url = item.link_url;
         gridItem.dataset.tooltip = item.title; // 添加 tooltip
@@ -398,7 +401,10 @@ class IconRenderer {
         };
 
         const widgetType = widgetTypeMap[item.title] || item.title.toLowerCase().replace('widget', '');
-        const size = `${layout.width}x${layout.height}`;
+        // 确保 width 和 height 有默认值
+        const width = layout.width || 2;
+        const height = layout.height || 2;
+        const size = `${width}x${height}`;
         const widgetId = item.id;  // 直接使用 icon_widgets.id
 
         // 使用 WidgetManager 创建 widget 元素

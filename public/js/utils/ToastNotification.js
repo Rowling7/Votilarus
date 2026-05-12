@@ -11,11 +11,11 @@ class Toast {
      */
     init() {
         if (this.container) return;
-        
+
         this.container = document.createElement('div');
         this.container.className = 'toast-container';
         this.container.id = 'toast-container';
-        
+
         // 添加到页面
         document.body.appendChild(this.container);
     }
@@ -25,44 +25,58 @@ class Toast {
      * @param {string} message - 提示信息
      * @param {string} type - 类型: success, error, warning, info
      * @param {number} duration - 显示时长（毫秒）
+     * @param {Object} options - 可选配置 { showUndo: boolean, onUndo: function }
      */
-    show(message, type = 'info', duration = 3000) {
+    show(message, type = 'info', duration = 3000, options = {}) {
         this.init();
-        
+
         // 创建 Toast 元素
         const toast = document.createElement('div');
         toast.className = `toast toast-${type}`;
-        
+
         const icons = {
             success: '✅',
             error: '❌',
             warning: '⚠️',
             info: 'ℹ️'
         };
-        
+
+        // 如果有撤销按钮，添加撤销按钮
+        const undoButton = options.showUndo ?
+            '<button class="toast-undo-btn">撤销</button>' : '';
+
         toast.innerHTML = `
             <span class="toast-icon">${icons[type] || icons.info}</span>
             <span class="toast-message">${message}</span>
+            ${undoButton}
             <button class="toast-close" aria-label="关闭">×</button>
         `;
-        
+
         // 添加到容器
         this.container.appendChild(toast);
         this.toasts.push(toast);
-        
+
         // 绑定关闭按钮
         const closeBtn = toast.querySelector('.toast-close');
         closeBtn.addEventListener('click', () => {
             this.removeToast(toast);
         });
-        
-        // 自动消失
-        if (duration > 0) {
-            setTimeout(() => {
+
+        // 绑定撤销按钮
+        if (options.showUndo && options.onUndo) {
+            const undoBtn = toast.querySelector('.toast-undo-btn');
+            undoBtn.addEventListener('click', () => {
+                options.onUndo();
                 this.removeToast(toast);
-            }, duration);
+            });
         }
-        
+
+        // 自动消失（默认3秒）
+        const autoHideDuration = duration > 0 ? duration : 3000;
+        setTimeout(() => {
+            this.removeToast(toast);
+        }, autoHideDuration);
+
         return toast;
     }
 
@@ -71,7 +85,7 @@ class Toast {
      */
     removeToast(toast) {
         toast.classList.add('toast-hide');
-        
+
         // 动画结束后移除 DOM
         setTimeout(() => {
             if (toast.parentNode) {
@@ -84,8 +98,8 @@ class Toast {
     /**
      * 成功提示
      */
-    success(message, duration = 3000) {
-        return this.show(message, 'success', duration);
+    success(message, duration = 3000, options = {}) {
+        return this.show(message, 'success', duration, options);
     }
 
     /**
@@ -205,6 +219,27 @@ style.textContent = `
     .toast-close:hover {
         background: var(--bg-secondary, rgba(255, 255, 255, 0.1));
         color: var(--text-primary, white);
+    }
+
+    .toast-undo-btn {
+        padding: 0.4rem 0.8rem;
+        background: var(--theme-color, #3b82f6);
+        color: white;
+        border: none;
+        border-radius: 0.375rem;
+        font-size: 0.875rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        font-weight: 500;
+    }
+
+    .toast-undo-btn:hover {
+        opacity: 0.9;
+        transform: scale(1.05);
+    }
+
+    .toast-undo-btn:active {
+        transform: scale(0.95);
     }
 
     @keyframes toast-in {

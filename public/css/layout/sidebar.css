@@ -172,6 +172,14 @@
     font-weight: bold;
 }
 
+/* 侧边栏分类拖拽高亮 */
+.sidebar-category.drag-over {
+    background: rgba(var(--theme-color-rgb), 0.2);
+    border: 2px solid var(--theme-color);
+    transform: scale(1.05);
+    box-shadow: 0 0 15px rgba(var(--theme-color-rgb), 0.4);
+}
+
 /* 侧栏渐入动画 */
 .sidebar {
     animation: fadeIn 0.3s ease backwards;
