@@ -17,6 +17,9 @@ class DragHandler {
         this.lastMoveState = null;
         this.placeholderElement = null;
         this.originalPosition = null;
+
+        // 防抖定时器
+        this.saveSortTimeout = null;
     }
 
     /**
@@ -27,10 +30,10 @@ class DragHandler {
         const contentArea = document.getElementById('contentArea');
 
         if (contentArea) {
-            // 监听图标的拖拽开始事件（事件委托）- 只处理图标，不处理组件
+            // 监听图标的拖拽开始事件（事件委托）- 支持图标和组件
             contentArea.addEventListener('dragstart', (e) => {
                 const gridItem = e.target.closest('.grid-item');
-                if (gridItem && gridItem.dataset.type !== 'widget') {
+                if (gridItem) {
                     this.handleDragStart(e, gridItem);
                 }
             });
@@ -43,10 +46,9 @@ class DragHandler {
             // 监听网格内的拖拽排序（使用事件委托，支持动态加载的内容）
             contentArea.addEventListener('dragenter', (e) => {
                 const gridItem = e.target.closest('.grid-item');
-                // 只处理图标，不处理组件，且不是被拖拽的元素本身
+                // 处理图标和组件，且不是被拖拽的元素本身
                 if (gridItem && this.draggedElement &&
                     gridItem !== this.draggedElement &&
-                    gridItem.dataset.type !== 'widget' &&
                     !gridItem.classList.contains('placeholder')) {
                     e.preventDefault();
                     e.stopPropagation();
@@ -110,20 +112,17 @@ class DragHandler {
     }
 
     /**
-     * 处理拖拽开始 - 只处理图标
+     * 处理拖拽开始 - 支持图标和组件
      */
     handleDragStart(e, element) {
-        // 只处理图标，跳过组件
-        if (element.dataset.type === 'widget') {
-            e.preventDefault();
-            return;
-        }
+        const isWidget = element.dataset.type === 'widget';
 
         this.draggedElement = element;
 
         // 保存原始位置信息用于撤销
         this.originalPosition = {
-            itemId: element.dataset.itemId,
+            itemId: isWidget ? element.dataset.widgetId : element.dataset.itemId,
+            itemType: isWidget ? 'widget' : 'icon',
             categoryId: element.closest('.category-panel').dataset.categoryId,
             element: element.cloneNode(true),
             nextSibling: element.nextSibling,
@@ -131,8 +130,8 @@ class DragHandler {
         };
 
         this.draggedData = {
-            itemId: element.dataset.itemId,
-            itemType: 'icon',
+            itemId: isWidget ? element.dataset.widgetId : element.dataset.itemId,
+            itemType: isWidget ? 'widget' : 'icon',
             url: element.dataset.url,
             sourcePanel: element.closest('.category-panel').dataset.categoryId
         };
@@ -144,8 +143,6 @@ class DragHandler {
         // 添加拖拽中的样式 - 半透明效果
         setTimeout(() => {
             element.classList.add('dragging');
-            // 显示占位符
-            this.showPlaceholder(element);
         }, 0);
     }
 
@@ -511,82 +508,99 @@ class DragHandler {
     async handleDragEnter(e, targetItem) {
         if (!this.draggedElement || !targetItem) return;
 
-        // 获取目标项所在的网格容器（可能是新分类的网格）
+        // 获取目标项所在的网格容器
         const gridContainer = targetItem.closest('.grid-container');
         if (!gridContainer) return;
 
-        // 如果被拖拽元素不在当前网格容器中（跨分类拖拽），需要特殊处理
-        const draggedInCurrentGrid = this.draggedElement.closest('.grid-container') === gridContainer;
+        // 同一分类内的拖拽排序
+        const allItems = Array.from(gridContainer.querySelectorAll('.grid-item:not(.placeholder)'));
+        const draggedIndex = allItems.indexOf(this.draggedElement);
+        const targetIndex = allItems.indexOf(targetItem);
 
-        if (!draggedInCurrentGrid) {
-            // 跨分类拖拽：将被拖拽元素移动到目标网格中
-            // 这里只是视觉上的移动，实际数据更新在 drop 时处理
-            console.log('检测到跨分类拖拽，将元素移入目标网格');
+        if (draggedIndex === -1 || targetIndex === -1) return;
 
-            // 获取所有网格项（排除占位符）
-            const allItems = Array.from(gridContainer.querySelectorAll('.grid-item:not(.placeholder)'));
-            const targetIndex = allItems.indexOf(targetItem);
-
-            // 将拖拽元素插入到目标位置
-            if (targetIndex !== -1) {
-                gridContainer.insertBefore(this.draggedElement, targetItem);
-            } else {
-                gridContainer.appendChild(this.draggedElement);
-            }
-
-            // 添加临时样式表示正在拖拽到新位置
-            this.draggedElement.style.opacity = '0.7';
-            this.draggedElement.style.transform = 'scale(0.95)';
+        // 交换位置
+        if (draggedIndex < targetIndex) {
+            gridContainer.insertBefore(this.draggedElement, targetItem.nextSibling);
         } else {
-            // 同一分类内的拖拽排序
-            const allItems = Array.from(gridContainer.querySelectorAll('.grid-item:not(.placeholder)'));
-            const draggedIndex = allItems.indexOf(this.draggedElement);
-            const targetIndex = allItems.indexOf(targetItem);
-
-            if (draggedIndex === -1 || targetIndex === -1) return;
-
-            // 交换位置
-            if (draggedIndex < targetIndex) {
-                gridContainer.insertBefore(this.draggedElement, targetItem.nextSibling);
-            } else {
-                gridContainer.insertBefore(this.draggedElement, targetItem);
-            }
+            gridContainer.insertBefore(this.draggedElement, targetItem);
         }
 
-        // 保存排序到数据库
-        await this.saveSortOrder(gridContainer);
+        // 使用防抖保存排序到数据库（避免频繁调用）
+        this.debounceSaveSortOrder(gridContainer);
     }
 
     /**
-     * 保存排序到数据库 - 只处理图标
+     * 防抖保存排序（500ms 后执行）
+     */
+    debounceSaveSortOrder(gridContainer) {
+        // 清除之前的定时器
+        if (this.saveSortTimeout) {
+            clearTimeout(this.saveSortTimeout);
+        }
+
+        // 设置新的定时器
+        this.saveSortTimeout = setTimeout(() => {
+            this.saveSortOrder(gridContainer);
+        }, 500);
+    }
+
+    /**
+     * 保存排序到数据库 - 支持图标和组件
      */
     async saveSortOrder(gridContainer) {
         try {
             const categoryId = gridContainer.closest('.category-panel').dataset.categoryId;
+
             // 排除占位符
             const items = Array.from(gridContainer.querySelectorAll('.grid-item:not(.placeholder)'));
 
-            // 只处理图标，跳过组件
+            // 分别处理图标和组件
             const iconUpdates = [];
+            const widgetUpdates = [];
 
             items.forEach((item, index) => {
-                // 跳过组件
-                if (item.dataset.type === 'widget') {
-                    return;
-                }
+                const isWidget = item.dataset.type === 'widget';
+                const itemId = isWidget ? item.dataset.widgetId : item.dataset.itemId;
 
-                // 图标：更新 item_layouts 表的 sort_order
-                iconUpdates.push({
-                    item_id: item.dataset.itemId,
-                    category_id: categoryId,
-                    sort_order: index
-                });
+                // 从 DOM 读取 data-sort-order，如果不存在则使用 index
+                const currentSortOrder = item.dataset.sortOrder;
+                const currentSortOrderNum = currentSortOrder !== undefined ? parseInt(currentSortOrder) : null;
+
+                // 只有当 sort_order 发生变化时才更新
+                if (currentSortOrderNum !== index) {
+                    if (isWidget) {
+                        // 组件：使用 widget API
+                        widgetUpdates.push({
+                            widget_id: itemId,
+                            category_id: categoryId,
+                            sort_order: index
+                        });
+                    } else {
+                        // 图标：使用 icon API
+                        iconUpdates.push({
+                            item_id: itemId,
+                            sort_order: index
+                        });
+                    }
+                }
             });
 
-            // 调用图标排序 API
+            // 更新图标排序
             if (iconUpdates.length > 0) {
                 await reorderItems(iconUpdates);
             }
+
+            // 更新组件排序
+            if (widgetUpdates.length > 0) {
+                const { reorderWidgets } = await import('../api-client.js');
+                await reorderWidgets(widgetUpdates);
+            }
+
+            // 更新 DOM 中的 data-sort-order 属性
+            items.forEach((item, index) => {
+                item.dataset.sortOrder = index;
+            });
         } catch (error) {
             console.error('保存排序失败:', error);
         }

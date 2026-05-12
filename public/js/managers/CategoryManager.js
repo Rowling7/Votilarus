@@ -1,12 +1,11 @@
 // ==================== 分类管理器 ====================
 
-import { fetchCategories, fetchItems, fetchLayouts } from '../core/api-client.js';
+import { fetchCategories, fetchItems } from '../core/api-client.js';
 
 class CategoryManager {
     constructor() {
         this.categories = [];
         this.items = {};
-        this.layouts = {};
         this.currentCategory = null;
     }
 
@@ -24,16 +23,7 @@ class CategoryManager {
     async loadAllItems() {
         const startTime = performance.now();
 
-        // 优化1：先一次性加载所有布局信息（只调用一次 API）
-        try {
-            const allLayouts = await fetchLayouts();
-            allLayouts.forEach(layout => {
-                this.layouts[layout.item_id] = layout;
-            });
-        } catch (error) {
-        }
-
-        // 优化2：并行加载所有分类的图标
+        // 并行加载所有分类的图标
         const loadPromises = this.categories.map(async (category) => {
             try {
                 const items = await fetchItems(category.id);
@@ -61,12 +51,6 @@ class CategoryManager {
             const items = await fetchItems(categoryUuid);
             this.items[categoryUuid] = items;
 
-            // 重新获取布局信息
-            const allLayouts = await fetchLayouts();
-            allLayouts.forEach(layout => {
-                this.layouts[layout.item_id] = layout;
-            });
-
             return items;
         } catch (error) {
             console.error('重新加载分类数据失败:', error);
@@ -83,7 +67,19 @@ class CategoryManager {
     }
 
     getLayout(itemId) {
-        return this.layouts[itemId];
+        // 从所有分类中查找该 item
+        for (const categoryId in this.items) {
+            const item = this.items[categoryId].find(i => i.id === itemId);
+            if (item) {
+                return {
+                    width: item.width || 1,
+                    height: item.height || 1,
+                    sort_order: item.sort_order !== undefined ? item.sort_order : 0,
+                    category_id: item.category_id
+                };
+            }
+        }
+        return null;
     }
 
     getCurrentCategory() {

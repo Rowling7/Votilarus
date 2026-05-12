@@ -9,11 +9,11 @@ function setDatabase(database) {
     db = database;
 }
 
-// 获取所有布局（默认路由）
+// 获取所有布局（默认路由）- 现在从 icon_items 表获取
 router.get('/', (req, res) => {
-    const sql = 'SELECT * FROM item_layouts WHERE is_active = ? ORDER BY category_id, sort_order';
+    const sql = 'SELECT id as item_id, category_id, width, height, sort_order FROM icon_items WHERE deleted_flag = ? ORDER BY category_id, COALESCE(sort_order, 999999) ASC';
 
-    db.all(sql, ['1'], (err, rows) => {
+    db.all(sql, ['0'], (err, rows) => {
         if (err) {
             res.status(500).json({ error: err.message });
             return;
@@ -118,18 +118,12 @@ router.put('/grid', (req, res) => {
         });
 });
 
-// 获取图标的布局信息
+// 获取图标的布局信息 - 现在从 icon_items 表获取
 router.get('/item/:uuid', (req, res) => {
     const { uuid } = req.params;
-    const categoryId = req.query.category_id;
 
-    let sql = 'SELECT * FROM item_layouts WHERE item_id = ?';
-    const params = [uuid];
-
-    if (categoryId) {
-        sql += ' AND category_id = ?';
-        params.push(parseInt(categoryId));
-    }
+    const sql = 'SELECT width, height, sort_order FROM icon_items WHERE id = ? AND deleted_flag = ?';
+    const params = [uuid, '0'];
 
     db.get(sql, params, (err, row) => {
         if (err) {
@@ -140,8 +134,6 @@ router.get('/item/:uuid', (req, res) => {
         if (!row) {
             // 返回默认布局
             res.json({
-                pos_x: 0,
-                pos_y: 0,
                 width: 1,
                 height: 1,
                 sort_order: 0
@@ -149,20 +141,31 @@ router.get('/item/:uuid', (req, res) => {
             return;
         }
 
-        res.json(row);
+        res.json({
+            width: row.width || 1,
+            height: row.height || 1,
+            sort_order: row.sort_order !== null ? row.sort_order : 0
+        });
     });
 });
 
-// 批量获取分类下所有图标的布局
+// 批量获取分类下所有图标的布局 - 现在从 icon_items 表获取
 router.get('/category/:categoryId', (req, res) => {
     const { categoryId } = req.params;
 
     const sql = `
-        SELECT il.*, a.title, a.link_url, a.icon_path
-        FROM item_layouts il
-        LEFT JOIN icon_items a ON il.item_id = a.id
-        WHERE il.category_id = ? AND il.is_active = '1'
-        ORDER BY il.sort_order ASC
+        SELECT 
+            i.id as item_id,
+            i.category_id,
+            i.title,
+            i.link_url,
+            i.icon_path,
+            i.width,
+            i.height,
+            i.sort_order
+        FROM icon_items i
+        WHERE i.category_id = ? AND i.deleted_flag = '0'
+        ORDER BY COALESCE(i.sort_order, 999999) ASC
     `;
 
     db.all(sql, [parseInt(categoryId)], (err, rows) => {

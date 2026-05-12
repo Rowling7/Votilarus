@@ -60,25 +60,6 @@ export async function fetchItems(categoryUuid = null) {
     return data;
 }
 
-export async function fetchLayouts(itemId = null) {
-    let url = `${API_BASE}/layout`;
-    if (itemId) {
-        url += `?item_id=${itemId}`;
-    }
-
-    const cacheKey = getCacheKey(url);
-    const cached = getCachedData(cacheKey);
-    if (cached) return cached;
-
-    const response = await fetch(url);
-    if (!response.ok) {
-        throw new Error('获取布局失败');
-    }
-    const data = await response.json();
-    setCacheData(cacheKey, data);
-    return data;
-}
-
 export async function fetchDockItems() {
     const response = await fetch(`${API_BASE}/dock`);
     if (!response.ok) {

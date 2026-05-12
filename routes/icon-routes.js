@@ -21,7 +21,8 @@ router.get('/', (req, res) => {
         params.push(parseInt(categoryUuid));
     }
 
-    sql += ' ORDER BY id ASC';
+    // 按 sort_order 排序，如果没有设置则按 id 排序
+    sql += ' ORDER BY COALESCE(sort_order, 999999) ASC, id ASC';
 
     db.all(sql, params, (err, rows) => {
         if (err) {
@@ -41,27 +42,29 @@ router.post('/', (req, res) => {
         return;
     }
 
-    // 生成 UUID
-    const uuid = require('crypto').randomUUID();
-
-    // 插入 icon_items 表
-    const insertSql = 'INSERT INTO icon_items (category_id, title, link_url, icon_path, deleted_flag) VALUES (?, ?, ?, ?, ?)';
-    db.run(insertSql, [parseInt(category_id), name, target, bgimage || null, '0'], function (err) {
+    // 计算当前分类下的最大 sort_order
+    const maxOrderSql = 'SELECT MAX(sort_order) as max_order FROM icon_items WHERE category_id = ? AND deleted_flag = ?';
+    db.get(maxOrderSql, [parseInt(category_id), '0'], (err, row) => {
         if (err) {
             res.status(500).json({ error: err.message });
             return;
         }
 
-        // 同时创建布局记录（默认位置）
-        const layoutSql = 'INSERT INTO item_layouts (item_id, category_id, pos_x, pos_y, width, height) VALUES (?, ?, 0, 0, 1, 1)';
-        db.run(layoutSql, [this.lastID, parseInt(category_id)], function (layoutErr) {
-            if (layoutErr) {
-                // 静默处理布局记录创建失败
+        // 自动递增：最大值 + 1，如果没有记录则从 0 开始
+        const sortOrder = row && row.max_order !== null ? row.max_order + 1 : 0;
+
+        // 插入 icon_items 表（包含 sort_order、width、height）
+        const insertSql = 'INSERT INTO icon_items (category_id, title, link_url, icon_path, sort_order, width, height, deleted_flag) VALUES (?, ?, ?, ?, ?, 1, 1, ?)';
+        db.run(insertSql, [parseInt(category_id), name, target, bgimage || null, sortOrder, '0'], function (err) {
+            if (err) {
+                res.status(500).json({ error: err.message });
+                return;
             }
 
             res.json({
                 success: true,
                 itemId: this.lastID,
+                sortOrder: sortOrder,
                 message: '图标创建成功'
             });
         });
@@ -117,50 +120,57 @@ router.post('/', (req, res) => {
 //     });
 // });
 
-// 更新图标布局（位置和大小）
+// 更新图标布局（位置和大小）- 现在直接更新 icon_items 表
 router.put('/layout', (req, res) => {
     const { item_id, category_id, pos_x, pos_y, width, height } = req.body;
 
-    // 先检查是否已存在布局记录
-    const checkSql = 'SELECT * FROM item_layouts WHERE item_id = ? AND category_id = ?';
-    db.get(checkSql, [item_id, category_id], (err, row) => {
+    // 构建动态更新语句
+    const updates = [];
+    const params = [];
+
+    if (width !== undefined) {
+        updates.push('width = ?');
+        params.push(parseInt(width));
+    }
+    if (height !== undefined) {
+        updates.push('height = ?');
+        params.push(parseInt(height));
+    }
+
+    if (updates.length === 0) {
+        res.status(400).json({ error: '没有提供要更新的字段' });
+        return;
+    }
+
+    updates.push('updated_at = CURRENT_TIMESTAMP');
+    params.push(item_id);
+
+    const sql = `UPDATE icon_items SET ${updates.join(', ')} WHERE id = ?`;
+
+    db.run(sql, params, function (err) {
         if (err) {
             res.status(500).json({ error: err.message });
             return;
         }
 
-        let sql;
-        let params;
-
-        if (row) {
-            // 更新现有记录
-            sql = 'UPDATE item_layouts SET pos_x = ?, pos_y = ?, width = ?, height = ?, updated_at = CURRENT_TIMESTAMP WHERE item_id = ? AND category_id = ?';
-            params = [pos_x, pos_y, width, height, item_id, category_id];
-        } else {
-            // 插入新记录
-            sql = 'INSERT INTO item_layouts (item_id, category_id, pos_x, pos_y, width, height) VALUES (?, ?, ?, ?, ?, ?)';
-            params = [item_id, category_id, pos_x, pos_y, width, height];
+        if (this.changes === 0) {
+            res.status(404).json({ error: '图标不存在' });
+            return;
         }
 
-        db.run(sql, params, function (err) {
-            if (err) {
-                res.status(500).json({ error: err.message });
-                return;
-            }
-            res.json({ success: true, id: this.lastID });
-        });
+        res.json({ success: true, changes: this.changes });
     });
 });
 
 // 批量更新图标排序
 router.put('/reorder', (req, res) => {
-    const { items } = req.body; // [{ item_id, category_id, sort_order }, ...]
+    const { items } = req.body;
     const promises = [];
 
     items.forEach(item => {
         const promise = new Promise((resolve, reject) => {
-            const sql = 'UPDATE item_layouts SET sort_order = ?, updated_at = CURRENT_TIMESTAMP WHERE item_id = ? AND category_id = ?';
-            db.run(sql, [item.sort_order, item.item_id, item.category_id], function (err) {
+            const sql = 'UPDATE icon_items SET sort_order = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?';
+            db.run(sql, [item.sort_order, item.item_id], function (err) {
                 if (err) reject(err);
                 else resolve({ changes: this.changes });
             });

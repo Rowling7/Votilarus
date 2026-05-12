@@ -185,6 +185,9 @@ class IconRenderer {
                     // 创建 widget 元素
                     const widgetElement = WidgetManager.createWidgetElement(widgetType, size, widgetId);
 
+                    // 添加 sort_order 属性
+                    widgetElement.dataset.sortOrder = widget.sort_order !== undefined && widget.sort_order !== null ? widget.sort_order : 999999;
+
                     // 设置位置信息（如果需要绝对定位）
                     if (widget.pos_x !== undefined && widget.pos_y !== undefined) {
                         widgetElement.dataset.posX = widget.pos_x;
@@ -242,10 +245,9 @@ class IconRenderer {
 
         // 按 sort_order 排序
         const sortedItems = items.sort((a, b) => {
-            const layoutA = CategoryManager.getLayout(a.id);
-            const layoutB = CategoryManager.getLayout(b.id);
-            if (!layoutA || !layoutB) return 0;
-            return layoutA.sort_order - layoutB.sort_order;
+            const orderA = a.sort_order !== undefined && a.sort_order !== null ? a.sort_order : 999999;
+            const orderB = b.sort_order !== undefined && b.sort_order !== null ? b.sort_order : 999999;
+            return orderA - orderB;
         });
 
         // 使用文档片段批量添加图标
@@ -298,29 +300,29 @@ class IconRenderer {
     }
 
     createIcon(item) {
-        const layout = CategoryManager.getLayout(item.id);
-
-        if (!layout) {
-            return null;
-        }
-
         // 检查是否是 widget（link_url 为空）
         const isWidget = !item.link_url || item.link_url.trim() === '';
 
         if (isWidget) {
             // 创建 widget
+            const layout = {
+                width: item.width || 2,
+                height: item.height || 2,
+                sort_order: item.sort_order
+            };
             return this.createWidgetItem(item, layout);
         }
 
         // 创建普通图标
         const gridItem = document.createElement('div');
         // 确保 width 和 height 有默认值，避免 size-nullxnull
-        const width = layout.width || 1;
-        const height = layout.height || 1;
+        const width = item.width || 1;
+        const height = item.height || 1;
         gridItem.className = `grid-item size-${width}x${height}`;
         gridItem.dataset.itemId = item.id;
         gridItem.dataset.url = item.link_url;
         gridItem.dataset.tooltip = item.title; // 添加 tooltip
+        gridItem.dataset.sortOrder = item.sort_order !== undefined && item.sort_order !== null ? item.sort_order : 999999; // 添加 sort_order
 
         const iconDiv = document.createElement('div');
         iconDiv.className = 'nav-icon';
@@ -409,6 +411,9 @@ class IconRenderer {
 
         // 使用 WidgetManager 创建 widget 元素
         const widgetElement = WidgetManager.createWidgetElement(widgetType, size, widgetId);
+
+        // 添加 sort_order 属性
+        widgetElement.dataset.sortOrder = item.sort_order !== undefined && item.sort_order !== null ? item.sort_order : 999999;
 
         // 启用拖拽
         DragHandler.enableDrag(widgetElement);
