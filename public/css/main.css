@@ -18,7 +18,9 @@
 @import 'components/widget-list.css';
 @import 'components/dock.css';
 @import 'components/tooltip.css';
-@import 'components/calendar-modal.css';
+
+/*modal*/
+@import 'modal/calendar-modal.css';
 
 /* Widgets */
 @import 'widgets/clock-widget.css';

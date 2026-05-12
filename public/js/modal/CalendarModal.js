@@ -38,21 +38,17 @@ class CalendarModal {
         // 渲染内容
         this.modal.innerHTML = `
             <div class="calendar-modal-header">
+                <button class="calendar-modal-nav-btn" id="calendarModalPrevMonth">‹</button>
                 <div class="calendar-modal-title-section">
                     <div class="calendar-modal-month-year" id="calendarModalMonthYear">
                         <span id="calendarModalTitle">${this.currentYear}年${this.currentMonth + 1}月</span>
-                        <span class="calendar-modal-dropdown-icon">▼</span>
                     </div>
                     <div class="calendar-modal-year-picker" id="calendarModalYearPicker">
                         <div class="calendar-modal-year-grid" id="calendarModalYearGrid"></div>
                     </div>
                 </div>
-                <div class="calendar-modal-nav-buttons">
-                    <button class="calendar-modal-nav-btn" id="calendarModalPrevMonth">‹</button>
-                    <button class="calendar-modal-today-btn" id="calendarModalTodayBtn">今天</button>
-                    <button class="calendar-modal-nav-btn" id="calendarModalNextMonth">›</button>
-                </div>
-                <button class="calendar-modal-close-btn" id="calendarModalCloseBtn">×</button>
+                <button class="calendar-modal-nav-btn" id="calendarModalNextMonth">›</button>
+                <button class="calendar-modal-today-btn" id="calendarModalTodayBtn">今天</button>
             </div>
             <div class="calendar-modal-weekdays" id="calendarModalWeekdays"></div>
             <div class="calendar-modal-grid" id="calendarModalGrid"></div>
@@ -74,11 +70,6 @@ class CalendarModal {
      * 绑定事件
      */
     bindEvents() {
-        // 关闭按钮
-        document.getElementById('calendarModalCloseBtn').addEventListener('click', () => {
-            this.close();
-        });
-
         // 点击遮罩层关闭
         this.overlay.addEventListener('click', (e) => {
             if (e.target === this.overlay) {
@@ -236,6 +227,7 @@ class CalendarModal {
         // 获取节假日信息
         const holiday = this.getHolidayForDate(date);
         const isHoliday = holiday && holiday.type === 'public_holiday';
+        const isWorkday = holiday && holiday.type === 'transfer_workday';
 
         // 获取农历信息
         const lunar = this.solarToLunar(
@@ -249,6 +241,7 @@ class CalendarModal {
         if (isToday) classes += ' today';
         if (isWeekend) classes += ' weekend';
         if (isHoliday) classes += ' holiday';
+        if (isWorkday) classes += ' workday';
 
         let html = `<div class="${classes}" data-date="${this.formatDate(date)}">`;
 
@@ -258,6 +251,11 @@ class CalendarModal {
         // 节假日标记
         if (isHoliday) {
             html += `<div class="calendar-modal-day-badge holiday">休</div>`;
+        }
+
+        // 补班标记
+        if (isWorkday) {
+            html += `<div class="calendar-modal-day-badge workday">班</div>`;
         }
 
         // 节假日名称
