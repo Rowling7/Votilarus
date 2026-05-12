@@ -194,7 +194,7 @@ class AddIconDialogHandler {
         }
 
         try {
-            const { createItem } = await import('../api-client.js');
+            const { createItem } = await import('../core/api-client.js');
 
             const result = await createItem({
                 name,

@@ -131,7 +131,7 @@ class AddWidgetDialogHandler {
      */
     async addWidget(widgetId) {
         try {
-            const { createWidget } = await import('../api-client.js');
+            const { createWidget } = await import('../core/api-client.js');
 
             // 小组件名称和默认大小映射
             const widgetConfigs = {

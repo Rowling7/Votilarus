@@ -51,6 +51,11 @@ class IconEditorHandler {
                 </div>
                 
                 <div class="form-group">
+                    <label for="edit-icon-category">所属分类</label>
+                    <select id="edit-icon-category"></select>
+                </div>
+                
+                <div class="form-group">
                     <label>预览</label>
                     <div class="icon-preview" id="icon-preview">
                         <div class="preview-icon" id="preview-icon"></div>
@@ -105,15 +110,51 @@ class IconEditorHandler {
     }
 
     /**
+     * 加载分类列表
+     */
+    async loadCategories() {
+        try {
+            const { fetchCategories } = await import('../api-client.js');
+            const categories = await fetchCategories();
+
+            const categorySelect = document.getElementById('edit-icon-category');
+            if (!categorySelect) return;
+
+            // 清空现有选项
+            categorySelect.innerHTML = '';
+
+            // 添加选项
+            categories.forEach(category => {
+                const option = document.createElement('option');
+                option.value = category.id;
+                option.textContent = category.category_name; // 使用 category_name 字段
+                categorySelect.appendChild(option);
+            });
+        } catch (error) {
+            console.error('加载分类列表失败:', error);
+            ToastNotification.error('加载分类列表失败');
+        }
+    }
+
+    /**
      * 打开编辑器
      */
-    open(itemData) {
+    async open(itemData) {
         this.currentItem = itemData;
+
+        // 加载分类列表
+        await this.loadCategories();
 
         // 填充表单
         document.getElementById('edit-icon-name').value = itemData.name || '';
         document.getElementById('edit-icon-url').value = itemData.target || '';
         document.getElementById('edit-icon-image').value = itemData.bgimage || '';
+
+        // 设置当前分类
+        const categorySelect = document.getElementById('edit-icon-category');
+        if (categorySelect && itemData.category_id !== undefined) {
+            categorySelect.value = itemData.category_id;
+        }
 
         // 更新预览
         this.updatePreview();
@@ -170,12 +211,14 @@ class IconEditorHandler {
         const name = document.getElementById('edit-icon-name').value.trim();
         const target = document.getElementById('edit-icon-url').value.trim();
         let bgimage = document.getElementById('edit-icon-image').value.trim();
+        const categoryId = document.getElementById('edit-icon-category').value;
 
         console.log('=== 开始保存图标 ===');
         console.log('当前图标数据:', this.currentItem);
         console.log('新名称:', name);
         console.log('新链接:', target);
         console.log('新背景图:', bgimage);
+        console.log('新分类 ID:', categoryId);
 
         if (!name) {
             ToastNotification.warning('请输入图标名称');
@@ -199,16 +242,29 @@ class IconEditorHandler {
             await updateItem(this.currentItem.uuid, {
                 name,
                 target,
-                bgimage
+                bgimage,
+                category_id: parseInt(categoryId)
             });
             console.log('数据库更新成功');
+
+            // 检查分类是否改变
+            const categoryChanged = parseInt(categoryId) !== this.currentItem.category_id;
 
             // 直接更新 DOM 中的图标元素
             console.log('开始更新 DOM...');
             this.updateIconInDOM(name, target, bgimage);
             console.log('DOM 更新完成');
 
-            ToastNotification.success('保存成功！');
+            // 如果分类改变了，需要刷新页面以重新渲染
+            if (categoryChanged) {
+                ToastNotification.success('保存成功！分类已更改，页面将在2秒后自动刷新...', 'success', 2000);
+                setTimeout(() => {
+                    location.reload();
+                }, 2000);
+            } else {
+                ToastNotification.success('保存成功！');
+            }
+
             this.close();
             console.log('=== 图标保存完成 ===\n');
         } catch (error) {

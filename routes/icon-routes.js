@@ -212,10 +212,10 @@ router.delete('/:id', (req, res) => {
     });
 });
 
-// 更新图标信息（名称、链接、图片）
+// 更新图标信息（名称、链接、图片、分类）
 router.put('/:id', (req, res) => {
     const { id } = req.params;
-    const { name, target, bgimage } = req.body;
+    const { name, target, bgimage, category_id } = req.body;
 
     // 构建动态 SQL
     const updates = [];
@@ -232,6 +232,10 @@ router.put('/:id', (req, res) => {
     if (bgimage !== undefined) {
         updates.push('icon_path = ?');
         params.push(bgimage);
+    }
+    if (category_id !== undefined && category_id !== null) {
+        updates.push('category_id = ?');
+        params.push(parseInt(category_id));
     }
 
     if (updates.length === 0) {
