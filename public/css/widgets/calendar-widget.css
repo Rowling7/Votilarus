@@ -77,13 +77,13 @@
 }
 
 .calendar-day-info {
-    font-size: 0.9rem;
+    font-size: 0.75rem;
     margin-bottom: 0.3rem;
     opacity: 0.8;
 }
 
 .calendar-lunar {
-    font-size: 0.85rem;
+    font-size: 0.7rem;
     opacity: 0.6;
 }
 
