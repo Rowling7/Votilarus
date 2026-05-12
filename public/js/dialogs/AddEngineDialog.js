@@ -1,7 +1,7 @@
 /**
  * 添加搜索引擎对话框
  */
-import ToastNotification from '../../utils/ToastNotification.js';
+import ToastNotification from '../utils/ToastNotification.js';
 
 class AddEngineDialog {
     constructor() {

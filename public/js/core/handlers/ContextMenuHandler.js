@@ -654,7 +654,7 @@ class ContextMenuHandler {
      */
     async addIcon(categoryId) {
         try {
-            const addIconDialog = await import('../dialogs/AddIconDialog.js');
+            const addIconDialog = await import('../../dialogs/AddIconDialog.js');
             addIconDialog.default.open(categoryId);
         } catch (error) {
         }
@@ -665,7 +665,7 @@ class ContextMenuHandler {
      */
     async addWidget(categoryId) {
         try {
-            const addWidgetDialog = await import('../dialogs/AddWidgetDialog.js');
+            const addWidgetDialog = await import('../../dialogs/AddWidgetDialog.js');
             addWidgetDialog.default.open(categoryId);
         } catch (error) {
             ToastNotification.error('打开对话框失败');

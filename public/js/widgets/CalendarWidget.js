@@ -1,7 +1,7 @@
 // ==================== 日历小组件 ====================
 
 import BaseWidget from './BaseWidget.js';
-import CalendarModal from '../core/dialogs/CalendarModal.js';
+import CalendarModal from '../modal/CalendarModal.js';
 
 class CalendarWidget extends BaseWidget {
     /**

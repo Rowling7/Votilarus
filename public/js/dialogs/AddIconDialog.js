@@ -1,7 +1,7 @@
 // ==================== 添加图标对话框处理器 ====================
 
-import ConfirmModal from '../../components/ConfirmModal.js';
-import ToastNotification from '../../utils/ToastNotification.js';
+import ConfirmModal from '../components/ConfirmModal.js';
+import ToastNotification from '../utils/ToastNotification.js';
 
 class AddIconDialogHandler {
     constructor() {

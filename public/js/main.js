@@ -13,9 +13,9 @@ import SettingsModalHandler from './core/handlers/SettingsModalHandler.js';
 import DockRenderer from './core/renderers/DockRenderer.js';
 import IconEditorHandler from './core/handlers/IconEditorHandler.js';
 import TooltipManager from './managers/TooltipManager.js';
-import AddIconDialog from './core/dialogs/AddIconDialog.js';
-import AddWidgetDialog from './core/dialogs/AddWidgetDialog.js';
-import CalendarModal from './core/dialogs/CalendarModal.js';
+import AddIconDialog from './dialogs/AddIconDialog.js';
+import AddWidgetDialog from './dialogs/AddWidgetDialog.js';
+import CalendarModal from './modal/CalendarModal.js';
 import NavSidebar from './components/NavSidebar.js';
 
 class App {

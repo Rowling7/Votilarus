@@ -1,6 +1,6 @@
 // ==================== 添加小组件对话框处理器 ====================
 
-import ToastNotification from '../../utils/ToastNotification.js';
+import ToastNotification from '../utils/ToastNotification.js';
 
 class AddWidgetDialogHandler {
     constructor() {

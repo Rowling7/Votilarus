@@ -1,7 +1,7 @@
 // ==================== 搜索功能处理器 ====================
 
 import SettingsManager from '../../managers/SettingsManager.js';
-import AddEngineDialog from '../dialogs/AddEngineDialog.js';
+import AddEngineDialog from '../../dialogs/AddEngineDialog.js';
 
 class SearchHandler {
     constructor() {
