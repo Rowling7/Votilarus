@@ -192,7 +192,7 @@ class CalendarModal {
      * 渲染星期标题
      */
     renderWeekdays() {
-        const weekdays = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
+        const weekdays = ['日', '一', '二', '三', '四', '五', '六'];
         this.weekdaysEl.innerHTML = weekdays.map((day, index) => {
             const isWeekend = index === 0 || index === 6;
             return `<div class="calendar-modal-weekday ${isWeekend ? 'weekend' : ''}">${day}</div>`;
