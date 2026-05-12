@@ -168,6 +168,27 @@
     overflow-y: auto;
     min-height: 0;
     padding: 1rem;
+    position: relative;
+}
+
+/* 月份背景数字 */
+.calendar-modal-month-bg {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 40rem;
+    font-weight: bold;
+    color: rgba(0, 0, 0, 0.1);
+    pointer-events: none;
+    z-index: 200;
+    user-select: none;
+    line-height: 1;
+    font-style: var(--font-family);
+}
+
+[data-theme="dark"] .calendar-modal-month-bg {
+    color: rgba(255, 255, 255, 0.1);
 }
 
 /* 日期单元格 */
@@ -186,6 +207,7 @@
     position: relative;
     overflow: hidden;
     min-height: 80px;
+    z-index: 1;
 }
 
 .calendar-modal-day:hover {

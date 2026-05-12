@@ -41,7 +41,7 @@ class CalendarModal {
                 <button class="calendar-modal-nav-btn" id="calendarModalPrevMonth">‹</button>
                 <div class="calendar-modal-title-section">
                     <div class="calendar-modal-month-year" id="calendarModalMonthYear">
-                        <span id="calendarModalTitle">${this.currentYear}年${this.currentMonth + 1}月</span>
+                        <!-- <span id="calendarModalTitle">${this.currentYear}年${this.currentMonth + 1}月</span> -->
                     </div>
                     <select class="calendar-modal-year-select" id="calendarModalYearSelect"></select>
                     <select class="calendar-modal-month-select" id="calendarModalMonthSelect"></select>
@@ -126,6 +126,29 @@ class CalendarModal {
             this.renderCalendar();
         });
 
+        // 鼠标滚轮切换月份
+        this.modal.addEventListener('wheel', async (e) => {
+            e.preventDefault();
+            if (e.deltaY > 0) {
+                // 向下滚动 - 下个月
+                this.currentMonth++;
+                if (this.currentMonth > 11) {
+                    this.currentMonth = 0;
+                    this.currentYear++;
+                }
+            } else {
+                // 向上滚动 - 上个月
+                this.currentMonth--;
+                if (this.currentMonth < 0) {
+                    this.currentMonth = 11;
+                    this.currentYear--;
+                }
+            }
+            // 重新加载该年的节假日数据
+            await this.loadHolidays();
+            this.renderCalendar();
+        });
+
         // ESC 关闭模态框
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape' && this.isOpen()) {
@@ -181,7 +204,7 @@ class CalendarModal {
      */
     renderCalendar() {
         // 更新标题
-        this.titleEl.textContent = `${this.currentYear}年${this.currentMonth + 1}月`;
+        // this.titleEl.textContent = `${this.currentYear}年${this.currentMonth + 1}月`;
 
         // 更新选择器的值
         this.updateSelectors();
@@ -225,7 +248,11 @@ class CalendarModal {
             html += this.renderDayCell(nextMonthDate, true);
         }
 
-        this.gridEl.innerHTML = html;
+        // 添加月份背景数字
+        this.gridEl.innerHTML = `
+            <div class="calendar-modal-month-bg">${this.currentMonth + 1}</div>
+            ${html}
+        `;
     }
 
     /**
