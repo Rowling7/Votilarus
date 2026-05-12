@@ -125,8 +125,8 @@ class WeatherWidget extends BaseWidget {
                             <div class="flip-card-inner">
                                 <div class="flip-card-front">
                                     <div class="detail-item">
-                                        <span class="detail-label">体感温度</span>
-                                        <span class="detail-value">--°C</span>
+                                        <span class="detail-label">体感温度 °C</span>
+                                        <span class="detail-value">--</span>
                                     </div>
                                     <div class="detail-item">
                                         <span class="detail-label">风速 m/s</span>
@@ -291,7 +291,7 @@ class WeatherWidget extends BaseWidget {
             // 更新正面数据 - 体感温度
             const feelsLikeEl = this.container.querySelector('.weather-details-compact .detail-item:nth-child(1) .detail-value');
             if (feelsLikeEl) {
-                feelsLikeEl.textContent = `${Math.round(weatherData.main.feels_like)}°C`;
+                feelsLikeEl.textContent = `${Math.round(weatherData.main.feels_like)}`;
             }
 
             // 更新正面数据 - 风速（添加风力等级）
