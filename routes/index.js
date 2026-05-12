@@ -6,6 +6,7 @@ const dockRoute = require('./dock-routes');
 const settingsRoute = require('./settings-routes');
 const searchEngineRoute = require('./search-engine-routes');
 const holidayRoute = require('./holiday-routes');
+const notebookRoute = require('./notebook-routes');
 
 /**
  * 注册所有路由到 Express 应用
@@ -22,6 +23,7 @@ function registerRoutes(app, db) {
     settingsRoute.setDatabase(db);
     searchEngineRoute.setDatabase(db);
     holidayRoute.setDatabase(db);
+    notebookRoute.setDatabase(db);
 
     // 注册路由
     app.use('/api/categories', categoriesRoute.router);
@@ -32,6 +34,7 @@ function registerRoutes(app, db) {
     app.use('/api/settings', settingsRoute.router);
     app.use('/api/search-engines', searchEngineRoute.router);
     app.use('/api/holidays', holidayRoute.router);
+    app.use('/api/notebook', notebookRoute.router);
 }
 
 module.exports = registerRoutes;

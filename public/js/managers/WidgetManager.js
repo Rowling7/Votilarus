@@ -3,6 +3,7 @@
 import ClockWidget from '../widgets/ClockWidget.js';
 import CalendarWidget from '../widgets/CalendarWidget.js';
 import WeatherWidget from '../widgets/WeatherWidget.js';
+import NotebookWidget from '../widgets/NotebookWidget.js';
 
 class WidgetManager {
     constructor() {
@@ -18,6 +19,7 @@ class WidgetManager {
         this.register('clock', ClockWidget);
         this.register('calendar', CalendarWidget);
         this.register('weather', WeatherWidget);
+        this.register('notebook', NotebookWidget);
     }
 
     /**
@@ -53,6 +55,11 @@ class WidgetManager {
         // 创建 widget 实例，传递 widgetId
         const widget = new WidgetClass(container, widgetId);
         const result = widget.render();
+
+        // 如果 widget 有 init 方法，则调用它来初始化组件（加载数据）
+        if (typeof widget.init === 'function') {
+            widget.init();
+        }
 
         // 记录活跃的 widget
         if (widgetId) {

@@ -12,7 +12,8 @@ class AddWidgetDialogHandler {
         this.availableWidgets = [
             { id: 'clock', name: 'ClockWidget', icon: '⏰', description: '显示当前时间' },
             { id: 'calendar', name: 'CalendarWidget', icon: '📅', description: '显示日期、周数、农历信息' },
-            { id: 'weather', name: 'WeatherWidget', icon: '🌤️', description: '显示天气信息' }
+            { id: 'weather', name: 'WeatherWidget', icon: '️', description: '显示天气信息' },
+            { id: 'notebook', name: 'NotebookWidget', icon: '📓', description: '备忘录，支持重要/紧急/完成状态筛选' }
         ];
     }
 
@@ -137,7 +138,8 @@ class AddWidgetDialogHandler {
             const widgetConfigs = {
                 'clock': { title: 'ClockWidget', width: 2, height: 2 },
                 'calendar': { title: 'CalendarWidget', width: 2, height: 2 },
-                'weather': { title: 'WeatherWidget', width: 2, height: 4 }
+                'weather': { title: 'WeatherWidget', width: 2, height: 4 },
+                'notebook': { title: 'NotebookWidget', width: 2, height: 3 }
             };
 
             const config = widgetConfigs[widgetId] || { title: widgetId, width: 2, height: 2 };
@@ -145,8 +147,6 @@ class AddWidgetDialogHandler {
             const result = await createWidget({
                 title: config.title,
                 category_id: this.currentCategoryId,
-                pos_x: 0,
-                pos_y: 0,
                 width: config.width,
                 height: config.height,
                 active_flag: 1

@@ -65,7 +65,7 @@ class NavSidebar extends HTMLElement {
     overflow: hidden;
     cursor: pointer;
     transition: transform var(--transition-normal);
-    border: 2px solid var(--theme-color);
+    border: 1px solid var(--theme-color);
     flex-shrink: 0;
     /* 防止被压缩 */
 }

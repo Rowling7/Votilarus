@@ -34,32 +34,41 @@ router.get('/', (req, res) => {
 
 // 创建新组件
 router.post('/', (req, res) => {
-    const { title, category_id, pos_x, pos_y, width, height, active_flag } = req.body;
+    const { title, category_id, width, height, active_flag } = req.body;
+
+    console.log('创建组件请求:', req.body);
 
     if (!title || !category_id) {
+        console.error('缺少必要参数:', { title, category_id });
         res.status(400).json({ error: '缺少必要参数' });
         return;
     }
 
     const insertSql = `INSERT INTO icon_widgets 
-        (category_id, title, pos_x, pos_y, width, height, active_flag, deleted_flag, created_at, updated_at) 
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`;
+        (category_id, sort_order, title, width, height, active_flag, deleted_flag, created_at, updated_at) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`;
 
-    db.run(insertSql, [
+    const params = [
         parseInt(category_id),
+        0,
         title,
-        pos_x || 0,
-        pos_y || 0,
         width || 2,
         height || 2,
         active_flag !== undefined ? active_flag : 1,
         '0'
-    ], function (err) {
+    ];
+
+    console.log('执行SQL:', insertSql);
+    console.log('参数:', params);
+
+    db.run(insertSql, params, function (err) {
         if (err) {
+            console.error('数据库插入错误:', err);
             res.status(500).json({ error: err.message });
             return;
         }
 
+        console.log('组件创建成功, ID:', this.lastID);
         res.json({
             success: true,
             widgetId: this.lastID,
