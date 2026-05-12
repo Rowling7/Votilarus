@@ -230,15 +230,23 @@ class IconRenderer {
 
     /**
      * 按需加载分类的图标内容
+     * @param {string} categoryUuid - 分类UUID
+     * @param {boolean} forceReload - 是否强制重新加载（即使已加载）
      */
-    loadCategoryContent(categoryUuid) {
+    loadCategoryContent(categoryUuid, forceReload = false) {
         const panel = document.getElementById(`category-${categoryUuid}`);
-        if (!panel || panel.dataset.loaded === 'true') {
-            return; // 已经加载过
+        if (!panel) return;
+
+        // 如果不是强制重载且已经加载过，则跳过
+        if (!forceReload && panel.dataset.loaded === 'true') {
+            return;
         }
 
         const gridContainer = document.getElementById(`grid-${categoryUuid}`);
         if (!gridContainer) return;
+
+        // 清空现有内容
+        gridContainer.innerHTML = '';
 
         // 获取该分类下的图标
         const items = CategoryManager.getItems(categoryUuid);

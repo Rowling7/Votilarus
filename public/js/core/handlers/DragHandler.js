@@ -317,7 +317,6 @@ class DragHandler {
             const originalLayout = CategoryManager.getLayout(itemId);
             const originalWidth = originalLayout ? originalLayout.width : 1;
             const originalHeight = originalLayout ? originalLayout.height : 1;
-            console.log('原始布局信息:', { width: originalWidth, height: originalHeight });
 
             // 获取图标当前在网格中的位置索引（在移动之前）
             const gridItem = document.querySelector(`.grid-item[data-item-id="${itemId}"]`);
@@ -328,7 +327,6 @@ class DragHandler {
                 if (gridContainer) {
                     const allItems = Array.from(gridContainer.querySelectorAll('.grid-item:not(.placeholder)'));
                     positionIndex = allItems.indexOf(gridItem);
-                    console.log('图标在新分类中的位置索引:', positionIndex);
                 }
             }
 
@@ -345,11 +343,8 @@ class DragHandler {
                 height: originalHeight // 保持原有高度
             };
 
-            console.log('准备更新布局信息:', layoutData);
-
             const { updateItemLayout } = await import('../api-client.js');
-            const result = await updateItemLayout(layoutData);
-            console.log('布局更新结果:', result);
+            await updateItemLayout(layoutData);
 
             // 重新加载目标分类的数据
             await CategoryManager.reloadCategoryItems(targetCategoryId);
@@ -358,6 +353,9 @@ class DragHandler {
             if (sourceCategoryId !== targetCategoryId) {
                 await CategoryManager.reloadCategoryItems(sourceCategoryId);
             }
+
+            // 立即更新两个分类的UI显示
+            await this.updateCategoryUIs(sourceCategoryId, targetCategoryId);
 
             // 显示成功消息和撤销按钮
             const categoryName = CategoryManager.getCategoryName(targetCategoryId);
@@ -378,6 +376,36 @@ class DragHandler {
     }
 
     /**
+     * 更新指定分类的UI显示
+     */
+    async updateCategoryUIs(...categoryIds) {
+        try {
+            for (const categoryId of categoryIds) {
+                if (!categoryId || categoryId === '-1') continue; // 跳过首页
+
+                // 查找对应的面板元素
+                const panel = document.getElementById(`category-${categoryId}`);
+                if (!panel) continue;
+
+                // 标记为未加载，下次访问时会重新加载
+                panel.dataset.loaded = 'false';
+
+                // 如果面板是激活状态，立即重新加载（强制刷新）
+                if (panel.classList.contains('active')) {
+                    await CategoryManager.reloadCategoryItems(categoryId);
+
+                    // 动态导入 IconRenderer 并重新渲染（强制重载）
+                    const IconRenderer = await import('../renderers/IconRenderer.js');
+                    IconRenderer.default.loadCategoryContent(categoryId, true);
+                }
+            }
+
+        } catch (error) {
+            console.error('更新分类UI失败:', error);
+        }
+    }
+
+    /**
      * 撤销上次移动
      */
     async undoLastMove() {
@@ -387,14 +415,17 @@ class DragHandler {
         }
 
         try {
-            const { itemId, sourceCategoryId } = this.lastMoveState;
+            const { itemId, sourceCategoryId, targetCategoryId } = this.lastMoveState;
 
             // 移回原分类
             await moveItemToCategory(itemId, sourceCategoryId);
 
             // 重新加载相关分类的数据
             await CategoryManager.reloadCategoryItems(sourceCategoryId);
-            await CategoryManager.reloadCategoryItems(this.lastMoveState.targetCategoryId);
+            await CategoryManager.reloadCategoryItems(targetCategoryId);
+
+            // 立即更新两个分类的UI显示
+            await this.updateCategoryUIs(sourceCategoryId, targetCategoryId);
 
             // 清除撤销状态
             this.lastMoveState = null;
@@ -432,7 +463,7 @@ class DragHandler {
             const currentCategoryId = CategoryManager.getCurrentCategory();
             // 如果当前分类与移动时的分类不同，说明用户切换了分类
             if (currentCategoryId !== movedCategoryId) {
-                console.log('检测到分类变化，刷新所有主内容区');
+
                 this.refreshAllContentAreas();
             }
         }, 3000);
@@ -453,18 +484,17 @@ class DragHandler {
                     // 标记为未加载，下次访问时会重新加载
                     panel.dataset.loaded = 'false';
 
-                    // 如果面板是激活状态，立即重新加载
+                    // 如果面板是激活状态，立即重新加载（强制刷新）
                     if (panel.classList.contains('active')) {
                         await CategoryManager.reloadCategoryItems(categoryId);
 
-                        // 动态导入 IconRenderer 并重新渲染
+                        // 动态导入 IconRenderer 并重新渲染（强制重载）
                         const IconRenderer = await import('../renderers/IconRenderer.js');
-                        IconRenderer.default.loadCategoryContent(categoryId);
+                        IconRenderer.default.loadCategoryContent(categoryId, true);
                     }
                 }
             }
 
-            console.log('所有主内容区已刷新');
         } catch (error) {
             console.error('刷新主内容区失败:', error);
         }
