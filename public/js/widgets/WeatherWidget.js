@@ -1,6 +1,7 @@
 // ==================== 天气小组件 ====================
 
 import BaseWidget from './BaseWidget.js';
+import weatherCache from '../utils/WeatherCache.js';
 
 class WeatherWidget extends BaseWidget {
     /**
@@ -68,6 +69,11 @@ class WeatherWidget extends BaseWidget {
                 });
             }
         }
+
+        // 清理过期缓存数据（在组件初始化时执行）
+        weatherCache.clearExpiredData().catch(err => {
+            console.error('清理过期缓存失败:', err);
+        });
 
         // 获取天气数据
         this.fetchWeatherData();
@@ -230,10 +236,28 @@ class WeatherWidget extends BaseWidget {
     }
 
     /**
-     * 获取天气数据
+     * 获取天气数据（带缓存）
      */
     async fetchWeatherData() {
         try {
+            // 先尝试从缓存获取
+            const cachedData = await weatherCache.getWeatherData(this.options.city);
+
+            if (cachedData) {
+                // 使用缓存数据
+                this.weatherData = cachedData;
+                this.updateWeatherDisplay(cachedData);
+
+                // 提取并应用图标颜色
+                const iconUrl = `https://openweathermap.org/themes/openweathermap/assets/vendor/owm/img/widgets/${cachedData.weather[0].icon}.png`;
+                const color = await this.extractIconColor(iconUrl);
+                this.applyBackgroundColor(color);
+                console.log('使用缓存的天气数据');
+                return;
+            }
+
+            // 缓存不存在或已过期，从 API 获取
+            console.log('从 API 获取天气数据');
             const response = await fetch(
                 `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(this.options.city)}&appid=${this.options.apiKey}&units=metric&lang=zh_cn`
             );
@@ -242,6 +266,9 @@ class WeatherWidget extends BaseWidget {
             if (data.cod === 200) {
                 this.weatherData = data;
                 this.updateWeatherDisplay(data);
+
+                // 保存到缓存
+                await weatherCache.saveWeatherData(this.options.city, data);
 
                 // 提取并应用图标颜色
                 const iconUrl = `https://openweathermap.org/themes/openweathermap/assets/vendor/owm/img/widgets/${data.weather[0].icon}.png`;
