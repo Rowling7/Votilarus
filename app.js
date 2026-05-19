@@ -3,6 +3,8 @@ const cors = require('cors');
 const path = require('path');
 const sqlite3 = require('sqlite3').verbose();
 const registerRoutes = require('./routes');
+const weatherRoutes = require('./routes/weather-routes');
+const WeatherScheduler = require('./scheduler/weather-scheduler');
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -70,6 +72,10 @@ async function startServer() {
         // 注册所有 API 路由（在数据库连接后，SPA 回退之前）
         registerRoutes(app, db);
 
+        // 注册天气 API 路由
+        weatherRoutes.setDatabase(db);
+        app.use('/api/weather', weatherRoutes.router);
+
         // 静态文件服务 - data 目录（专门处理 SVG 等文件）
         app.use('/data', (req, res, next) => {
             const fs = require('fs');
@@ -103,6 +109,13 @@ async function startServer() {
 
         app.listen(PORT, () => {
             console.log(`Server running on port ${PORT}`);
+
+            // 启动天气数据定时任务
+            const scheduler = new WeatherScheduler(db);
+            scheduler.start();
+
+            // 将 scheduler 挂载到 app 上，方便后续管理
+            app.locals.weatherScheduler = scheduler;
         });
     } catch (err) {
         console.error("Failed to start server:", err);
