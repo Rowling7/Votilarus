@@ -308,7 +308,7 @@ class WeatherWidget extends BaseWidget {
         // 更新大温度
         const tempLargeEl = this.container.querySelector('.weather-temp-large');
         if (tempLargeEl) {
-            tempLargeEl.textContent = `${Math.round(weatherData.main.temp)}°`;
+            tempLargeEl.innerHTML = `${Math.round(weatherData.main.temp)}<sup class="temp-unit">°C</sup>`;
         }
 
         // 更新天气描述
