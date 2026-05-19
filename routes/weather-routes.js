@@ -69,6 +69,7 @@ function saveCurrentWeather(weatherData) {
     return new Promise((resolve, reject) => {
         const now = new Date();
         const expiresAt = new Date(now.getTime() + 30 * 60 * 1000); // 30分钟后过期
+        const weatherDate = new Date(weatherData.dt * 1000).toISOString().slice(0, 10);
 
         const sql = `
             INSERT INTO weather_cache (
@@ -82,8 +83,9 @@ function saveCurrentWeather(weatherData) {
                 sunrise, sunset, timezone_offset,
                 api_cod,
                 cached_at, expires_at, is_valid,
+                weather_date,
                 created_at, updated_at
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))
         `;
 
         const params = [
@@ -115,7 +117,8 @@ function saveCurrentWeather(weatherData) {
             weatherData.cod,                                     // api_cod
             now.toISOString().slice(0, 19).replace('T', ' '),  // cached_at
             expiresAt.toISOString().slice(0, 19).replace('T', ' '), // expires_at
-            1                                                    // is_valid
+            1,                                                   // is_valid
+            weatherDate                                          // weather_date (YYYY-MM-DD)
         ];
 
         db.run(sql, params, function (err) {

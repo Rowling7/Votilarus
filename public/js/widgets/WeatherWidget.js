@@ -511,12 +511,36 @@ class WeatherWidget extends BaseWidget {
             locationNameEl.textContent = cityName;
         }
 
-        // 同步更新到数据库
+        // 同步更新到数据库 settings 表
         await this.updateCityInDatabase(cityPinyin);
 
-        // 重新获取天气数据
+        // 异步刷新天气数据并存入 weather_cache 表（不等待完成，让它在后台执行）
+        this.refreshWeatherDataAsync(cityPinyin).catch(err => {
+            console.error('异步刷新天气失败:', err);
+        });
+
+        // 同时更新前端显示（使用缓存或重新获取）
         this.weatherData = null; // 清空旧数据
         await this.fetchWeatherData();
+    }
+
+    /**
+     * 异步刷新天气数据并存入数据库
+     * @param {string} cityPinyin - 城市拼音
+     */
+    async refreshWeatherDataAsync(cityPinyin) {
+        try {
+            // 调用后端 refresh API，强制从 OpenWeatherMap 获取最新数据并存入数据库
+            const response = await fetch(`/api/weather/refresh/${encodeURIComponent(cityPinyin)}`);
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const result = await response.json();
+        } catch (error) {
+            // 静默失败
+        }
     }
 
     /**
