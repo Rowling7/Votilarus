@@ -2,6 +2,9 @@
 
 import BaseWidget from './BaseWidget.js';
 
+// 从全局对象获取 TimeUtils（UMD 模式导出）
+const TimeUtils = window.TimeUtils;
+
 class ClockWidget extends BaseWidget {
     /**
      * 构造函数
@@ -89,7 +92,8 @@ class ClockWidget extends BaseWidget {
     updateClock() {
         if (this.isDestroyed) return;
 
-        const now = new Date();
+        // 使用 TimeUtils 获取东八区时间
+        const now = TimeUtils.getBeijingTime();
         let hours = now.getHours();
 
         // 根据格式调整小时显示

@@ -2,11 +2,16 @@
 
 import lunarConverter from '../utils/Lunar.js';
 
+// 从全局对象获取 TimeUtils（UMD 模式导出）
+const TimeUtils = window.TimeUtils;
+
 class CalendarModal {
     constructor() {
-        this.currentYear = new Date().getFullYear();
-        this.currentMonth = new Date().getMonth();
-        this.today = new Date();
+        // 使用东八区时间初始化
+        const now = TimeUtils.getBeijingTime();
+        this.currentYear = now.getFullYear();
+        this.currentMonth = now.getMonth();
+        this.today = now;
         this.holidays = [];
         this.overlay = null;
         this.modal = null;
@@ -104,7 +109,7 @@ class CalendarModal {
 
         // 今天按钮
         document.getElementById('calendarModalTodayBtn').addEventListener('click', async () => {
-            const today = new Date();
+            const today = TimeUtils.getBeijingTime();
             this.currentYear = today.getFullYear();
             this.currentMonth = today.getMonth();
             // 重新加载该年的节假日数据
@@ -356,7 +361,7 @@ class CalendarModal {
      * 初始化选择器
      */
     initSelectors() {
-        const currentYear = new Date().getFullYear();
+        const currentYear = TimeUtils.getBeijingTime().getFullYear();
 
         // 生成年份选项（前后各50年）
         let yearOptions = '';

@@ -4,6 +4,9 @@ import BaseWidget from './BaseWidget.js';
 import CalendarModal from '../modal/CalendarModal.js';
 import lunarConverter from '../utils/Lunar.js';
 
+// 从全局对象获取 TimeUtils（UMD 模式导出）
+const TimeUtils = window.TimeUtils;
+
 class CalendarWidget extends BaseWidget {
     /**
      * 构造函数
@@ -14,9 +17,10 @@ class CalendarWidget extends BaseWidget {
         super(container, widgetId, 'CalendarWidget');
         // 日历组件支持多种尺寸
         this.supportedSizes = ['2x2', '2x3', '2x4'];
-        // 当前显示的年月
-        this.currentYear = new Date().getFullYear();
-        this.currentMonth = new Date().getMonth();
+        // 当前显示的年月（使用东八区时间）
+        const now = TimeUtils.getBeijingTime();
+        this.currentYear = now.getFullYear();
+        this.currentMonth = now.getMonth();
     }
 
     /**
@@ -29,7 +33,7 @@ class CalendarWidget extends BaseWidget {
                     <span class="calendar-title">${this.currentYear}年${this.currentMonth + 1}月</span>
                 </div>
                 <div class="calendar-body">
-                    <div class="calendar-date">${new Date().getDate()}</div>
+                    <div class="calendar-date">${TimeUtils.getBeijingTime().getDate()}</div>
                     <div class="calendar-info">
                         <div class="calendar-day-info">第${this.getDayOfYear()}天 第${this.getWeekNumber()}周</div>
                         <div class="calendar-lunar">${this.getLunarDate()}</div>
@@ -76,7 +80,7 @@ class CalendarWidget extends BaseWidget {
      * @returns {number}
      */
     getDayOfYear() {
-        const now = new Date();
+        const now = TimeUtils.getBeijingTime();
         const start = new Date(now.getFullYear(), 0, 0);
         const diff = now - start;
         const oneDay = 1000 * 60 * 60 * 24;
@@ -88,7 +92,7 @@ class CalendarWidget extends BaseWidget {
      * @returns {number}
      */
     getWeekNumber() {
-        const now = new Date();
+        const now = TimeUtils.getBeijingTime();
         const start = new Date(now.getFullYear(), 0, 1);
         const days = Math.floor((now - start) / (24 * 60 * 60 * 1000));
         return Math.ceil((days + start.getDay() + 1) / 7);
@@ -99,7 +103,7 @@ class CalendarWidget extends BaseWidget {
      * @returns {string}
      */
     getLunarDate() {
-        const now = new Date();
+        const now = TimeUtils.getBeijingTime();
         const weekdays = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
         const weekday = weekdays[now.getDay()];
 
@@ -115,7 +119,7 @@ class CalendarWidget extends BaseWidget {
     startAutoUpdate() {
         // 每分钟更新一次时间相关数据
         this.setInterval(() => {
-            const now = new Date();
+            const now = TimeUtils.getBeijingTime();
             const dateEl = this.container.querySelector('.calendar-date');
             const infoEl = this.container.querySelector('.calendar-day-info');
 

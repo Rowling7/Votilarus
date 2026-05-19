@@ -2,6 +2,9 @@
 
 import toast from '../utils/ToastNotification.js';
 
+// 从全局对象获取 TimeUtils（UMD 模式导出）
+const TimeUtils = window.TimeUtils;
+
 class WeatherForecastModal {
     constructor(options = {}) {
         this.options = {
@@ -295,7 +298,7 @@ class WeatherForecastModal {
      * 获取相对日期标签
      */
     getRelativeDayLabel(dateObj, direction) {
-        const today = new Date();
+        const today = TimeUtils.getBeijingTime();
         today.setHours(0, 0, 0, 0);
 
         const targetDate = new Date(dateObj);
