@@ -8,6 +8,7 @@ const searchEngineRoute = require('./search-engine-routes');
 const holidayRoute = require('./holiday-routes');
 const notebookRoute = require('./notebook-routes');
 const weatherRoute = require('./weather-routes');
+const cityRoute = require('./city-routes');
 
 /**
  * 注册所有路由到 Express 应用
@@ -26,6 +27,7 @@ function registerRoutes(app, db) {
     holidayRoute.setDatabase(db);
     notebookRoute.setDatabase(db);
     weatherRoute.setDatabase(db);
+    cityRoute.setDatabase(db);
 
     // 注册路由
     app.use('/api/categories', categoriesRoute.router);
@@ -38,6 +40,7 @@ function registerRoutes(app, db) {
     app.use('/api/holidays', holidayRoute.router);
     app.use('/api/notebook', notebookRoute.router);
     app.use('/api/weather', weatherRoute.router);
+    app.use('/api/cities', cityRoute.router);
 }
 
 module.exports = registerRoutes;

@@ -2,6 +2,7 @@
 
 import BaseWidget from './BaseWidget.js';
 import weatherCache from '../utils/WeatherCache.js';
+import CityModal from '../components/CityModal.js';
 
 class WeatherWidget extends BaseWidget {
     /**
@@ -23,6 +24,7 @@ class WeatherWidget extends BaseWidget {
             ...options
         };
         this.weatherData = null;
+        this.cityModal = null;
 
         // 天气组件支持 2x2 和 2x4 尺寸
         this.supportedSizes = ['2x2', '2x3', '2x4'];
@@ -75,6 +77,9 @@ class WeatherWidget extends BaseWidget {
             console.error('清理过期缓存失败:', err);
         });
 
+        // 初始化城市选择模态框
+        this.initCityModal();
+
         // 获取天气数据
         this.fetchWeatherData();
 
@@ -99,7 +104,7 @@ class WeatherWidget extends BaseWidget {
             this.container.innerHTML = `
                 <div class="weather-location">
                     <span class="location-name">--</span>
-                    <span class="location-icon location-pin"></span>
+                    <button class="city-select-btn" title="选择城市"></button>
                 </div>
                 <div class="weather-content">
                     <div class="weather-main">
@@ -116,7 +121,7 @@ class WeatherWidget extends BaseWidget {
             this.container.innerHTML = `
                 <div class="weather-location">
                     <span class="location-name">--</span>
-                    <span class="location-icon location-pin"></span>
+                    <button class="city-select-btn" title="选择城市"></button>
                 </div>
                 <div class="weather-content">
                     <div class="weather-main">
@@ -287,11 +292,11 @@ class WeatherWidget extends BaseWidget {
      * @param {Object} weatherData - 天气数据
      */
     updateWeatherDisplay(weatherData) {
-        // 更新位置名称
-        const locationNameEl = this.container.querySelector('.location-name');
-        if (locationNameEl) {
-            locationNameEl.textContent = weatherData.name;
-        }
+        // 不更新位置名称，保持用户选择的中文名
+        // const locationNameEl = this.container.querySelector('.location-name');
+        // if (locationNameEl) {
+        //     locationNameEl.textContent = weatherData.name;
+        // }
 
         // 更新天气图标
         const iconEl = this.container.querySelector('.weather-icon');
@@ -406,6 +411,170 @@ class WeatherWidget extends BaseWidget {
     refresh() {
         // 重新获取天气数据并更新显示
         this.fetchWeatherData();
+    }
+
+    /**
+     * 初始化城市选择模态框
+     */
+    async initCityModal() {
+        // 优先从 localStorage 读取，如果没有则从 settings API 读取，最后使用默认值
+        let savedCity = localStorage.getItem('weather_city');
+
+        if (!savedCity) {
+            // 从 settings API 读取
+            try {
+                const response = await fetch('/api/settings/weather_city');
+                const result = await response.json();
+
+                if (result.success && result.data && result.data.value) {
+                    savedCity = result.data.value;
+                } else {
+                    // 如果 settings 中没有配置，自动创建默认值（威海）
+                    console.log('没有城市配置，创建默认值: Weihai');
+                    await this.initializeDefaultCity();
+                    savedCity = 'Weihai';
+                }
+            } catch (error) {
+                console.error('从 settings 读取城市配置失败:', error);
+                // 出错时也使用默认值
+                savedCity = 'Weihai';
+            }
+        }
+
+        // 如果都没有，使用默认值
+        savedCity = savedCity || this.options.city || 'Weihai';
+
+        // 创建城市模态框实例
+        this.cityModal = new CityModal({
+            defaultCity: savedCity,
+            onCityChange: (cityPinyin, cityName) => {
+                this.handleCityChange(cityPinyin, cityName);
+            }
+        });
+
+        // 绑定城市选择按钮点击事件
+        setTimeout(async () => {
+            const cityBtn = this.container.querySelector('.city-select-btn');
+            if (cityBtn) {
+                cityBtn.addEventListener('click', () => {
+                    this.cityModal.open();
+                });
+            }
+
+            // 更新当前显示的城市名
+            const locationNameEl = this.container.querySelector('.location-name');
+            if (locationNameEl && this.cityModal) {
+                // 从模态框获取城市中文名
+                await this.updateCityDisplayName(savedCity);
+            }
+        }, 100);
+    }
+
+    /**
+     * 初始化默认城市配置
+     */
+    async initializeDefaultCity() {
+        try {
+            const response = await fetch('/api/weather/city', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    city: 'Weihai'
+                })
+            });
+
+            const result = await response.json();
+            if (result.success) {
+                console.log('已创建默认城市配置: Weihai');
+            } else {
+                console.error('创建默认城市配置失败:', result.error);
+            }
+        } catch (error) {
+            console.error('初始化默认城市配置异常:', error);
+        }
+    }
+
+    /**
+     * 处理城市切换
+     */
+    async handleCityChange(cityPinyin, cityName) {
+        console.log(`切换到城市: ${cityName} (${cityPinyin})`);
+
+        // 更新 options.city
+        this.options.city = cityPinyin;
+
+        // 立即更新显示的城市名（使用传入的 cityName）
+        const locationNameEl = this.container.querySelector('.location-name');
+        if (locationNameEl) {
+            locationNameEl.textContent = cityName;
+        }
+
+        // 同步更新到数据库
+        await this.updateCityInDatabase(cityPinyin);
+
+        // 重新获取天气数据
+        this.weatherData = null; // 清空旧数据
+        await this.fetchWeatherData();
+    }
+
+    /**
+     * 更新数据库中的城市信息
+     */
+    async updateCityInDatabase(cityPinyin) {
+        try {
+            const response = await fetch('/api/weather/city', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    city: cityPinyin
+                })
+            });
+
+            const result = await response.json();
+            if (result.success) {
+                console.log('城市配置已保存到数据库');
+            } else {
+                console.error('保存城市配置失败:', result.error);
+            }
+        } catch (error) {
+            console.error('更新数据库异常:', error);
+        }
+    }
+
+    /**
+     * 更新城市显示名称
+     */
+    async updateCityDisplayName(cityPinyin) {
+        try {
+            console.log(`正在获取城市 ${cityPinyin} 的中文名...`);
+            const response = await fetch('/api/cities');
+            const result = await response.json();
+
+            if (result.success) {
+                const allCities = [
+                    ...result.data.featured,
+                    ...Object.values(result.data.alphabetical).flat()
+                ];
+
+                const city = allCities.find(c => c.pinyin === cityPinyin);
+                if (city) {
+                    console.log(`找到城市: ${city.name} (${city.pinyin})`);
+                    const locationNameEl = this.container.querySelector('.location-name');
+                    if (locationNameEl) {
+                        locationNameEl.textContent = city.name;
+                        console.log(`已更新显示为: ${city.name}`);
+                    }
+                } else {
+                    console.warn(`未找到城市: ${cityPinyin}`);
+                }
+            }
+        } catch (error) {
+            console.error('获取城市名称失败:', error);
+        }
     }
 }
 

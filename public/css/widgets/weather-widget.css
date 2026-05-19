@@ -50,6 +50,51 @@
     position: relative;
 }
 
+/* 城市选择按钮 - 水滴形定位图标 */
+.city-select-btn {
+    width: 18px;
+    height: 18px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    margin-left: 8px;
+    position: relative;
+    padding: 0;
+    transition: transform 0.2s ease;
+}
+
+.city-select-btn:hover {
+    transform: scale(1.1);
+}
+
+/* 使用 CSS 绘制水滴形图标 */
+.city-select-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 14px;
+    height: 14px;
+    background: var(--theme-color, #667eea);
+    border-radius: 50% 50% 50% 0;
+    transform: translateX(-50%) rotate(-45deg);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.city-select-btn::after {
+    content: '';
+    position: absolute;
+    top: 4px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 6px;
+    height: 6px;
+    background: white;
+    border-radius: 50%;
+    z-index: 1;
+}
+
 /* 水滴形定位图标 */
 .location-pin {
     width: 0.9rem;

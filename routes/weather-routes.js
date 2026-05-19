@@ -377,6 +377,74 @@ router.get('/stats', (req, res) => {
     });
 });
 
+/**
+ * PUT /api/weather/city
+ * 更新天气组件的城市配置（保存到 settings 表）
+ */
+router.put('/city', (req, res) => {
+    const { city } = req.body;
+
+    if (!city) {
+        return res.status(400).json({
+            success: false,
+            error: '城市名称不能为空'
+        });
+    }
+
+    try {
+        // 检查是否已存在城市配置
+        const checkSql = `SELECT id FROM settings WHERE key = ? LIMIT 1`;
+
+        db.get(checkSql, ['weather_city'], (err, row) => {
+            if (err) {
+                console.error('查询城市配置失败:', err);
+                res.status(500).json({
+                    success: false,
+                    error: '查询城市配置失败'
+                });
+                return;
+            }
+
+            let updateSql;
+            let params;
+
+            if (row) {
+                // 更新现有配置
+                updateSql = `UPDATE settings SET value = ? WHERE key = ?`;
+                params = [city, 'weather_city'];
+            } else {
+                // 插入新配置
+                updateSql = `INSERT INTO settings (key, value, type, isdisplay, isdel) VALUES (?, ?, 'personal', '1', '0')`;
+                params = ['weather_city', city];
+            }
+
+            db.run(updateSql, params, function (err) {
+                if (err) {
+                    console.error('更新城市配置失败:', err);
+                    res.status(500).json({
+                        success: false,
+                        error: '更新城市配置失败'
+                    });
+                    return;
+                }
+
+                console.log(`城市配置已更新为: ${city}`);
+                res.json({
+                    success: true,
+                    message: '城市配置已更新',
+                    city: city
+                });
+            });
+        });
+    } catch (error) {
+        console.error('更新城市配置异常:', error);
+        res.status(500).json({
+            success: false,
+            error: error.message
+        });
+    }
+});
+
 // 导出模块
 module.exports = {
     router,

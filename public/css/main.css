@@ -18,6 +18,7 @@
 @import 'components/widget-list.css';
 @import 'components/dock.css';
 @import 'components/tooltip.css';
+@import 'components/city-modal.css';
 
 /*modal*/
 @import 'modal/calendar-modal.css';
