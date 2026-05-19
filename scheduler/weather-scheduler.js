@@ -30,13 +30,11 @@ class WeatherScheduler {
         // 立即执行一次
         this.fetchAllCitiesWeather();
 
-        // 设置定时器：每6小时执行一次（6 * 60 * 60 * 1000 = 21600000 毫秒）
-        this.intervalId = setInterval(() => {
-            this.fetchAllCitiesWeather();
-        }, 6 * 60 * 60 * 1000);
+        // 设置定时器：在每天的 0:00, 6:00, 12:00, 18:00 执行
+        this.scheduleNextExecution();
 
         this.isRunning = true;
-        console.log('✅ 天气定时任务已启动（每6小时执行一次）');
+        console.log('✅ 天气定时任务已启动（每天 0:00, 6:00, 12:00, 18:00 执行）');
     }
 
     /**
@@ -49,7 +47,7 @@ class WeatherScheduler {
         }
 
         if (this.intervalId) {
-            clearInterval(this.intervalId);
+            clearTimeout(this.intervalId);
             this.intervalId = null;
         }
 
@@ -102,7 +100,7 @@ class WeatherScheduler {
         console.log(`\n📊 批量获取完成:`);
         console.log(`   成功: ${successCount} 个城市`);
         console.log(`   失败: ${failCount} 个城市`);
-        console.log(`⏰ 下次执行时间: ${this.getNextRunTime()}\n`);
+        console.log(`⏰ 下次执行时间将在定时任务中自动安排\n`);
 
         return results;
     }
@@ -116,12 +114,37 @@ class WeatherScheduler {
     }
 
     /**
-     * 计算下次执行时间
+     * 安排下一次执行时间
      */
-    getNextRunTime() {
+    scheduleNextExecution() {
         const now = new Date();
-        const nextRun = new Date(now.getTime() + 6 * 60 * 60 * 1000);
-        return nextRun.toLocaleString('zh-CN');
+        const currentHour = now.getHours();
+
+        // 确定下一个执行时间点（0, 6, 12, 18）
+        let nextHour;
+        if (currentHour < 0) nextHour = 0;
+        else if (currentHour < 6) nextHour = 6;
+        else if (currentHour < 12) nextHour = 12;
+        else if (currentHour < 18) nextHour = 18;
+        else nextHour = 24; // 第二天0点
+
+        // 如果nextHour是24，表示第二天0点
+        const nextRun = new Date(now);
+        if (nextHour === 24) {
+            nextRun.setDate(nextRun.getDate() + 1);
+            nextRun.setHours(0, 0, 0, 0);
+        } else {
+            nextRun.setHours(nextHour, 0, 0, 0);
+        }
+
+        const delay = nextRun.getTime() - now.getTime();
+
+        console.log(`⏰ 下次执行时间: ${nextRun.toLocaleString('zh-CN')} (${Math.round(delay / 1000 / 60)}分钟后)`);
+
+        this.intervalId = setTimeout(() => {
+            this.fetchAllCitiesWeather();
+            this.scheduleNextExecution(); // 递归安排下一次执行
+        }, delay);
     }
 
     /**
