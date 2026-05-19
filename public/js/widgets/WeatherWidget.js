@@ -3,6 +3,7 @@
 import BaseWidget from './BaseWidget.js';
 import weatherCache from '../utils/WeatherCache.js';
 import CityModal from '../components/CityModal.js';
+import WeatherForecastModal from '../components/WeatherForecastModal.js';
 
 class WeatherWidget extends BaseWidget {
     /**
@@ -25,6 +26,8 @@ class WeatherWidget extends BaseWidget {
         };
         this.weatherData = null;
         this.cityModal = null;
+        this.forecastModal = null;
+        this.extractedColor = 'rgba(102, 126, 234, 0.3)'; // 存储提取的颜色
 
         // 天气组件支持 2x2 和 2x4 尺寸
         this.supportedSizes = ['2x2', '2x3', '2x4'];
@@ -79,6 +82,9 @@ class WeatherWidget extends BaseWidget {
 
         // 初始化城市选择模态框
         this.initCityModal();
+
+        // 初始化天气预报详情模态框
+        this.initForecastModal();
 
         // 获取天气数据
         this.fetchWeatherData();
@@ -237,6 +243,8 @@ class WeatherWidget extends BaseWidget {
         if (widget) {
             // 将颜色转换为低透明度的背景
             widget.style.background = color.replace('rgb', 'rgba').replace(')', ', 0.15)');
+            // 保存提取的颜色供模态框使用
+            this.extractedColor = color;
         }
     }
 
@@ -469,6 +477,40 @@ class WeatherWidget extends BaseWidget {
     }
 
     /**
+     * 初始化天气预报详情模态框
+     */
+    initForecastModal() {
+        this.forecastModal = new WeatherForecastModal({
+            onCityChange: () => {
+                // 打开城市选择模态框
+                if (this.cityModal) {
+                    this.cityModal.open();
+                }
+            }
+        });
+
+        // 绑定 weather-content 点击事件
+        setTimeout(() => {
+            const weatherContent = this.container.querySelector('.weather-content');
+            if (weatherContent) {
+                weatherContent.addEventListener('click', (e) => {
+                    // 如果点击的是城市选择按钮，不打开预报模态框
+                    if (e.target.closest('.city-select-btn')) {
+                        return;
+                    }
+
+                    // 获取当前城市中文名
+                    const locationNameEl = this.container.querySelector('.location-name');
+                    const cityName = locationNameEl ? locationNameEl.textContent : this.options.city;
+
+                    // 打开预报模态框
+                    this.forecastModal.open(this.options.city, cityName, this.extractedColor);
+                });
+            }
+        }, 100);
+    }
+
+    /**
      * 初始化默认城市配置
      */
     async initializeDefaultCity() {
@@ -520,6 +562,38 @@ class WeatherWidget extends BaseWidget {
         // 同时更新前端显示（使用缓存或重新获取）
         this.weatherData = null; // 清空旧数据
         await this.fetchWeatherData();
+
+        // 如果天气弹窗是打开状态，刷新弹窗数据
+        if (this.forecastModal && !this.forecastModal.modal.classList.contains('hidden')) {
+            console.log('[WeatherWidget] 检测到天气弹窗已打开，准备刷新弹窗数据');
+            console.log('[WeatherWidget] 新城市:', cityName, '(', cityPinyin, ')');
+
+            // 更新弹窗的城市信息
+            this.forecastModal.currentCity = cityPinyin;
+            this.forecastModal.cityName = cityName;
+
+            // 更新弹窗标题中的城市名
+            if (this.forecastModal.cityNameEl) {
+                this.forecastModal.cityNameEl.textContent = cityName;
+            }
+
+            // 重新提取颜色（因为新城市的天气图标可能不同）
+            const iconUrl = this.weatherData ?
+                `https://openweathermap.org/themes/openweathermap/assets/vendor/owm/img/widgets/${this.weatherData.weather[0].icon}.png` :
+                '';
+
+            if (iconUrl) {
+                const color = await this.extractIconColor(iconUrl);
+                this.applyBackgroundColor(color);
+                this.forecastModal.themeColor = color;
+                console.log('[WeatherWidget] 已更新主题色:', color);
+            }
+
+            // 重新获取并渲染天气预报数据
+            console.log('[WeatherWidget] 开始刷新弹窗天气数据...');
+            await this.forecastModal.fetchWeatherData();
+            console.log('[WeatherWidget] 弹窗数据刷新完成');
+        }
     }
 
     /**

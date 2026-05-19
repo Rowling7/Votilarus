@@ -3,7 +3,8 @@ const { fetchAndSaveCurrentWeather } = require('../routes/weather-routes');
 // 默认城市列表（可以从配置文件或数据库读取）
 const DEFAULT_CITIES = process.env.WEATHER_CITIES
     ? process.env.WEATHER_CITIES.split(',')
-    : ['Weihai', 'Wuhan', 'Guiyang', 'Quanzhou', 'Qingdao', 'Yantai'];
+    : ['Weihai'];
+//: ['Weihai', 'Wuhan', 'Guiyang', 'Quanzhou', 'Qingdao', 'Yantai'];
 
 /**
  * 定时任务：每6小时自动获取天气数据

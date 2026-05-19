@@ -1,0 +1,453 @@
+/* ==================== 天气预报详情模态框样式 ==================== */
+
+/* 遮罩层 */
+.weather-forecast-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 10001;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.weather-forecast-overlay.hidden {
+    opacity: 0;
+    visibility: hidden;
+}
+
+.weather-forecast-overlay:not(.hidden) {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* 模态框主体 */
+.weather-forecast-modal {
+    background: var(--bg-primary);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 1.4rem;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+    width: 95%;
+    max-width: 1200px;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    transform: scale(0.9) translateY(20px);
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.weather-forecast-overlay:not(.hidden) .weather-forecast-modal {
+    transform: scale(1) translateY(0);
+}
+
+/* 模态框头部 */
+.weather-forecast-header {
+    padding: 1.5rem 2rem;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(135deg, rgba(var(--theme-color-rgb), 0.05) 0%, transparent 100%);
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    flex: 1;
+}
+
+.weather-forecast-title {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    display: flex;
+    align-items: baseline;
+    gap: 0.75rem;
+}
+
+.city-name {
+    color: var(--theme-color);
+}
+
+.weather-date-range {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    font-weight: 400;
+}
+
+.city-switch-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.5rem 1rem;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
+    color: var(--text-primary);
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.city-switch-btn:hover {
+    background: var(--bg-hover);
+    border-color: var(--theme-color);
+    color: var(--theme-color);
+    transform: translateY(-1px);
+}
+
+.city-switch-btn svg {
+    stroke: currentColor;
+}
+
+.weather-forecast-close {
+    width: 36px;
+    height: 36px;
+    border: none;
+    border-radius: 50%;
+    background: transparent;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-secondary);
+    transition: all 0.2s ease;
+    font-size: 1.8rem;
+    line-height: 1;
+}
+
+.weather-forecast-close:hover {
+    background: var(--bg-hover);
+    color: var(--text-primary);
+    transform: rotate(90deg);
+}
+
+/* 模态框主体内容 */
+.weather-forecast-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1.5rem 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.weather-forecast-body::-webkit-scrollbar {
+    width: 8px;
+}
+
+.weather-forecast-body::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.weather-forecast-body::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 4px;
+}
+
+.weather-forecast-body::-webkit-scrollbar-thumb:hover {
+    background: var(--text-tertiary);
+}
+
+/* 天气卡片滚动容器 */
+.weather-cards-container {
+    position: relative;
+}
+
+.weather-cards-scroll {
+    display: flex;
+    gap: 1rem;
+    overflow-x: auto;
+    padding: 0.5rem 0.25rem;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+}
+
+.weather-cards-scroll::-webkit-scrollbar {
+    height: 6px;
+}
+
+.weather-cards-scroll::-webkit-scrollbar-track {
+    background: var(--bg-secondary);
+    border-radius: 3px;
+}
+
+.weather-cards-scroll::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 3px;
+}
+
+.weather-cards-scroll::-webkit-scrollbar-thumb:hover {
+    background: var(--text-tertiary);
+}
+
+/* 加载状态 */
+.loading-state {
+    padding: 3rem 2rem;
+    text-align: center;
+    color: var(--text-tertiary);
+    font-size: 0.95rem;
+    width: 100%;
+}
+
+/* 天气卡片 */
+.weather-card {
+    min-width: 160px;
+    max-width: 160px;
+    padding: 1.25rem 1rem;
+    background: var(--bg-secondary);
+    border: 2px solid transparent;
+    border-radius: 1rem;
+    transition: all 0.2s ease;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.weather-card:hover {
+    background: var(--bg-hover);
+    border-color: var(--theme-color);
+    transform: translateY(-4px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+}
+
+.weather-card.today {
+    background: rgba(var(--theme-color-rgb), 0.1);
+    border-color: var(--theme-color);
+    box-shadow: 0 4px 12px rgba(var(--theme-color-rgb), 0.2);
+}
+
+.card-date {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--theme-color);
+    margin-bottom: 0.25rem;
+}
+
+.card-full-date {
+    font-size: 0.75rem;
+    color: var(--text-tertiary);
+    margin-bottom: 0.75rem;
+}
+
+.card-icon {
+    width: 3.5rem;
+    height: 3.5rem;
+    margin: 0.5rem auto;
+    filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.2));
+}
+
+.card-description {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.75rem;
+    text-transform: capitalize;
+}
+
+.card-temp {
+    display: flex;
+    justify-content: center;
+    align-items: baseline;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+}
+
+.temp-max {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.temp-min {
+    font-size: 1rem;
+    color: var(--text-tertiary);
+}
+
+.card-details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--border-color);
+}
+
+.detail-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.75rem;
+}
+
+.detail-row .detail-label {
+    color: var(--text-tertiary);
+}
+
+.detail-row .detail-value {
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+/* 图表控制栏 */
+.chart-controls {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    padding: 0.5rem 0;
+}
+
+.chart-metric-btn {
+    padding: 0.6rem 1.25rem;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.chart-metric-btn:hover {
+    background: var(--bg-hover);
+    border-color: var(--theme-color);
+    color: var(--theme-color);
+}
+
+.chart-metric-btn.active {
+    background: var(--theme-color);
+    border-color: var(--theme-color);
+    color: #ffffff;
+    font-weight: 500;
+    box-shadow: 0 2px 8px rgba(var(--theme-color-rgb), 0.3);
+}
+
+/* 图表容器 */
+.chart-container {
+    position: relative;
+    height: 350px;
+    background: var(--bg-secondary);
+    border-radius: 1rem;
+    padding: 1.5rem;
+    border: 1px solid var(--border-color);
+}
+
+/* 移动端适配 */
+@media (max-width: 768px) {
+    .weather-forecast-modal {
+        width: 98%;
+        max-height: 95vh;
+    }
+
+    .weather-forecast-header {
+        padding: 1.25rem 1.5rem;
+    }
+
+    .header-left {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+    }
+
+    .weather-forecast-title {
+        font-size: 1.25rem;
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+
+    .weather-date-range {
+        font-size: 0.8rem;
+    }
+
+    .city-switch-btn {
+        padding: 0.4rem 0.75rem;
+        font-size: 0.8rem;
+    }
+
+    .weather-forecast-body {
+        padding: 1.25rem 1.5rem;
+        gap: 1.25rem;
+    }
+
+    .weather-card {
+        min-width: 140px;
+        max-width: 140px;
+        padding: 1rem 0.75rem;
+    }
+
+    .card-icon {
+        width: 3rem;
+        height: 3rem;
+    }
+
+    .temp-max {
+        font-size: 1.25rem;
+    }
+
+    .chart-container {
+        height: 280px;
+        padding: 1rem;
+    }
+
+    .chart-controls {
+        gap: 0.5rem;
+    }
+
+    .chart-metric-btn {
+        padding: 0.5rem 1rem;
+        font-size: 0.8rem;
+    }
+}
+
+/* 小屏幕手机适配 */
+@media (max-width: 480px) {
+    .weather-card {
+        min-width: 130px;
+        max-width: 130px;
+        padding: 0.875rem 0.625rem;
+    }
+
+    .card-date {
+        font-size: 0.9rem;
+    }
+
+    .card-full-date {
+        font-size: 0.7rem;
+    }
+
+    .card-icon {
+        width: 2.5rem;
+        height: 2.5rem;
+    }
+
+    .card-description {
+        font-size: 0.75rem;
+    }
+
+    .temp-max {
+        font-size: 1.125rem;
+    }
+
+    .temp-min {
+        font-size: 0.875rem;
+    }
+
+    .detail-row {
+        font-size: 0.7rem;
+    }
+
+    .chart-container {
+        height: 240px;
+        padding: 0.75rem;
+    }
+}
