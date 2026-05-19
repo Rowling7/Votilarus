@@ -156,6 +156,7 @@
     overflow-x: auto;
     padding: 0.5rem 0.25rem;
     scroll-behavior: smooth;
+    justify-content: space-between;
     -webkit-overflow-scrolling: touch;
 }
 

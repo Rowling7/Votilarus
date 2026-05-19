@@ -690,7 +690,8 @@ router.get('/forecast/:city', async (req, res) => {
                 weather_description: row.weather_description,
                 weather_icon: row.weather_icon,
                 pressure: row.pressure,
-                clouds: row.clouds_all
+                clouds: row.clouds_all,
+                visibility: row.visibility ? (row.visibility / 1000).toFixed(1) : null
             })),
             current: {
                 date: new Date(Date.now() + 8 * 60 * 60 * 1000).toISOString().slice(0, 10),
@@ -705,7 +706,8 @@ router.get('/forecast/:city', async (req, res) => {
                 weather_description: currentData.weather_description,
                 weather_icon: currentData.weather_icon,
                 pressure: currentData.pressure,
-                clouds: currentData.clouds_all
+                clouds: currentData.clouds_all,
+                visibility: currentData.visibility ? (currentData.visibility / 1000).toFixed(1) : null
             },
             forecast: dailyForecast
         };
@@ -750,7 +752,8 @@ function processForecastData(forecastList) {
                 weather_description: item.weather[0].description,
                 weather_icon: item.weather[0].icon,
                 pressures: [],
-                clouds_list: []
+                clouds_list: [],
+                visibilities: []
             });
         }
 
@@ -762,6 +765,9 @@ function processForecastData(forecastList) {
         dayData.wind_degs.push(item.wind.deg);
         dayData.pressures.push(item.main.pressure);
         dayData.clouds_list.push(item.clouds.all);
+        if (item.visibility !== undefined) {
+            dayData.visibilities.push(item.visibility);
+        }
 
         // 更新最高/最低温度
         if (item.main.temp_max > dayData.temp_max) {
@@ -794,7 +800,8 @@ function processForecastData(forecastList) {
         weather_description: day.weather_description,
         weather_icon: day.weather_icon,
         pressure_avg: Math.round(day.pressures.reduce((a, b) => a + b, 0) / day.pressures.length),
-        clouds_avg: Math.round(day.clouds_list.reduce((a, b) => a + b, 0) / day.clouds_list.length)
+        clouds_avg: Math.round(day.clouds_list.reduce((a, b) => a + b, 0) / day.clouds_list.length),
+        visibility_avg: day.visibilities.length > 0 ? Math.round(day.visibilities.reduce((a, b) => a + b, 0) / day.visibilities.length / 1000 * 10) / 10 : null
     }));
 
     // 只返回未来的预报（不包括今天），最多4天（API 限制）

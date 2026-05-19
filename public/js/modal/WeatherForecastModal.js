@@ -82,6 +82,7 @@ class WeatherForecastModal extends BaseModal {
                         <button class="chart-metric-btn" data-metric="feels_like">体感温度</button>
                         <button class="chart-metric-btn" data-metric="humidity">湿度</button>
                         <button class="chart-metric-btn" data-metric="wind_speed">风速</button>
+                        <button class="chart-metric-btn" data-metric="clouds">云量</button>
                     </div>
 
                     <!-- 图表区域 -->
@@ -285,6 +286,14 @@ class WeatherForecastModal extends BaseModal {
                         <span class="detail-label">风速</span>
                         <span class="detail-value">${windInfo.arrow} ${day.wind_speed !== undefined ? day.wind_speed : (day.wind_speed_avg !== undefined ? day.wind_speed_avg : '-')} m/s</span>
                     </div>
+                    <div class="detail-row">
+                        <span class="detail-label">云量</span>
+                        <span class="detail-value">${day.clouds !== undefined ? day.clouds : (day.clouds_avg !== undefined ? day.clouds_avg : '-')}%</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">能见度</span>
+                        <span class="detail-value">${day.visibility !== undefined && day.visibility !== null ? day.visibility + ' km' : (day.visibility_avg !== undefined && day.visibility_avg !== null ? day.visibility_avg + ' km' : '-')}</span>
+                    </div>
                 </div>
             </div>
         `;
@@ -414,6 +423,8 @@ class WeatherForecastModal extends BaseModal {
                                         label += '%';
                                     } else if (this.currentMetric === 'wind_speed') {
                                         label += ' m/s';
+                                    } else if (this.currentMetric === 'clouds') {
+                                        label += '%';
                                     }
                                 }
                                 return label;
@@ -452,6 +463,8 @@ class WeatherForecastModal extends BaseModal {
                                     return value + '%';
                                 } else if (this.currentMetric === 'wind_speed') {
                                     return value + ' m/s';
+                                } else if (this.currentMetric === 'clouds') {
+                                    return value + '%';
                                 }
                                 return value;
                             }
@@ -491,7 +504,8 @@ class WeatherForecastModal extends BaseModal {
             tempMins: allDays.map(day => Math.round(day.temp_min)),
             feelsLikes: allDays.map(day => Math.round(day.feels_like_avg || day.feels_like || 0)),
             humidities: allDays.map(day => day.humidity !== undefined ? day.humidity : (day.humidity_avg !== undefined ? day.humidity_avg : 0)),
-            windSpeeds: allDays.map(day => parseFloat(day.wind_speed !== undefined ? day.wind_speed : (day.wind_speed_avg !== undefined ? day.wind_speed_avg : 0)))
+            windSpeeds: allDays.map(day => parseFloat(day.wind_speed !== undefined ? day.wind_speed : (day.wind_speed_avg !== undefined ? day.wind_speed_avg : 0))),
+            clouds: allDays.map(day => day.clouds !== undefined ? day.clouds : (day.clouds_avg !== undefined ? day.clouds_avg : 0))
         };
     }
 
@@ -571,6 +585,23 @@ class WeatherForecastModal extends BaseModal {
                     {
                         label: '风速',
                         data: chartData.windSpeeds,
+                        borderColor: globalThemeColor,
+                        backgroundColor: globalThemeColor + '20',
+                        tension: 0.4,
+                        fill: true,
+                        pointRadius: 4,
+                        pointHoverRadius: 6,
+                        pointBackgroundColor: globalThemeColor,
+                        pointBorderColor: isDarkMode ? '#1a1a1a' : '#ffffff',
+                        pointBorderWidth: 2
+                    }
+                ];
+
+            case 'clouds':
+                return [
+                    {
+                        label: '云量',
+                        data: chartData.clouds,
                         borderColor: globalThemeColor,
                         backgroundColor: globalThemeColor + '20',
                         tension: 0.4,

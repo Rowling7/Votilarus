@@ -387,6 +387,12 @@
     gap: 0.3rem;
 }
 
+/* 如果背面有4个项目，调整间距 */
+.grid-item[data-size="2x3"][data-widget-type="weather"] .widget-container .weather-details-compact .flip-card-back .detail-item:nth-child(4),
+.grid-item[data-size="2x4"][data-widget-type="weather"] .widget-container .weather-details-compact .flip-card-back .detail-item:nth-child(4) {
+    flex: 1;
+}
+
 .grid-item[data-size="2x3"][data-widget-type="weather"] .widget-container .weather-details-compact .flip-card-front .detail-item,
 .grid-item[data-size="2x4"][data-widget-type="weather"] .widget-container .weather-details-compact .flip-card-front .detail-item {
     flex: 1;
