@@ -114,25 +114,8 @@
 }
 
 .weather-forecast-close {
-    width: 36px;
-    height: 36px;
-    border: none;
-    border-radius: 50%;
-    background: transparent;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--text-secondary);
-    transition: all 0.2s ease;
-    font-size: 1.8rem;
-    line-height: 1;
-}
-
-.weather-forecast-close:hover {
-    background: var(--bg-hover);
-    color: var(--text-primary);
-    transform: rotate(90deg);
+    /* 此样式已废弃，关闭按钮现在由 BaseModal 统一管理 */
+    display: none;
 }
 
 /* 模态框主体内容 */

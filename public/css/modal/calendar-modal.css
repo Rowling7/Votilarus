@@ -19,7 +19,12 @@
     transition: opacity 0.3s ease, visibility 0.3s ease;
 }
 
-.calendar-modal-overlay.active {
+.calendar-modal-overlay.hidden {
+    opacity: 0;
+    visibility: hidden;
+}
+
+.calendar-modal-overlay:not(.hidden) {
     opacity: 1;
     visibility: visible;
 }
@@ -43,7 +48,7 @@
     transition: transform 0.3s ease;
 }
 
-.calendar-modal-overlay.active .calendar-modal {
+.calendar-modal-overlay:not(.hidden) .calendar-modal {
     transform: scale(1);
 }
 

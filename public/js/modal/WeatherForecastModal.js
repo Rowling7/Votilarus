@@ -1,18 +1,28 @@
 // ==================== 天气预报详情模态框组件 ====================
 
 import toast from '../utils/ToastNotification.js';
+import BaseModal from './BaseModal.js';
 
 // 从全局对象获取 TimeUtils（UMD 模式导出）
 const TimeUtils = window.TimeUtils;
 
-class WeatherForecastModal {
+class WeatherForecastModal extends BaseModal {
     constructor(options = {}) {
-        this.options = {
+        // 调用父类构造函数，设置不允许点击遮罩层和 ESC 键关闭
+        super({
+            overlayClass: 'weather-forecast-overlay',
+            modalClass: 'weather-forecast-modal',
+            closeOnOverlayClick: false,
+            closeOnEscape: false,
+            enableMaximize: true  // 启用最大化功能
+        });
+
+        // 合并自定义选项，不要覆盖 this.options
+        this.customOptions = {
             onCityChange: null,
             ...options
         };
 
-        this.modal = null;
         this.chart = null;
         this.currentCity = '';
         this.cityName = '';
@@ -28,16 +38,19 @@ class WeatherForecastModal {
      */
     init() {
         this.renderModal();
-        this.bindEvents();
+        // 调用父类的 bindEvents 方法绑定通用事件
+        super.bindEvents();
+        // 绑定自定义事件
+        this._bindCustomEvents();
     }
 
     /**
      * 渲染模态框 HTML
      */
     renderModal() {
-        this.modal = document.createElement('div');
-        this.modal.className = 'weather-forecast-overlay hidden';
-        this.modal.innerHTML = `
+        this.overlay = document.createElement('div');
+        this.overlay.className = 'weather-forecast-overlay hidden';
+        this.overlay.innerHTML = `
             <div class="weather-forecast-modal">
                 <div class="weather-forecast-header">
                     <div class="header-left">
@@ -53,7 +66,6 @@ class WeatherForecastModal {
                             切换城市
                         </button>
                     </div>
-                    <button class="weather-forecast-close" aria-label="关闭">×</button>
                 </div>
                 
                 <div class="weather-forecast-body">
@@ -80,44 +92,29 @@ class WeatherForecastModal {
             </div>
         `;
 
-        document.body.appendChild(this.modal);
+        document.body.appendChild(this.overlay);
 
         // 获取元素引用
-        this.closeBtn = this.modal.querySelector('.weather-forecast-close');
-        this.citySwitchBtn = this.modal.querySelector('.city-switch-btn');
-        this.cardsScroll = this.modal.querySelector('.weather-cards-scroll');
-        this.cityNameEl = this.modal.querySelector('.city-name');
-        this.dateRangeEl = this.modal.querySelector('.weather-date-range');
-        this.metricBtns = this.modal.querySelectorAll('.chart-metric-btn');
+        this.modal = this.overlay.querySelector('.weather-forecast-modal');
+        // 注意：closeBtn 现在由 BaseModal 统一管理，不需要在这里获取
+        this.citySwitchBtn = this.overlay.querySelector('.city-switch-btn');
+        this.cardsScroll = this.overlay.querySelector('.weather-cards-scroll');
+        this.cityNameEl = this.overlay.querySelector('.city-name');
+        this.dateRangeEl = this.overlay.querySelector('.weather-date-range');
+        this.metricBtns = this.overlay.querySelectorAll('.chart-metric-btn');
     }
 
     /**
-     * 绑定事件
+     * 绑定自定义事件（子类实现）
+     * @private
      */
-    bindEvents() {
-        // 关闭按钮
-        this.closeBtn.addEventListener('click', () => {
-            this.close();
-        });
-
-        // 点击遮罩层关闭
-        this.modal.addEventListener('click', (e) => {
-            if (e.target === this.modal) {
-                this.close();
-            }
-        });
-
-        // ESC 键关闭
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && !this.modal.classList.contains('hidden')) {
-                this.close();
-            }
-        });
+    _bindCustomEvents() {
+        // 注意：关闭按钮事件已由 BaseModal 统一管理，不需要在这里绑定
 
         // 切换城市按钮
         this.citySwitchBtn.addEventListener('click', () => {
-            if (this.options.onCityChange) {
-                this.options.onCityChange();
+            if (this.customOptions.onCityChange) {
+                this.customOptions.onCityChange();
             }
         });
 
@@ -144,9 +141,8 @@ class WeatherForecastModal {
         // 显示加载状态
         this.showLoading();
 
-        // 显示模态框
-        this.modal.classList.remove('hidden');
-        document.body.style.overflow = 'hidden';
+        // 调用父类的 open 方法
+        await super.open();
 
         // 获取天气数据
         await this.fetchWeatherData();
@@ -156,8 +152,8 @@ class WeatherForecastModal {
      * 关闭模态框
      */
     close() {
-        this.modal.classList.add('hidden');
-        document.body.style.overflow = '';
+        // 调用父类的 close 方法
+        super.close();
 
         // 销毁图表
         if (this.chart) {
@@ -624,9 +620,8 @@ class WeatherForecastModal {
         if (this.chart) {
             this.chart.destroy();
         }
-        if (this.modal && this.modal.parentNode) {
-            this.modal.parentNode.removeChild(this.modal);
-        }
+        // 调用父类的 destroy 方法
+        super.destroy();
     }
 }
 

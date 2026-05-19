@@ -1,21 +1,30 @@
 // ==================== 日历模态弹窗 ====================
 
 import lunarConverter from '../utils/Lunar.js';
+import BaseModal from './BaseModal.js';
 
 // 从全局对象获取 TimeUtils（UMD 模式导出）
 const TimeUtils = window.TimeUtils;
 
-class CalendarModal {
+class CalendarModal extends BaseModal {
     constructor() {
+        // 调用父类构造函数
+        super({
+            overlayClass: 'calendar-modal-overlay',
+            modalClass: 'calendar-modal',
+            closeOnOverlayClick: true,
+            closeOnEscape: true
+        });
+
         // 使用东八区时间初始化
         const now = TimeUtils.getBeijingTime();
         this.currentYear = now.getFullYear();
         this.currentMonth = now.getMonth();
         this.today = now;
         this.holidays = [];
-        this.overlay = null;
-        this.modal = null;
         this.lunarInfo = null;
+
+        this.init();
     }
 
     /**
@@ -23,16 +32,19 @@ class CalendarModal {
      */
     init() {
         this.renderModal();
-        this.bindEvents();
+        // 调用父类的 bindEvents 方法绑定通用事件
+        super.bindEvents();
+        // 绑定自定义事件
+        this._bindCustomEvents();
     }
 
     /**
      * 渲染模态弹窗 HTML
      */
     renderModal() {
-        // 创建遮罩层
+        // 创建遮罩层（初始状态为隐藏）
         this.overlay = document.createElement('div');
-        this.overlay.className = 'calendar-modal-overlay';
+        this.overlay.className = 'calendar-modal-overlay hidden';
         this.overlay.id = 'calendarModalOverlay';
 
         // 创建模态框
@@ -74,16 +86,10 @@ class CalendarModal {
     }
 
     /**
-     * 绑定事件
+     * 绑定自定义事件（子类实现）
+     * @private
      */
-    bindEvents() {
-        // 点击遮罩层关闭
-        this.overlay.addEventListener('click', (e) => {
-            if (e.target === this.overlay) {
-                this.close();
-            }
-        });
-
+    _bindCustomEvents() {
         // 月份导航
         document.getElementById('calendarModalPrevMonth').addEventListener('click', async () => {
             this.currentMonth--;
@@ -153,19 +159,14 @@ class CalendarModal {
             await this.loadHolidays();
             this.renderCalendar();
         });
-
-        // ESC 关闭模态框
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && this.isOpen()) {
-                this.close();
-            }
-        });
     }
 
     /**
      * 显示模态弹窗
      */
     async open() {
+        if (this._isOpen) return;
+
         // 加载节假日数据
         await this.loadHolidays();
 
@@ -173,24 +174,16 @@ class CalendarModal {
         this.renderWeekdays();
         this.renderCalendar();
 
-        // 显示模态框
-        this.overlay.classList.add('active');
-        document.body.style.overflow = 'hidden';
+        // 调用父类的 open 方法（处理最大化状态重置和显示）
+        await super.open();
     }
 
     /**
      * 关闭模态弹窗
      */
     close() {
-        this.overlay.classList.remove('active');
-        document.body.style.overflow = '';
-    }
-
-    /**
-     * 检查是否打开
-     */
-    isOpen() {
-        return this.overlay.classList.contains('active');
+        // 调用父类的 close 方法（处理最大化状态还原和隐藏）
+        super.close();
     }
 
     /**

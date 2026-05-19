@@ -1,0 +1,156 @@
+/* ==================== 模态框通用控制按钮样式 ==================== */
+
+/* 确保 modal 有正确的定位上下文 */
+.weather-forecast-modal,
+.calendar-modal {
+    position: relative;
+}
+
+/* 控制按钮容器 - 悬浮在 modal 右上角 */
+.modal-control-buttons {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    display: flex;
+    gap: 0.5rem;
+    z-index: 10;
+    opacity: 0.6;
+    transition: opacity 0.3s ease;
+}
+
+.modal-control-buttons:hover {
+    opacity: 1;
+}
+
+/* 控制按钮基础样式 */
+.modal-control-btn {
+    width: 36px;
+    height: 36px;
+    border: none;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-primary, #1a1a1a);
+    font-size: 1.2rem;
+    line-height: 1;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.modal-control-btn:hover {
+    background: rgba(255, 255, 255, 0.35);
+    transform: scale(1.1);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+}
+
+.modal-control-btn:active {
+    transform: scale(0.95);
+}
+
+/* 关闭按钮特殊样式 */
+.modal-close-btn {
+    font-size: 1.8rem;
+    color: #dc2626;
+    /* 统一的红色 */
+}
+
+.modal-close-btn:hover {
+    background: rgba(220, 38, 38, 0.2);
+    color: #b91c1c;
+    transform: rotate(90deg) scale(1.1);
+}
+
+/* 最大化按钮特殊样式 */
+.modal-maximize-btn {
+    font-size: 1rem;
+    color: #2563eb;
+    /* 统一的蓝色 */
+}
+
+.modal-maximize-btn:hover {
+    background: rgba(37, 99, 235, 0.2);
+    color: #1d4ed8;
+    animation: maximizePulse 0.6s ease;
+}
+
+/* 最大化脉冲动画 */
+@keyframes maximizePulse {
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.2);
+    }
+
+    100% {
+        transform: scale(1.1);
+    }
+}
+
+/* 最大化状态下的模态框样式 */
+.modal-maximized {
+    width: 100vw !important;
+    height: 100vh !important;
+    max-width: 100vw !important;
+    max-height: 100vh !important;
+    border-radius: 0 !important;
+    transform: none !important;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* 暗色模式适配 */
+[data-theme="dark"] .modal-control-btn {
+    background: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] .modal-control-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+}
+
+/* 关闭按钮和最大化按钮颜色在暗色模式下保持一致 */
+[data-theme="dark"] .modal-close-btn {
+    color: #ef4444;
+    /* 暗色模式下稍亮的红色 */
+}
+
+[data-theme="dark"] .modal-close-btn:hover {
+    background: rgba(239, 68, 68, 0.3);
+    color: #dc2626;
+}
+
+[data-theme="dark"] .modal-maximize-btn {
+    color: #3b82f6;
+    /* 暗色模式下稍亮的蓝色 */
+}
+
+[data-theme="dark"] .modal-maximize-btn:hover {
+    background: rgba(59, 130, 246, 0.3);
+    color: #2563eb;
+}
+
+/* 移动端适配 */
+@media (max-width: 768px) {
+    .modal-control-buttons {
+        top: 0.75rem;
+        right: 0.75rem;
+        gap: 0.4rem;
+    }
+
+    .modal-control-btn {
+        width: 32px;
+        height: 32px;
+        font-size: 1rem;
+    }
+
+    .modal-close-btn {
+        font-size: 1.6rem;
+    }
+}

@@ -85,8 +85,8 @@ class App {
             // 初始化添加小组件对话框
             AddWidgetDialog.init();
 
-            // 初始化日历模态弹窗
-            CalendarModal.init();
+            // 日历模态弹窗已在构造函数中自动初始化（单例模式）
+            // CalendarModal.init();
 
             // 绑定头像点击事件（打开设置）
             this.bindAvatarClick();

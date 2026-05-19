@@ -41,24 +41,29 @@
     color: var(--text-primary);
 }
 
-.modal-close-btn {
+.settings-modal .modal-header .modal-close-btn {
     width: 36px;
     height: 36px;
     border: none;
     border-radius: 50%;
-    background: transparent;
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--text-secondary);
-    transition: all var(--transition-fast);
-    font-size: 1.5rem;
+    color: #dc2626;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    font-size: 1.8rem;
 }
 
-.modal-close-btn:hover {
-    background: var(--bg-hover);
-    color: var(--text-primary);
+.settings-modal .modal-header .modal-close-btn:hover {
+    background: rgba(220, 38, 38, 0.2);
+    color: #b91c1c;
+    transform: rotate(90deg) scale(1.1);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
 }
 
 /* Modal 页签 */
@@ -276,6 +281,19 @@
 
 .btn-danger:hover {
     background: #DC2626;
+}
+
+/* 暗色模式适配 */
+[data-theme="dark"] .settings-modal .modal-header .modal-close-btn {
+    background: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    color: #ef4444;
+}
+
+[data-theme="dark"] .settings-modal .modal-header .modal-close-btn:hover {
+    background: rgba(239, 68, 68, 0.3);
+    color: #dc2626;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
 }
 
 /* 响应式 */
