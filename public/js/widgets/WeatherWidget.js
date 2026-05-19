@@ -3,7 +3,7 @@
 import BaseWidget from './BaseWidget.js';
 import weatherCache from '../utils/WeatherCache.js';
 import CityModal from '../components/CityModal.js';
-import WeatherForecastModal from '../components/WeatherForecastModal.js';
+import WeatherForecastModal from '../modal/WeatherForecastModal.js';
 
 class WeatherWidget extends BaseWidget {
     /**

@@ -28,9 +28,6 @@ class WeatherScheduler {
 
         console.log('🕒 启动天气数据自动更新定时任务...');
 
-        // 立即执行一次
-        this.fetchAllCitiesWeather();
-
         // 设置定时器：在每天的 0:00, 6:00, 12:00, 18:00 执行
         this.scheduleNextExecution();
 

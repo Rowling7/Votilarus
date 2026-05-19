@@ -25,18 +25,13 @@ function fetchWeatherFromAPI(city, type = 'current') {
         let url;
 
         if (type === 'current') {
-            // 当前天气
             url = `${WEATHER_API_BASE}/weather?q=${encodeURIComponent(city)}&appid=${WEATHER_API_KEY}&units=metric&lang=zh_cn`;
         } else if (type === 'forecast') {
-            // 5天预报（每3小时）
             url = `${WEATHER_API_BASE}/forecast?q=${encodeURIComponent(city)}&appid=${WEATHER_API_KEY}&units=metric&lang=zh_cn`;
         } else {
             reject(new Error('不支持的天气类型'));
             return;
         }
-
-        console.log('[API调用] 请求 URL:', url);
-        console.log('[API调用] API Key:', WEATHER_API_KEY.substring(0, 8) + '...');
 
         https.get(url, (res) => {
             let data = '';
@@ -47,24 +42,18 @@ function fetchWeatherFromAPI(city, type = 'current') {
 
             res.on('end', () => {
                 try {
-                    console.log('[API调用] 原始响应数据:', data);
                     const jsonData = JSON.parse(data);
-                    console.log('[API调用] 解析后的数据 cod:', jsonData.cod);
 
                     if (jsonData.cod === 200 || jsonData.cod === '200') {
                         resolve(jsonData);
                     } else {
-                        console.error('[API调用] API 返回错误:', jsonData);
                         reject(new Error(`API 错误 (${jsonData.cod}): ${jsonData.message || '未知错误'}`));
                     }
                 } catch (error) {
-                    console.error('[API调用] 解析 JSON 失败:', error);
-                    console.error('[API调用] 原始数据:', data);
                     reject(error);
                 }
             });
         }).on('error', (error) => {
-            console.error('[API调用] HTTPS 请求错误:', error);
             reject(error);
         });
     });
@@ -77,92 +66,84 @@ function fetchWeatherFromAPI(city, type = 'current') {
  */
 function saveCurrentWeather(weatherData) {
     return new Promise((resolve, reject) => {
+        // 使用东八区时间（UTC+8）
         const now = new Date();
-        const expiresAt = new Date(now.getTime() + 30 * 60 * 1000); // 30分钟后过期
-        const weatherDate = new Date(weatherData.dt * 1000).toISOString().slice(0, 10);
+        const utc8Now = new Date(now.getTime() + 8 * 60 * 60 * 1000); // 转换为UTC+8
+        const expiresAt = new Date(utc8Now.getTime() + 6 * 60 * 60 * 1000); // 6小时后过期
 
-        const sql = `
-            INSERT INTO weather_cache (
-                city_name, city_id, country_code,
-                longitude, latitude,
-                weather_id, weather_main, weather_description, weather_icon,
-                temperature, feels_like, temp_min, temp_max,
-                pressure, humidity, sea_level, grnd_level,
-                wind_speed, wind_deg, wind_gust,
-                clouds_all, visibility,
-                sunrise, sunset, timezone_offset,
-                api_cod,
-                cached_at, expires_at, is_valid,
-                weather_date,
-                created_at, updated_at
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))
-        `;
+        // 将API返回的时间戳转换为东八区日期
+        const weatherTimestamp = weatherData.dt * 1000;
+        const utc8WeatherDate = new Date(weatherTimestamp + 8 * 60 * 60 * 1000).toISOString().slice(0, 10);
 
-        const params = [
-            weatherData.name,                                    // city_name
-            weatherData.id,                                      // city_id
-            weatherData.sys.country,                             // country_code
-            weatherData.coord.lon,                               // longitude
-            weatherData.coord.lat,                               // latitude
-            weatherData.weather[0].id,                           // weather_id
-            weatherData.weather[0].main,                         // weather_main
-            weatherData.weather[0].description,                  // weather_description
-            weatherData.weather[0].icon,                         // weather_icon
-            weatherData.main.temp,                               // temperature
-            weatherData.main.feels_like,                         // feels_like
-            weatherData.main.temp_min,                           // temp_min
-            weatherData.main.temp_max,                           // temp_max
-            weatherData.main.pressure,                           // pressure
-            weatherData.main.humidity,                           // humidity
-            weatherData.main.sea_level || null,                  // sea_level
-            weatherData.main.grnd_level || null,                 // grnd_level
-            weatherData.wind.speed,                              // wind_speed
-            weatherData.wind.deg,                                // wind_deg
-            weatherData.wind.gust || null,                       // wind_gust
-            weatherData.clouds.all,                              // clouds_all
-            weatherData.visibility || null,                      // visibility
-            weatherData.sys.sunrise,                             // sunrise
-            weatherData.sys.sunset,                              // sunset
-            weatherData.timezone,                                // timezone_offset
-            weatherData.cod,                                     // api_cod
-            now.toISOString().slice(0, 19).replace('T', ' '),  // cached_at
-            expiresAt.toISOString().slice(0, 19).replace('T', ' '), // expires_at
-            1,                                                   // is_valid
-            weatherDate                                          // weather_date (YYYY-MM-DD)
-        ];
+        // 先删除旧数据，再插入新数据
+        const deleteSql = `DELETE FROM weather_cache WHERE city_name = ? AND weather_date = ?`;
 
-        db.run(sql, params, function (err) {
-            if (err) {
-                reject(err);
-            } else {
-                resolve(this.lastID);
+        db.run(deleteSql, [weatherData.name, utc8WeatherDate], function (deleteErr) {
+            if (deleteErr) {
+                // 继续执行插入
             }
+
+            const sql = `
+                INSERT INTO weather_cache (
+                    city_name, city_id, country_code,
+                    longitude, latitude,
+                    weather_id, weather_main, weather_description, weather_icon,
+                    temperature, feels_like, temp_min, temp_max,
+                    pressure, humidity, sea_level, grnd_level,
+                    wind_speed, wind_deg, wind_gust,
+                    clouds_all, visibility,
+                    sunrise, sunset, timezone_offset,
+                    api_cod,
+                    cached_at, expires_at,
+                    weather_date,
+                    created_at, updated_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))
+            `;
+
+            const params = [
+                weatherData.name,                                    // city_name
+                weatherData.id,                                      // city_id
+                weatherData.sys.country,                             // country_code
+                weatherData.coord.lon,                               // longitude
+                weatherData.coord.lat,                               // latitude
+                weatherData.weather[0].id,                           // weather_id
+                weatherData.weather[0].main,                         // weather_main
+                weatherData.weather[0].description,                  // weather_description
+                weatherData.weather[0].icon,                         // weather_icon
+                weatherData.main.temp,                               // temperature
+                weatherData.main.feels_like,                         // feels_like
+                weatherData.main.temp_min,                           // temp_min
+                weatherData.main.temp_max,                           // temp_max
+                weatherData.main.pressure,                           // pressure
+                weatherData.main.humidity,                           // humidity
+                weatherData.main.sea_level || null,                  // sea_level
+                weatherData.main.grnd_level || null,                 // grnd_level
+                weatherData.wind.speed,                              // wind_speed
+                weatherData.wind.deg,                                // wind_deg
+                weatherData.wind.gust || null,                       // wind_gust
+                weatherData.clouds.all,                              // clouds_all
+                weatherData.visibility || null,                      // visibility
+                weatherData.sys.sunrise,                             // sunrise
+                weatherData.sys.sunset,                              // sunset
+                weatherData.timezone,                                // timezone_offset
+                weatherData.cod,                                     // api_cod
+                utc8Now.toISOString().slice(0, 19).replace('T', ' '),  // cached_at
+                expiresAt.toISOString().slice(0, 19).replace('T', ' '), // expires_at
+                utc8WeatherDate                                      // weather_date (YYYY-MM-DD)
+            ];
+
+            db.run(sql, params, function (err) {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(this.lastID);
+                }
+            });
         });
     });
 }
 
-/**
- * 标记旧缓存为无效
- * @param {string} cityName - 城市名称
- * @returns {Promise<void>}
- */
-function invalidateOldCache(cityName) {
-    return new Promise((resolve, reject) => {
-        const sql = `
-            UPDATE weather_cache 
-            SET is_valid = 0, updated_at = datetime('now')
-            WHERE city_name = ? AND is_valid = 1
-        `;
 
-        db.run(sql, [cityName], (err) => {
-            if (err) {
-                reject(err);
-            } else {
-                resolve();
-            }
-        });
-    });
-}
 
 /**
  * 获取并保存当前天气
@@ -171,14 +152,32 @@ function invalidateOldCache(cityName) {
  */
 async function fetchAndSaveCurrentWeather(city) {
     try {
+        console.log('[WeatherAPI] 开始获取当前天气:', city);
+
         // 1. 从 API 获取数据
         const weatherData = await fetchWeatherFromAPI(city, 'current');
 
-        // 2. 标记旧缓存为无效
-        await invalidateOldCache(city);
+        // 2. 只删除当前天气数据（今天的记录），保留预报数据
+        console.log('[WeatherAPI] 删除', city, '的当前天气数据...');
+        await new Promise((resolve, reject) => {
+            db.run(
+                `DELETE FROM weather_cache WHERE city_name = ? AND weather_date = DATE('now', 'localtime')`,
+                [city],
+                function (err) {
+                    if (err) {
+                        console.error('[WeatherAPI] 删除失败:', err);
+                        reject(err);
+                    } else {
+                        console.log('[WeatherAPI] 已删除', this.changes, '条当前天气记录');
+                        resolve();
+                    }
+                }
+            );
+        });
 
         // 3. 保存新数据
         const insertId = await saveCurrentWeather(weatherData);
+        console.log('[WeatherAPI] 已保存新数据, ID:', insertId);
 
         return {
             success: true,
@@ -204,7 +203,6 @@ router.get('/current/:city', async (req, res) => {
         const cacheSql = `
             SELECT * FROM weather_cache
             WHERE city_name = ?
-              AND is_valid = 1
               AND expires_at > datetime('now', 'localtime')
             ORDER BY cached_at DESC
             LIMIT 1
@@ -391,185 +389,331 @@ router.get('/stats', (req, res) => {
 });
 
 /**
+ * 保存预报数据到数据库
+ * @param {string} cityName - 城市名称
+ * @param {Array} dailyForecast - 每日预报数组
+ * @returns {Promise<void>}
+ */
+function saveForecastToCache(cityName, dailyForecast) {
+    return new Promise((resolve, reject) => {
+        if (!dailyForecast || dailyForecast.length === 0) {
+            resolve();
+            return;
+        }
+
+        const now = new Date();
+        const utc8Now = new Date(now.getTime() + 8 * 60 * 60 * 1000);
+        const expiresAt = new Date(utc8Now.getTime() + 6 * 60 * 60 * 1000); // 6小时后过期
+
+        let completed = 0;
+        const total = dailyForecast.length;
+
+        dailyForecast.forEach(day => {
+            const sql = `
+                INSERT OR REPLACE INTO weather_cache (
+                    city_name, weather_date,
+                    temp_max, temp_min, temperature, feels_like,
+                    humidity, wind_speed, wind_deg,
+                    weather_main, weather_description, weather_icon,
+                    pressure, clouds_all,
+                    cached_at, expires_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            `;
+
+            const params = [
+                cityName,
+                day.date,
+                day.temp_max,
+                day.temp_min,
+                day.temp_avg,
+                day.feels_like_avg,
+                day.humidity_avg,
+                parseFloat(day.wind_speed_avg),
+                day.wind_deg_avg,
+                day.weather_main,
+                day.weather_description,
+                day.weather_icon,
+                day.pressure_avg,
+                day.clouds_avg,
+                utc8Now.toISOString().slice(0, 19).replace('T', ' '),
+                expiresAt.toISOString().slice(0, 19).replace('T', ' ')
+            ];
+
+            db.run(sql, params, function (err) {
+                if (err) {
+                    console.error('[天气缓存] 保存预报数据失败:', err);
+                }
+                completed++;
+                if (completed === total) {
+                    resolve();
+                }
+            });
+        });
+    });
+}
+
+/**
  * GET /api/weather/forecast/:city
  * 获取天气预报数据（历史 + 当前 + 未来预报）
  */
 router.get('/forecast/:city', async (req, res) => {
-    console.log('========================================');
-    console.log('[API] 收到天气预报请求');
-    console.log('[API] 城市:', req.params.city);
-    console.log('[API] 完整URL:', req.originalUrl);
-    console.log('========================================');
-
     try {
         const cityName = req.params.city;
 
-        // 1. 从数据库获取历史数据（最近7天，每天取最新的一条）
-        const historySql = `
-            SELECT 
-                wc.*,
-                DATE(wc.weather_date) as date_key
-            FROM weather_cache wc
-            INNER JOIN (
-                SELECT DATE(weather_date) as date_key, MAX(cached_at) as max_cached
-                FROM weather_cache
-                WHERE city_name = ?
-                  AND is_valid = 1
-                  AND weather_date < DATE('now', 'localtime')
-                GROUP BY DATE(weather_date)
-                ORDER BY DATE(weather_date) DESC
-                LIMIT 7
-            ) latest ON DATE(wc.weather_date) = latest.date_key AND wc.cached_at = latest.max_cached
-            WHERE wc.city_name = ?
-            ORDER BY wc.weather_date ASC
-        `;
+        // 1. 从数据库获取历史数据（最近7天）
+        const historyRows = await new Promise((resolve, reject) => {
+            const historySql = `
+                SELECT 
+                    wc.*,
+                    DATE(wc.weather_date) as date_key
+                FROM weather_cache wc
+                INNER JOIN (
+                    SELECT DATE(weather_date) as date_key, MAX(cached_at) as max_cached
+                    FROM weather_cache
+                    WHERE city_name = ?
+                      AND weather_date < DATE('now', 'localtime')
+                    GROUP BY DATE(weather_date)
+                    ORDER BY DATE(weather_date) DESC
+                    LIMIT 7
+                ) latest ON DATE(wc.weather_date) = latest.date_key AND wc.cached_at = latest.max_cached
+                WHERE wc.city_name = ?
+                ORDER BY wc.weather_date ASC
+            `;
 
-        db.all(historySql, [cityName, cityName], (err, historyRows) => {
-            if (err) {
-                console.error('[API] 查询历史天气失败:', err);
-                res.status(500).json({ error: err.message });
-                return;
-            }
+            db.all(historySql, [cityName, cityName], (err, rows) => {
+                if (err) reject(err);
+                else resolve(rows);
+            });
+        });
 
-            console.log('[API] 历史数据查询结果:', historyRows.length, '条');
-            if (historyRows.length > 0) {
-                console.log('[API] 历史日期列表:', historyRows.map(r => r.weather_date));
-            }
-
-            // 2. 获取当前天气（优先从缓存）
+        // 2. 获取当前天气（优先从缓存，否则从 API 获取）
+        let currentData = await new Promise((resolve, reject) => {
             const currentSql = `
                 SELECT * FROM weather_cache
                 WHERE city_name = ?
-                  AND is_valid = 1
                   AND expires_at > datetime('now', 'localtime')
+                  AND weather_date = DATE('now', 'localtime')
                 ORDER BY cached_at DESC
                 LIMIT 1
             `;
 
-            db.get(currentSql, [cityName], async (err2, currentData) => {
-                if (err2) {
-                    console.error('[API] 查询当前天气失败:', err2);
-                    res.status(500).json({ error: err2.message });
-                    return;
-                }
-
-                console.log('[API] 当前天气缓存:', currentData ? '存在' : '不存在');
-
-                let finalCurrentData = currentData;
-
-                // 如果缓存不存在或已过期，从 API 获取
-                if (!currentData) {
-                    try {
-                        const result = await fetchAndSaveCurrentWeather(cityName);
-                        finalCurrentData = result.data;
-                    } catch (apiError) {
-                        console.error('获取当前天气 API 失败:', apiError);
-                        res.status(500).json({ error: '获取当前天气失败' });
-                        return;
-                    }
-                }
-
-                // 3. 从 OpenWeatherMap 获取预报数据（5天，每3小时）
-                try {
-                    console.log('[天气预报] 开始获取预报数据，城市:', cityName);
-                    const forecastData = await fetchWeatherFromAPI(cityName, 'forecast');
-
-                    console.log('[天气预报] API 返回的预报数据条数:', forecastData.list.length);
-                    console.log('[天气预报] 预报数据时间范围:');
-                    if (forecastData.list.length > 0) {
-                        const firstDate = new Date(forecastData.list[0].dt * 1000).toISOString();
-                        const lastDate = new Date(forecastData.list[forecastData.list.length - 1].dt * 1000).toISOString();
-                        console.log('  - 第一条:', firstDate);
-                        console.log('  - 最后一条:', lastDate);
-                    }
-
-                    // 处理预报数据：按天分组，提取每天的摘要信息
-                    const dailyForecast = processForecastData(forecastData.list);
-
-                    console.log('[天气预报] 处理后的预报天数:', dailyForecast.length);
-                    console.log('[天气预报] 预报日期列表:', dailyForecast.map(d => d.date));
-
-                    // 组合所有数据
-                    const allWeatherData = {
-                        history: historyRows.map(row => ({
-                            date: row.weather_date,
-                            temp_max: row.temp_max,
-                            temp_min: row.temp_min,
-                            temp: row.temperature,
-                            feels_like: row.feels_like,
-                            humidity: row.humidity,
-                            wind_speed: row.wind_speed,
-                            wind_deg: row.wind_deg,
-                            weather_main: row.weather_main,
-                            weather_description: row.weather_description,
-                            weather_icon: row.weather_icon,
-                            pressure: row.pressure,
-                            clouds: row.clouds_all
-                        })),
-                        current: {
-                            date: new Date().toISOString().slice(0, 10),
-                            temp_max: finalCurrentData.main.temp_max,
-                            temp_min: finalCurrentData.main.temp_min,
-                            temp: finalCurrentData.main.temp,
-                            feels_like: finalCurrentData.main.feels_like,
-                            humidity: finalCurrentData.main.humidity,
-                            wind_speed: finalCurrentData.wind.speed,
-                            wind_deg: finalCurrentData.wind.deg,
-                            weather_main: finalCurrentData.weather[0].main,
-                            weather_description: finalCurrentData.weather[0].description,
-                            weather_icon: finalCurrentData.weather[0].icon,
-                            pressure: finalCurrentData.main.pressure,
-                            clouds: finalCurrentData.clouds.all
-                        },
-                        forecast: dailyForecast
-                    };
-
-                    res.json({
-                        success: true,
-                        data: allWeatherData
-                    });
-                } catch (forecastError) {
-                    console.error('[天气预报] 获取预报数据失败:', forecastError);
-                    console.error('[天气预报] 错误详情:', forecastError.message);
-                    // 即使预报失败，也返回历史和当前数据
-                    res.json({
-                        success: true,
-                        data: {
-                            history: historyRows.map(row => ({
-                                date: row.weather_date,
-                                temp_max: row.temp_max,
-                                temp_min: row.temp_min,
-                                temp: row.temperature,
-                                feels_like: row.feels_like,
-                                humidity: row.humidity,
-                                wind_speed: row.wind_speed,
-                                wind_deg: row.wind_deg,
-                                weather_main: row.weather_main,
-                                weather_description: row.weather_description,
-                                weather_icon: row.weather_icon,
-                                pressure: row.pressure,
-                                clouds: row.clouds_all
-                            })),
-                            current: {
-                                date: new Date().toISOString().slice(0, 10),
-                                temp_max: finalCurrentData.main.temp_max,
-                                temp_min: finalCurrentData.main.temp_min,
-                                temp: finalCurrentData.main.temp,
-                                feels_like: finalCurrentData.main.feels_like,
-                                humidity: finalCurrentData.main.humidity,
-                                wind_speed: finalCurrentData.wind.speed,
-                                wind_deg: finalCurrentData.wind.deg,
-                                weather_main: finalCurrentData.weather[0].main,
-                                weather_description: finalCurrentData.weather[0].description,
-                                weather_icon: finalCurrentData.weather[0].icon,
-                                pressure: finalCurrentData.main.pressure,
-                                clouds: finalCurrentData.clouds.all
-                            },
-                            forecast: []
-                        }
-                    });
-                }
+            db.get(currentSql, [cityName], (err, row) => {
+                if (err) reject(err);
+                else resolve(row);
             });
+        });
+
+        let currentFromCache = !!currentData;
+
+        // 如果缓存不存在或已过期，从 API 获取
+        if (!currentData) {
+            try {
+                await fetchAndSaveCurrentWeather(cityName);
+                // 从数据库重新获取，确保数据格式一致
+                currentData = await new Promise((resolve, reject) => {
+                    const currentSql = `
+                        SELECT * FROM weather_cache
+                        WHERE city_name = ?
+                          AND expires_at > datetime('now', 'localtime')
+                          AND weather_date = DATE('now', 'localtime')
+                        ORDER BY cached_at DESC
+                        LIMIT 1
+                    `;
+                    db.get(currentSql, [cityName], (err, row) => {
+                        if (err) reject(err);
+                        else resolve(row);
+                    });
+                });
+                currentFromCache = false;
+            } catch (apiError) {
+                return res.status(500).json({
+                    success: false,
+                    error: '获取当前天气失败',
+                    details: apiError.message
+                });
+            }
+        }
+
+        // 3. 获取预报数据（智能缓存：只获取缺失的日期）
+        let dailyForecast = [];
+        let forecastFromCache = true;
+
+        try {
+            // 3.1 查询数据库中已有的未来预报日期
+            const cachedForecastDates = await new Promise((resolve, reject) => {
+                const sql = `
+                    SELECT DISTINCT weather_date
+                    FROM weather_cache
+                    WHERE city_name = ?
+                      AND expires_at > datetime('now', 'localtime')
+                      AND weather_date > DATE('now', 'localtime')
+                    ORDER BY weather_date ASC
+                `;
+
+                console.log('[WeatherAPI] 执行 SQL 查询缓存日期...');
+                db.all(sql, [cityName], (err, rows) => {
+                    if (err) {
+                        console.error('[WeatherAPI] SQL 查询失败:', err);
+                        reject(err);
+                    } else {
+                        const dates = rows.map(r => r.weather_date);
+                        console.log('[WeatherAPI] SQL 查询结果:', dates);
+                        resolve(dates);
+                    }
+                });
+            });
+
+            // 3.2 检查是否需要从 API 获取新数据
+            const utc8Now = new Date(Date.now() + 8 * 60 * 60 * 1000);
+            const today = utc8Now.toISOString().slice(0, 10);
+
+            console.log('[WeatherAPI] 缓存检查:', {
+                城市: cityName,
+                JS计算的今天: today,
+                数据库中的缓存日期: cachedForecastDates,
+                缓存日期数量: cachedForecastDates.length
+            });
+
+            // 计算需要的日期范围（今天之后的4天，因为 API 限制）
+            const neededDates = [];
+            for (let i = 1; i <= 4; i++) {
+                const futureDate = new Date(utc8Now.getTime() + i * 24 * 60 * 60 * 1000);
+                neededDates.push(futureDate.toISOString().slice(0, 10));
+            }
+
+            console.log('[WeatherAPI] 需要的日期:', neededDates);
+
+            // 找出缺失的日期
+            const missingDates = neededDates.filter(date => !cachedForecastDates.includes(date));
+
+            console.log('[WeatherAPI] 缺失的日期:', missingDates);
+
+            if (missingDates.length > 0) {
+                // 有缺失的日期，需要从 API 获取
+                console.log('[WeatherAPI] 检测到缺失的预报日期:', missingDates, '(共', missingDates.length, '天)');
+                const forecastData = await fetchWeatherFromAPI(cityName, 'forecast');
+                const allForecast = processForecastData(forecastData.list);
+
+                // 只保存缺失日期的数据
+                const missingForecast = allForecast.filter(day => missingDates.includes(day.date));
+                await saveForecastToCache(cityName, missingForecast);
+                forecastFromCache = false;
+                console.log('[WeatherAPI] 已保存', missingForecast.length, '天的预报数据到数据库');
+            } else {
+                console.log('[WeatherAPI] 所有预报数据都在缓存中，无需调用 API');
+            }
+
+            // 3.3 从数据库读取所有预报数据
+            dailyForecast = await new Promise((resolve, reject) => {
+                const sql = `
+                    SELECT 
+                        weather_date as date,
+                        temp_max,
+                        temp_min,
+                        temperature as temp_avg,
+                        feels_like as feels_like_avg,
+                        humidity as humidity_avg,
+                        wind_speed as wind_speed_avg,
+                        wind_deg as wind_deg_avg,
+                        weather_main,
+                        weather_description,
+                        weather_icon,
+                        pressure as pressure_avg,
+                        clouds_all as clouds_avg
+                    FROM weather_cache
+                    WHERE city_name = ?
+                      AND expires_at > datetime('now', 'localtime')
+                      AND weather_date > DATE('now', 'localtime')
+                    ORDER BY weather_date ASC
+                    LIMIT 4
+                `;
+
+                db.all(sql, [cityName], (err, rows) => {
+                    if (err) reject(err);
+                    else resolve(rows);
+                });
+            });
+        } catch (forecastError) {
+            console.error('[WeatherAPI] 获取预报数据失败:', forecastError.message);
+            // 即使失败也尝试从数据库读取已有数据
+            dailyForecast = await new Promise((resolve) => {
+                const sql = `
+                    SELECT 
+                        weather_date as date,
+                        temp_max,
+                        temp_min,
+                        temperature as temp_avg,
+                        feels_like as feels_like_avg,
+                        humidity as humidity_avg,
+                        wind_speed as wind_speed_avg,
+                        wind_deg as wind_deg_avg,
+                        weather_main,
+                        weather_description,
+                        weather_icon,
+                        pressure as pressure_avg,
+                        clouds_all as clouds_avg
+                    FROM weather_cache
+                    WHERE city_name = ?
+                      AND expires_at > datetime('now', 'localtime')
+                      AND weather_date > DATE('now', 'localtime')
+                    ORDER BY weather_date ASC
+                    LIMIT 4
+                `;
+                db.all(sql, [cityName], (err, rows) => {
+                    resolve(rows || []);
+                });
+            });
+        }
+
+        // 4. 组合所有数据
+        console.log('[WeatherAPI] 数据组装:', {
+            城市: cityName,
+            历史数据条数: historyRows.length,
+            历史日期: historyRows.map(r => r.weather_date),
+            当前数据来源: currentFromCache ? '缓存' : 'API',
+            预报数据来源: forecastFromCache ? '缓存' : 'API',
+            预报数据条数: dailyForecast.length,
+            预报日期: dailyForecast.map(d => d.date)
+        });
+
+        const allWeatherData = {
+            history: historyRows.map(row => ({
+                date: row.weather_date,
+                temp_max: row.temp_max,
+                temp_min: row.temp_min,
+                temp: row.temperature,
+                feels_like: row.feels_like,
+                humidity: row.humidity,
+                wind_speed: row.wind_speed,
+                wind_deg: row.wind_deg,
+                weather_main: row.weather_main,
+                weather_description: row.weather_description,
+                weather_icon: row.weather_icon,
+                pressure: row.pressure,
+                clouds: row.clouds_all
+            })),
+            current: {
+                date: new Date(Date.now() + 8 * 60 * 60 * 1000).toISOString().slice(0, 10),
+                temp_max: currentData.temp_max,
+                temp_min: currentData.temp_min,
+                temp: currentData.temperature,
+                feels_like: currentData.feels_like,
+                humidity: currentData.humidity,
+                wind_speed: currentData.wind_speed,
+                wind_deg: currentData.wind_deg,
+                weather_main: currentData.weather_main,
+                weather_description: currentData.weather_description,
+                weather_icon: currentData.weather_icon,
+                pressure: currentData.pressure,
+                clouds: currentData.clouds_all
+            },
+            forecast: dailyForecast
+        };
+
+        res.json({
+            success: true,
+            fromCache: currentFromCache,
+            data: allWeatherData
         });
     } catch (error) {
         res.status(500).json({
@@ -585,30 +729,12 @@ router.get('/forecast/:city', async (req, res) => {
  * @returns {Array} 每日预报摘要
  */
 function processForecastData(forecastList) {
-    console.log('[数据处理] 开始处理预报数据，原始数据条数:', forecastList.length);
-
     const dailyMap = new Map();
 
-    forecastList.forEach((item, index) => {
-        const date = new Date(item.dt * 1000).toISOString().slice(0, 10);
-        const dateTime = new Date(item.dt * 1000).toLocaleString('zh-CN', {
-            timeZone: 'Asia/Shanghai',
-            year: 'numeric',
-            month: '2-digit',
-            day: '2-digit',
-            hour: '2-digit',
-            minute: '2-digit'
-        });
-
-        if (index < 3 || index === forecastList.length - 1) {
-            console.log(`[数据处理] 第${index + 1}条数据:`, {
-                日期: dateTime,
-                温度: item.main.temp,
-                最高温: item.main.temp_max,
-                最低温: item.main.temp_min,
-                天气: item.weather[0].description
-            });
-        }
+    forecastList.forEach((item) => {
+        // 使用东八区时间（UTC+8）
+        const utc8Time = new Date(item.dt * 1000 + 8 * 60 * 60 * 1000);
+        const date = utc8Time.toISOString().slice(0, 10);
 
         if (!dailyMap.has(date)) {
             dailyMap.set(date, {
@@ -645,17 +771,14 @@ function processForecastData(forecastList) {
             dayData.temp_min = item.main.temp_min;
         }
 
-        // 使用中午12点左右的天气图标作为当天的代表
-        const hour = new Date(item.dt * 1000).getHours();
+        // 使用中午12点左右的天气图标作为当天的代表（东八区时间）
+        const hour = utc8Time.getUTCHours();
         if (hour >= 11 && hour <= 13) {
             dayData.weather_main = item.weather[0].main;
             dayData.weather_description = item.weather[0].description;
             dayData.weather_icon = item.weather[0].icon;
         }
     });
-
-    console.log('[数据处理] 按天分组后的天数:', dailyMap.size);
-    console.log('[数据处理] 日期列表:', Array.from(dailyMap.keys()));
 
     // 计算平均值并转换为数组
     const dailyForecast = Array.from(dailyMap.values()).map(day => ({
@@ -674,15 +797,12 @@ function processForecastData(forecastList) {
         clouds_avg: Math.round(day.clouds_list.reduce((a, b) => a + b, 0) / day.clouds_list.length)
     }));
 
-    console.log('[数据处理] 最终返回的预报天数:', dailyForecast.length);
-    console.log('[数据处理] 返回的日期:', dailyForecast.map(d => d.date));
-
-    // 只返回前6天的预报（从今天开始算起）
-    const today = new Date().toISOString().slice(0, 10);
+    // 只返回未来的预报（不包括今天），最多4天（API 限制）
+    const utc8Now = new Date(Date.now() + 8 * 60 * 60 * 1000);
+    const today = utc8Now.toISOString().slice(0, 10);
     const futureForecast = dailyForecast.filter(day => day.date > today);
-    console.log('[数据处理] 过滤后的未来预报天数:', futureForecast.length);
 
-    return futureForecast.slice(0, 6);
+    return futureForecast.slice(0, 4);
 }
 
 /**

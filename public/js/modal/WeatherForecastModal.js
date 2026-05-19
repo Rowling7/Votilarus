@@ -113,7 +113,6 @@ class WeatherForecastModal {
 
         // 切换城市按钮
         this.citySwitchBtn.addEventListener('click', () => {
-            // 不关闭天气弹窗，只打开城市选择模态框
             if (this.options.onCityChange) {
                 this.options.onCityChange();
             }
@@ -177,31 +176,29 @@ class WeatherForecastModal {
      */
     async fetchWeatherData() {
         try {
-            console.log('[前端] 开始获取天气预报数据，城市:', this.currentCity);
             const response = await fetch(`/api/weather/forecast/${encodeURIComponent(this.currentCity)}`);
             const result = await response.json();
 
             if (result.success) {
                 this.weatherData = result.data;
-
-                console.log('[前端] 接收到的数据结构:');
-                console.log('  - 历史数据天数:', this.weatherData.history?.length || 0);
-                console.log('  - 历史日期:', this.weatherData.history?.map(d => d.date));
-                console.log('  - 当前日期:', this.weatherData.current?.date);
-                console.log('  - 预报数据天数:', this.weatherData.forecast?.length || 0);
-                console.log('  - 预报日期:', this.weatherData.forecast?.map(d => d.date));
-                console.log('  - 总天数:', (this.weatherData.history?.length || 0) + 1 + (this.weatherData.forecast?.length || 0));
-
+                console.log('[WeatherForecastModal] 数据来源:', {
+                    当前天气: result.fromCache ? '数据库缓存' : 'API',
+                    城市: this.cityName
+                });
+                console.log('[WeatherForecastModal] 数据详情:', {
+                    历史天数: this.weatherData.history?.length || 0,
+                    当前日期: this.weatherData.current?.date,
+                    预报天数: this.weatherData.forecast?.length || 0,
+                    总卡片数: (this.weatherData.history?.length || 0) + 1 + (this.weatherData.forecast?.length || 0)
+                });
                 this.renderWeatherCards();
                 this.updateDateRange();
                 this.initChart();
             } else {
-                console.error('[前端] API 返回失败:', result);
                 toast.error('获取天气数据失败');
                 this.close();
             }
         } catch (error) {
-            console.error('[前端] 获取天气数据异常:', error);
             toast.error('网络错误');
             this.close();
         }
@@ -267,7 +264,6 @@ class WeatherForecastModal {
         }
 
         const weatherIconUrl = `https://openweathermap.org/themes/openweathermap/assets/vendor/owm/img/widgets/${day.weather_icon}.png`;
-        // 兼容不同的字段名：wind_deg（历史/当前）或 wind_deg_avg（预报）
         const windDeg = day.wind_deg !== undefined ? day.wind_deg : (day.wind_deg_avg !== undefined ? day.wind_deg_avg : null);
         const windInfo = this.getWindDirection(windDeg);
 
@@ -320,7 +316,6 @@ class WeatherForecastModal {
      * 根据风向角度获取风向名称和箭头
      */
     getWindDirection(deg) {
-        // 如果 deg 为 undefined 或 null，返回默认值
         if (deg === undefined || deg === null || isNaN(deg)) {
             return { name: '未知', arrow: '-' };
         }
@@ -505,7 +500,6 @@ class WeatherForecastModal {
      * 获取数据集配置
      */
     getDatasets(chartData, isDarkMode) {
-        const themeColor = this.themeColor;
         const globalThemeColor = getComputedStyle(document.documentElement).getPropertyValue('--theme-color').trim();
 
         switch (this.currentMetric) {
