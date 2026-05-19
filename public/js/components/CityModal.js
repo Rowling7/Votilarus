@@ -230,7 +230,7 @@ class CityModal {
         // 显示 Toast 提示
         toast.success(`已切换到 ${cityName}`);
 
-        console.log(`城市已切换: ${cityName} (${cityPinyin})`);
+
     }
 
     /**

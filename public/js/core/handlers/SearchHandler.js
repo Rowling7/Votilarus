@@ -240,7 +240,7 @@ class SearchHandler {
             if (addBtn) {
                 addBtn.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    console.log('Add button clicked!');
+
                     this.showAddEngineDialog();
                 });
             }
@@ -277,7 +277,7 @@ class SearchHandler {
 
     // 显示添加搜索引擎对话框
     showAddEngineDialog() {
-        console.log('showAddEngineDialog called');
+
 
         // 使用新的对话框组件
         AddEngineDialog.show(async () => {

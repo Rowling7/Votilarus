@@ -431,7 +431,7 @@ router.put('/city', (req, res) => {
                     return;
                 }
 
-                console.log(`城市配置已更新为: ${city}`);
+
                 res.json({
                     success: true,
                     message: '城市配置已更新',

@@ -225,7 +225,7 @@ class NotebookWidget extends BaseWidget {
         const noteItems = this.container.querySelectorAll('.note-item');
         noteItems.forEach(item => {
             item.addEventListener('click', () => {
-                console.log('NotebookWidget: modal待完成');
+
                 const uuid = item.dataset.uuid;
                 if (uuid && window.ModalManager) {
                     window.ModalManager.showNotebookModal(uuid);

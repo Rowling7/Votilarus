@@ -36,7 +36,7 @@ router.get('/', (req, res) => {
 router.post('/', (req, res) => {
     const { title, category_id, width, height, active_flag } = req.body;
 
-    console.log('创建组件请求:', req.body);
+
 
     if (!title || !category_id) {
         console.error('缺少必要参数:', { title, category_id });
@@ -58,8 +58,7 @@ router.post('/', (req, res) => {
         '0'
     ];
 
-    console.log('执行SQL:', insertSql);
-    console.log('参数:', params);
+
 
     db.run(insertSql, params, function (err) {
         if (err) {
@@ -68,7 +67,7 @@ router.post('/', (req, res) => {
             return;
         }
 
-        console.log('组件创建成功, ID:', this.lastID);
+
         res.json({
             success: true,
             widgetId: this.lastID,

@@ -67,7 +67,7 @@ class WeatherCache {
                 const request = store.put(cacheEntry);
 
                 request.onsuccess = () => {
-                    console.log(`天气数据已缓存: ${city}`);
+
                     resolve();
                 };
 
@@ -100,14 +100,14 @@ class WeatherCache {
                     const result = request.result;
 
                     if (!result) {
-                        console.log(`未找到缓存数据: ${city}`);
+
                         resolve(null);
                         return;
                     }
 
                     // 检查是否过期
                     if (Date.now() > result.expiresAt) {
-                        console.log(`缓存已过期: ${city}`);
+
                         // 删除过期数据
                         this.deleteWeatherData(city).catch(err => {
                             console.error('删除过期缓存失败:', err);
@@ -116,7 +116,7 @@ class WeatherCache {
                         return;
                     }
 
-                    console.log(`从缓存获取天气数据: ${city}`);
+
                     resolve(result.data);
                 };
 
@@ -146,7 +146,7 @@ class WeatherCache {
                 const request = store.delete(city);
 
                 request.onsuccess = () => {
-                    console.log(`已删除缓存数据: ${city}`);
+
                     resolve();
                 };
 
@@ -189,7 +189,7 @@ class WeatherCache {
                         // 删除所有过期的数据
                         Promise.all(keysToDelete.map(key => this.deleteWeatherData(key)))
                             .then(() => {
-                                console.log(`已清理 ${keysToDelete.length} 条过期缓存`);
+
                                 resolve();
                             })
                             .catch(reject);
@@ -221,7 +221,7 @@ class WeatherCache {
                 const request = store.clear();
 
                 request.onsuccess = () => {
-                    console.log('已清除所有天气缓存数据');
+
                     resolve();
                 };
 

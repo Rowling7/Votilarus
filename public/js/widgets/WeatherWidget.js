@@ -257,12 +257,11 @@ class WeatherWidget extends BaseWidget {
                 const iconUrl = `https://openweathermap.org/themes/openweathermap/assets/vendor/owm/img/widgets/${cachedData.weather[0].icon}.png`;
                 const color = await this.extractIconColor(iconUrl);
                 this.applyBackgroundColor(color);
-                console.log('使用缓存的天气数据');
+
                 return;
             }
 
-            // 缓存不存在或已过期，从 API 获取
-            console.log('从 API 获取天气数据');
+
             const response = await fetch(
                 `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(this.options.city)}&appid=${this.options.apiKey}&units=metric&lang=zh_cn`
             );
@@ -429,8 +428,7 @@ class WeatherWidget extends BaseWidget {
                 if (result.success && result.data && result.data.value) {
                     savedCity = result.data.value;
                 } else {
-                    // 如果 settings 中没有配置，自动创建默认值（威海）
-                    console.log('没有城市配置，创建默认值: Weihai');
+
                     await this.initializeDefaultCity();
                     savedCity = 'Weihai';
                 }
@@ -487,7 +485,7 @@ class WeatherWidget extends BaseWidget {
 
             const result = await response.json();
             if (result.success) {
-                console.log('已创建默认城市配置: Weihai');
+
             } else {
                 console.error('创建默认城市配置失败:', result.error);
             }
@@ -500,7 +498,7 @@ class WeatherWidget extends BaseWidget {
      * 处理城市切换
      */
     async handleCityChange(cityPinyin, cityName) {
-        console.log(`切换到城市: ${cityName} (${cityPinyin})`);
+
 
         // 更新 options.city
         this.options.city = cityPinyin;
@@ -560,7 +558,7 @@ class WeatherWidget extends BaseWidget {
 
             const result = await response.json();
             if (result.success) {
-                console.log('城市配置已保存到数据库');
+
             } else {
                 console.error('保存城市配置失败:', result.error);
             }
@@ -574,7 +572,7 @@ class WeatherWidget extends BaseWidget {
      */
     async updateCityDisplayName(cityPinyin) {
         try {
-            console.log(`正在获取城市 ${cityPinyin} 的中文名...`);
+
             const response = await fetch('/api/cities');
             const result = await response.json();
 
@@ -586,11 +584,11 @@ class WeatherWidget extends BaseWidget {
 
                 const city = allCities.find(c => c.pinyin === cityPinyin);
                 if (city) {
-                    console.log(`找到城市: ${city.name} (${city.pinyin})`);
+
                     const locationNameEl = this.container.querySelector('.location-name');
                     if (locationNameEl) {
                         locationNameEl.textContent = city.name;
-                        console.log(`已更新显示为: ${city.name}`);
+
                     }
                 } else {
                     console.warn(`未找到城市: ${cityPinyin}`);

@@ -213,12 +213,8 @@ class IconEditorHandler {
         let bgimage = document.getElementById('edit-icon-image').value.trim();
         const categoryId = document.getElementById('edit-icon-category').value;
 
-        console.log('=== 开始保存图标 ===');
-        console.log('当前图标数据:', this.currentItem);
-        console.log('新名称:', name);
-        console.log('新链接:', target);
-        console.log('新背景图:', bgimage);
-        console.log('新分类 ID:', categoryId);
+
+
 
         if (!name) {
             ToastNotification.warning('请输入图标名称');
@@ -238,22 +234,21 @@ class IconEditorHandler {
         try {
             const { updateItem } = await import('../api-client.js');
 
-            console.log('调用 API 更新数据库...');
+
             await updateItem(this.currentItem.uuid, {
                 name,
                 target,
                 bgimage,
                 category_id: parseInt(categoryId)
             });
-            console.log('数据库更新成功');
+
 
             // 检查分类是否改变
             const categoryChanged = parseInt(categoryId) !== this.currentItem.category_id;
 
-            // 直接更新 DOM 中的图标元素
-            console.log('开始更新 DOM...');
+
             this.updateIconInDOM(name, target, bgimage);
-            console.log('DOM 更新完成');
+
 
             // 如果分类改变了，需要刷新页面以重新渲染
             if (categoryChanged) {
@@ -265,8 +260,7 @@ class IconEditorHandler {
                 ToastNotification.success('保存成功！');
             }
 
-            this.close();
-            console.log('=== 图标保存完成 ===\n');
+
         } catch (error) {
             console.error('保存失败:', error);
             ToastNotification.error('保存失败: ' + error.message);
@@ -277,37 +271,31 @@ class IconEditorHandler {
      * 直接更新 DOM 中的图标元素
      */
     updateIconInDOM(name, target, bgimage) {
-        console.log('[updateIconInDOM] 查找图标元素, UUID:', this.currentItem.uuid);
+
 
         // 找到对应的 grid-item 元素（注意：是 .grid-item 而不是 nav-icon）
         const gridItem = document.querySelector(`.grid-item[data-item-id="${this.currentItem.uuid}"]`);
         if (!gridItem) {
-            console.warn('[updateIconInDOM] 未找到对应的图标元素!');
-            console.log('[updateIconInDOM] 尝试查找所有 grid-item 元素:');
-            const allItems = document.querySelectorAll('.grid-item');
-            console.log('[updateIconInDOM] 找到的 grid-item 数量:', allItems.length);
-            allItems.forEach((item, index) => {
-                console.log(`[updateIconInDOM]   [${index}] UUID:`, item.dataset.itemId);
-            });
+
             return;
         }
-        console.log('[updateIconInDOM] 找到图标元素:', gridItem);
+
 
         // 获取 nav-icon 元素
         const iconElement = gridItem.querySelector('.nav-icon');
         if (!iconElement) {
-            console.warn('[updateIconInDOM] 未找到 .nav-icon 元素');
+
             return;
         }
 
         // 更新标题
         const titleElement = gridItem.querySelector('.nav-icon-title');
         if (titleElement) {
-            console.log('[updateIconInDOM] 更新标题:', titleElement.textContent, '->', name);
+
             titleElement.textContent = name;
             titleElement.title = name; // 同时更新 tooltip
         } else {
-            console.warn('[updateIconInDOM] 未找到标题元素 .nav-icon-title');
+
         }
 
         // 更新背景图片或首字母
@@ -315,7 +303,7 @@ class IconEditorHandler {
         const letterElement = iconElement.querySelector('.nav-icon-letter');
 
         if (bgimage) {
-            console.log('[updateIconInDOM] 设置背景图:', bgimage);
+
             // 将 Windows 路径分隔符 \ 转换为 URL 友好的 /
             let imageUrl = bgimage.replace(/\\/g, '/');
             // 如果路径不是完整URL且不以 static/ 开头，则添加 static/ico/ 前缀
@@ -326,33 +314,33 @@ class IconEditorHandler {
             if (bgElement) {
                 bgElement.style.backgroundImage = `url(${imageUrl})`;
                 bgElement.style.display = 'block';
-                console.log('[updateIconInDOM] 背景图元素已更新');
+
             } else {
-                console.warn('[updateIconInDOM] 未找到背景图元素 .nav-icon-bg，需要创建');
+
                 // 如果不存在背景图元素，需要创建
                 const newBgDiv = document.createElement('div');
                 newBgDiv.className = 'nav-icon-bg';
                 newBgDiv.style.backgroundImage = `url(${imageUrl})`;
                 newBgDiv.style.display = 'block';
                 iconElement.insertBefore(newBgDiv, iconElement.firstChild);
-                console.log('[updateIconInDOM] 已创建新的背景图元素');
+
             }
 
             // 隐藏首字母
             if (letterElement) {
-                console.log('[updateIconInDOM] 隐藏首字母元素');
+
                 letterElement.style.display = 'none';
             }
         } else {
-            console.log('[updateIconInDOM] 无背景图，显示首字母');
+
             // 显示首字母
             if (letterElement) {
                 const firstLetter = name.charAt(0).toUpperCase();
-                console.log('[updateIconInDOM] 设置首字母:', firstLetter);
+
                 letterElement.textContent = firstLetter;
                 letterElement.style.display = 'flex';
             } else {
-                console.warn('[updateIconInDOM] 未找到首字母元素 .nav-icon-letter，需要创建');
+
                 // 如果不存在首字母元素，需要创建
                 const newLetterDiv = document.createElement('div');
                 newLetterDiv.className = 'nav-icon-letter';
@@ -360,22 +348,19 @@ class IconEditorHandler {
                 newLetterDiv.textContent = firstLetter;
                 newLetterDiv.style.display = 'flex';
                 iconElement.appendChild(newLetterDiv);
-                console.log('[updateIconInDOM] 已创建新的首字母元素');
+
             }
 
             if (bgElement) {
-                console.log('[updateIconInDOM] 隐藏背景图元素');
+
                 bgElement.style.display = 'none';
             }
         }
 
         // 更新 data 属性
-        console.log('[updateIconInDOM] 更新 data-url:', gridItem.dataset.url, '->', target);
-        gridItem.dataset.url = target;
-        console.log('[updateIconInDOM] 更新 tooltip:', gridItem.dataset.tooltip, '->', name);
-        gridItem.dataset.tooltip = name;
 
-        console.log('[updateIconInDOM] 所有更新完成');
+
+
     }
 }
 
