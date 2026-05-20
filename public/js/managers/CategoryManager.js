@@ -69,13 +69,17 @@ class CategoryManager {
     getLayout(itemId) {
         // 从所有分类中查找该 item
         for (const categoryId in this.items) {
-            const item = this.items[categoryId].find(i => i.id === itemId);
+            const items = this.items[categoryId];
+            if (!items) continue;
+
+            // 使用 == 而不是 ===，因为 itemId 可能是字符串，而 item.id 可能是数字
+            const item = items.find(i => i.id == itemId);
             if (item) {
                 return {
                     width: item.width || 1,
                     height: item.height || 1,
                     sort_order: item.sort_order !== undefined ? item.sort_order : 0,
-                    category_id: item.category_id
+                    category_id: item.category_id !== undefined && item.category_id !== null ? item.category_id : parseInt(categoryId)
                 };
             }
         }

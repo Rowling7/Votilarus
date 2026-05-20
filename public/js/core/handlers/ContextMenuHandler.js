@@ -466,15 +466,22 @@ class ContextMenuHandler {
             } else {
                 // 图标：保持原有逻辑不变
                 const layout = this.getItemLayout(itemId);
-                if (!layout || !layout.category_id) {
+                if (!layout) {
                     ToastNotification.error('无法获取图标布局信息');
+                    return;
+                }
+
+                // 确保 category_id 存在且有效
+                const categoryId = layout.category_id;
+                if (categoryId === undefined || categoryId === null) {
+                    ToastNotification.error('图标分类信息缺失');
                     return;
                 }
 
                 const { updateItemLayout } = await import('../api-client.js');
                 await updateItemLayout({
                     item_id: itemId,
-                    category_id: layout.category_id,
+                    category_id: categoryId,
                     width: width,
                     height: height
                 });
@@ -483,9 +490,19 @@ class ContextMenuHandler {
                 gridItem.className = `grid-item size-${size}`;
 
                 // 同步更新 CategoryManager 缓存
-                if (window.categoryManager && window.categoryManager.layouts[itemId]) {
-                    window.categoryManager.layouts[itemId].width = width;
-                    window.categoryManager.layouts[itemId].height = height;
+                if (window.categoryManager) {
+                    // 在所有分类中查找并更新该图标
+                    for (const categoryId in window.categoryManager.items) {
+                        const items = window.categoryManager.items[categoryId];
+                        if (!items) continue;
+
+                        const item = items.find(i => i.id == itemId);
+                        if (item) {
+                            item.width = width;
+                            item.height = height;
+                            break;
+                        }
+                    }
                 }
 
                 ToastNotification.success(`图标尺寸已更改为 ${size}`);
