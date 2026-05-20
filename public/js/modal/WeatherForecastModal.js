@@ -87,8 +87,7 @@ class WeatherForecastModal extends BaseModal {
                         <button class="chart-metric-btn" data-metric="humidity">湿度</button>
                         <button class="chart-metric-btn" data-metric="wind_speed">风速</button>
                         <button class="chart-metric-btn" data-metric="clouds">云量</button>
-                        <button class="chart-metric-btn map-tab-btn" data-metric="map">🗺️ 地图</button>
-                        <button class="chart-metric-btn forecast-tab-btn" data-metric="forecast">预报</button>
+                        <button class="chart-metric-btn map-tab-btn" data-metric="map">️ 地图</button>
                     </div>
 
                     <!-- 图表区域 -->
@@ -154,9 +153,12 @@ class WeatherForecastModal extends BaseModal {
             btn.addEventListener('click', () => {
                 const metric = btn.dataset.metric;
                 if (metric === 'map') {
-                    this.switchToMap();
-                } else if (metric === 'forecast') {
-                    this.switchToForecast();
+                    // 根据当前状态切换地图/预报
+                    if (this.mapContainer.classList.contains('hidden')) {
+                        this.switchToMap();
+                    } else {
+                        this.switchToForecast();
+                    }
                 } else {
                     this.showForecastView(metric);
                 }
@@ -206,6 +208,7 @@ class WeatherForecastModal extends BaseModal {
         this.metricBtns.forEach(btn => {
             if (btn.dataset.metric === 'map') {
                 btn.classList.add('active');
+                btn.textContent = ' 预报'; // 切换按钮文本
             } else {
                 btn.classList.remove('active');
             }
@@ -232,6 +235,14 @@ class WeatherForecastModal extends BaseModal {
     switchToForecast() {
         // 显示天气卡片
         this.cardsContainer.classList.remove('hidden');
+
+        // 更新按钮状态
+        this.metricBtns.forEach(btn => {
+            if (btn.dataset.metric === 'map') {
+                btn.classList.remove('active');
+                btn.textContent = '️ 地图'; // 切换按钮文本
+            }
+        });
 
         // 隐藏地图，显示图表
         this.mapContainer.classList.add('hidden');
@@ -261,12 +272,7 @@ class WeatherForecastModal extends BaseModal {
      */
     initMap() {
         const mapElement = document.getElementById('weatherMap');
-        if (!mapElement) {
-            console.error('[WeatherMap] 地图容器不存在');
-            return;
-        }
-
-        console.log('[WeatherMap] 地图容器尺寸:', mapElement.offsetWidth, 'x', mapElement.offsetHeight);
+        if (!mapElement) return;
 
         // 创建地图实例，默认中心为中国，缩放级别 6
         this.map = L.map('weatherMap', {
@@ -291,10 +297,7 @@ class WeatherForecastModal extends BaseModal {
         // 等待地图渲染后刷新视图
         setTimeout(() => {
             this.map.invalidateSize();
-            console.log('[WeatherMap] 地图刷新完成');
         }, 100);
-
-        console.log('[WeatherMap] 地图初始化完成');
     }
 
     /**
@@ -313,8 +316,6 @@ class WeatherForecastModal extends BaseModal {
             opacity: 0.7,
             maxZoom: 10
         }).addTo(this.map);
-
-        console.log(`[WeatherMap] 已切换图层: ${layerType}`);
     }
 
     /**
@@ -892,11 +893,12 @@ class WeatherForecastModal extends BaseModal {
     switchMetric(metric) {
         this.currentMetric = metric;
 
-        // 更新按钮状态
+        // 更新按钮状态（但不修改地图按钮的文本）
         this.metricBtns.forEach(btn => {
             if (btn.dataset.metric === metric) {
                 btn.classList.add('active');
-            } else {
+            } else if (btn.dataset.metric !== 'map') {
+                // 只移除其他按钮的 active 状态，不修改地图按钮文本
                 btn.classList.remove('active');
             }
         });
