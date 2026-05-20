@@ -29,6 +29,10 @@ class WeatherForecastModal extends BaseModal {
         this.weatherData = null;
         this.themeColor = 'rgba(102, 126, 234, 0.3)';
         this.currentMetric = 'temperature'; // 当前显示的指标
+        this.map = null; // Leaflet 地图实例
+        this.currentTileLayer = null; // 当前瓦片图层
+        this.currentMapLayer = 'temp_new'; // 当前地图图层类型
+        this.userLocationMarker = null; // 用户位置标记
 
         this.init();
     }
@@ -83,11 +87,32 @@ class WeatherForecastModal extends BaseModal {
                         <button class="chart-metric-btn" data-metric="humidity">湿度</button>
                         <button class="chart-metric-btn" data-metric="wind_speed">风速</button>
                         <button class="chart-metric-btn" data-metric="clouds">云量</button>
+                        <button class="chart-metric-btn map-tab-btn" data-metric="map">🗺️ 地图</button>
+                        <button class="chart-metric-btn forecast-tab-btn" data-metric="forecast">预报</button>
                     </div>
 
                     <!-- 图表区域 -->
                     <div class="chart-container">
                         <canvas id="weatherChart"></canvas>
+                    </div>
+
+                    <!-- 地图区域 -->
+                    <div class="map-container hidden">
+                        <div class="map-layer-selector">
+                            <button class="map-layer-btn active" data-layer="temp_new">温度</button>
+                            <button class="map-layer-btn" data-layer="wind_new">风速</button>
+                            <button class="map-layer-btn" data-layer="precipitation_new">降水</button>
+                            <button class="map-layer-btn" data-layer="clouds_new">云量</button>
+                            <button class="map-layer-btn" data-layer="pressure_new">气压</button>
+                            <button class="map-layer-btn" data-layer="snow_new">降雪</button>
+                        </div>
+                        <div id="weatherMap"></div>
+                        <button class="locate-btn" title="定位到我的位置">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="3"></circle>
+                                <path d="M12 2v4M12 18v4M2 12h4M18 12h4"></path>
+                            </svg>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -99,10 +124,15 @@ class WeatherForecastModal extends BaseModal {
         this.modal = this.overlay.querySelector('.weather-forecast-modal');
         // 注意：closeBtn 现在由 BaseModal 统一管理，不需要在这里获取
         this.citySwitchBtn = this.overlay.querySelector('.city-switch-btn');
+        this.cardsContainer = this.overlay.querySelector('.weather-cards-container');
         this.cardsScroll = this.overlay.querySelector('.weather-cards-scroll');
         this.cityNameEl = this.overlay.querySelector('.city-name');
         this.dateRangeEl = this.overlay.querySelector('.weather-date-range');
         this.metricBtns = this.overlay.querySelectorAll('.chart-metric-btn');
+        this.chartContainer = this.overlay.querySelector('.chart-container');
+        this.mapContainer = this.overlay.querySelector('.map-container');
+        this.mapLayerBtns = this.overlay.querySelectorAll('.map-layer-btn');
+        this.locateBtn = this.overlay.querySelector('.locate-btn');
     }
 
     /**
@@ -123,8 +153,27 @@ class WeatherForecastModal extends BaseModal {
         this.metricBtns.forEach(btn => {
             btn.addEventListener('click', () => {
                 const metric = btn.dataset.metric;
-                this.switchMetric(metric);
+                if (metric === 'map') {
+                    this.switchToMap();
+                } else if (metric === 'forecast') {
+                    this.switchToForecast();
+                } else {
+                    this.showForecastView(metric);
+                }
             });
+        });
+
+        // 地图图层切换
+        this.mapLayerBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const layer = btn.dataset.layer;
+                this.switchMapLayer(layer);
+            });
+        });
+
+        // 定位按钮
+        this.locateBtn.addEventListener('click', () => {
+            this.locateUserPosition();
         });
     }
 
@@ -150,6 +199,188 @@ class WeatherForecastModal extends BaseModal {
     }
 
     /**
+     * 切换到地图视图
+     */
+    switchToMap() {
+        // 更新按钮状态
+        this.metricBtns.forEach(btn => {
+            if (btn.dataset.metric === 'map') {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
+        });
+
+        // 隐藏天气卡片
+        this.cardsContainer.classList.add('hidden');
+
+        // 显示地图容器，隐藏图表容器
+        this.chartContainer.classList.add('hidden');
+        this.mapContainer.classList.remove('hidden');
+
+        // 初始化地图（如果尚未初始化）
+        if (!this.map) {
+            setTimeout(() => {
+                this.initMap();
+            }, 100);
+        }
+    }
+
+    /**
+     * 切换到预报视图（点击“预报”按钮）
+     */
+    switchToForecast() {
+        // 显示天气卡片
+        this.cardsContainer.classList.remove('hidden');
+
+        // 隐藏地图，显示图表
+        this.mapContainer.classList.add('hidden');
+        this.chartContainer.classList.remove('hidden');
+
+        // 切换到温度标签
+        this.showForecastView('temperature');
+    }
+
+    /**
+     * 显示预报视图（显示卡片 + 指定指标的图表）
+     */
+    showForecastView(metric) {
+        // 确保卡片显示
+        this.cardsContainer.classList.remove('hidden');
+
+        // 隐藏地图，显示图表
+        this.mapContainer.classList.add('hidden');
+        this.chartContainer.classList.remove('hidden');
+
+        // 切换指标
+        this.switchMetric(metric);
+    }
+
+    /**
+     * 初始化 Leaflet 地图
+     */
+    initMap() {
+        const mapElement = document.getElementById('weatherMap');
+        if (!mapElement) return;
+
+        // 创建地图实例，默认中心为中国，缩放级别 6
+        this.map = L.map('weatherMap', {
+            center: [35.8617, 104.1954], // 中国中心坐标
+            zoom: 6,
+            minZoom: 3,
+            maxZoom: 10,
+            zoomControl: true,
+            attributionControl: false
+        });
+
+        // 添加基础图层（OpenStreetMap）
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(this.map);
+
+        // 添加天气图层
+        this.addWeatherTileLayer(this.currentMapLayer);
+
+        console.log('[WeatherMap] 地图初始化完成');
+    }
+
+    /**
+     * 添加天气瓦片图层
+     */
+    addWeatherTileLayer(layerType) {
+        // 移除旧图层
+        if (this.currentTileLayer) {
+            this.map.removeLayer(this.currentTileLayer);
+        }
+
+        // 创建新的瓦片图层，使用后端 API
+        const tileUrl = `/api/weather/tile/${layerType}/{z}/{x}/{y}`;
+
+        this.currentTileLayer = L.tileLayer(tileUrl, {
+            opacity: 0.7,
+            maxZoom: 10
+        }).addTo(this.map);
+
+        console.log(`[WeatherMap] 已切换图层: ${layerType}`);
+    }
+
+    /**
+     * 切换地图图层
+     */
+    switchMapLayer(layerType) {
+        this.currentMapLayer = layerType;
+
+        // 更新按钮状态
+        this.mapLayerBtns.forEach(btn => {
+            if (btn.dataset.layer === layerType) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
+        });
+
+        // 切换图层
+        if (this.map) {
+            this.addWeatherTileLayer(layerType);
+        }
+    }
+
+    /**
+     * 定位用户位置
+     */
+    locateUserPosition() {
+        if (!navigator.geolocation) {
+            toast.error('您的浏览器不支持地理定位');
+            return;
+        }
+
+        toast.info('正在获取您的位置...');
+
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                const { latitude, longitude } = position.coords;
+                console.log('[WeatherMap] 用户位置:', latitude, longitude);
+
+                // 移除旧标记
+                if (this.userLocationMarker) {
+                    this.map.removeLayer(this.userLocationMarker);
+                }
+
+                // 添加新标记
+                this.userLocationMarker = L.marker([latitude, longitude]).addTo(this.map);
+                this.userLocationMarker.bindPopup('您的位置').openPopup();
+
+                // 移动地图到用户位置
+                this.map.setView([latitude, longitude], 10);
+
+                toast.success('已定位到您的位置');
+            },
+            (error) => {
+                console.error('[WeatherMap] 定位失败:', error);
+                let message = '定位失败';
+                switch (error.code) {
+                    case error.PERMISSION_DENIED:
+                        message = '您拒绝了定位请求';
+                        break;
+                    case error.POSITION_UNAVAILABLE:
+                        message = '位置信息不可用';
+                        break;
+                    case error.TIMEOUT:
+                        message = '定位超时';
+                        break;
+                }
+                toast.error(message);
+            },
+            {
+                enableHighAccuracy: true,
+                timeout: 10000,
+                maximumAge: 0
+            }
+        );
+    }
+
+    /**
      * 关闭模态框
      */
     close() {
@@ -160,6 +391,14 @@ class WeatherForecastModal extends BaseModal {
         if (this.chart) {
             this.chart.destroy();
             this.chart = null;
+        }
+
+        // 销毁地图
+        if (this.map) {
+            this.map.remove();
+            this.map = null;
+            this.currentTileLayer = null;
+            this.userLocationMarker = null;
         }
     }
 
@@ -650,6 +889,10 @@ class WeatherForecastModal extends BaseModal {
             }
         });
 
+        // 显示图表容器，隐藏地图容器
+        this.chartContainer.classList.remove('hidden');
+        this.mapContainer.classList.add('hidden');
+
         // 重新渲染图表
         if (this.chart && this.weatherData) {
             const chartData = this.prepareChartData();
@@ -682,6 +925,15 @@ class WeatherForecastModal extends BaseModal {
         if (this.chart) {
             this.chart.destroy();
         }
+
+        // 销毁地图
+        if (this.map) {
+            this.map.remove();
+            this.map = null;
+            this.currentTileLayer = null;
+            this.userLocationMarker = null;
+        }
+
         // 调用父类的 destroy 方法
         super.destroy();
     }

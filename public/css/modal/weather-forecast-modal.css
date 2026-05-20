@@ -142,10 +142,13 @@
 .weather-forecast-body {
     flex: 1;
     overflow-y: auto;
+    overflow-x: hidden;
     padding: 1.5rem 2rem;
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
+    gap: 0.5rem;
+    /* 默认不显示滚动条，只有内容超出时才滚动 */
+    scrollbar-gutter: stable;
 }
 
 .weather-forecast-body::-webkit-scrollbar {
@@ -168,6 +171,20 @@
 /* 天气卡片滚动容器 */
 .weather-cards-container {
     position: relative;
+    flex-shrink: 0;
+    transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+        opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+        margin 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+        padding 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.weather-cards-container.hidden {
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+    transform: translateY(-10px);
 }
 
 .weather-cards-scroll {
@@ -179,6 +196,24 @@
     justify-content: space-between;
     -webkit-overflow-scrolling: touch;
     transition: opacity 0.2s ease;
+}
+
+.weather-cards-scroll::-webkit-scrollbar {
+    height: 6px;
+}
+
+.weather-cards-scroll::-webkit-scrollbar-track {
+    background: var(--bg-secondary);
+    border-radius: 3px;
+}
+
+.weather-cards-scroll::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 3px;
+}
+
+.weather-cards-scroll::-webkit-scrollbar-thumb:hover {
+    background: var(--text-tertiary);
 }
 
 .weather-cards-scroll::-webkit-scrollbar {
@@ -449,7 +484,9 @@
 /* 图表容器 */
 .chart-container {
     position: relative;
-    height: 350px;
+    flex: 1;
+    min-height: 250px;
+    max-height: 450px;
     background: var(--bg-secondary);
     border-radius: 1rem;
     padding: 1.5rem;
@@ -459,6 +496,10 @@
     animation: chartFadeIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
     animation-delay: 0.3s;
     transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.chart-container.hidden {
+    display: none;
 }
 
 /* 图表淡入动画 */
@@ -472,6 +513,132 @@
         opacity: 1;
         transform: translateY(0);
     }
+}
+
+/* ==================== 地图容器样式 ==================== */
+
+.map-container {
+    position: relative;
+    flex: 1;
+    min-height: 620px;
+    /* 移除 max-height 限制，让地图可以完全占满空间 */
+    background: var(--bg-secondary);
+    border-radius: 1rem;
+    padding: 1.5rem;
+    border: 1px solid var(--border-color);
+    opacity: 0;
+    transform: translateY(10px);
+    animation: mapFadeIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    animation-delay: 0.3s;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.map-container.hidden {
+    display: none;
+}
+
+@keyframes mapFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+#weatherMap {
+    width: 100%;
+    height: calc(100% - 60px);
+    border-radius: 0.75rem;
+    z-index: 1;
+    overflow: hidden;
+}
+
+/* 地图图层选择器 */
+.map-layer-selector {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+}
+
+.map-layer-btn {
+    padding: 0.6rem 1.25rem;
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.map-layer-btn::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(var(--theme-color-rgb), 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.map-layer-btn:active::before {
+    width: 300px;
+    height: 300px;
+}
+
+.map-layer-btn:hover {
+    background: var(--bg-hover);
+    border-color: var(--theme-color);
+    color: var(--theme-color);
+}
+
+.map-layer-btn.active {
+    background: var(--theme-color);
+    border-color: var(--theme-color);
+    color: #ffffff;
+    font-weight: 500;
+    box-shadow: 0 2px 8px rgba(var(--theme-color-rgb), 0.3);
+}
+
+/* 定位按钮 */
+.locate-btn {
+    position: absolute;
+    bottom: 2rem;
+    right: 2rem;
+    width: 40px;
+    height: 40px;
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
+    color: var(--text-primary);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    z-index: 1000;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.locate-btn:hover {
+    background: var(--theme-color);
+    border-color: var(--theme-color);
+    color: #ffffff;
+    transform: scale(1.05);
+}
+
+.locate-btn svg {
+    stroke: currentColor;
 }
 
 /* 移动端适配 */
@@ -527,8 +694,35 @@
     }
 
     .chart-container {
-        height: 280px;
+        min-height: 200px;
+        max-height: 350px;
         padding: 1rem;
+    }
+
+    .map-container {
+        min-height: 200px;
+        /* 移动端也移除 max-height，让地图占满空间 */
+        padding: 1rem;
+    }
+
+    #weatherMap {
+        height: calc(100% - 55px);
+    }
+
+    .map-layer-selector {
+        gap: 0.5rem;
+    }
+
+    .map-layer-btn {
+        padding: 0.5rem 1rem;
+        font-size: 0.8rem;
+    }
+
+    .locate-btn {
+        bottom: 1.5rem;
+        right: 1.5rem;
+        width: 36px;
+        height: 36px;
     }
 
     .chart-controls {
@@ -579,7 +773,23 @@
     }
 
     .chart-container {
-        height: 240px;
+        min-height: 180px;
+        max-height: 300px;
         padding: 0.75rem;
+    }
+
+    .map-container {
+        min-height: 180px;
+        /* 小屏幕也移除 max-height */
+        padding: 0.75rem;
+    }
+
+    #weatherMap {
+        height: calc(100% - 50px);
+    }
+
+    .map-layer-btn {
+        padding: 0.4rem 0.75rem;
+        font-size: 0.75rem;
     }
 }

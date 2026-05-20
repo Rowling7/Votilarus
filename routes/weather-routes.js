@@ -8,6 +8,7 @@ let db;
 // OpenWeatherMap API 配置
 const WEATHER_API_KEY = process.env.WEATHER_API_KEY || '269d058c99d1f3cdcd9232f62910df1d';
 const WEATHER_API_BASE = 'https://api.openweathermap.org/data/2.5';
+const TILE_API_BASE = 'https://tile.openweathermap.org/map';
 
 // 设置数据库连接
 function setDatabase(database) {
@@ -886,3 +887,133 @@ module.exports = {
     setDatabase,
     fetchAndSaveCurrentWeather
 };
+
+// ==================== 地图瓦片 API ====================
+
+/**
+ * GET /api/weather/tile/:layer/:z/:x/:y
+ * 获取地图瓦片（优先从缓存，缓存失效则从 API 获取）
+ */
+router.get('/tile/:layer/:z/:x/:y', (req, res) => {
+    const { layer, z, x, y } = req.params;
+    const zoom = parseInt(z);
+    const tileX = parseInt(x);
+    const tileY = parseInt(y);
+
+    // 验证图层类型
+    const validLayers = ['temp_new', 'wind_new', 'precipitation_new', 'clouds_new', 'pressure_new', 'snow_new'];
+    if (!validLayers.includes(layer)) {
+        return res.status(400).json({
+            success: false,
+            error: '不支持的图层类型'
+        });
+    }
+
+    // 1. 查询缓存
+    const cacheSql = `
+        SELECT tile_data FROM weather_json
+        WHERE layer_type = ?
+          AND zoom_level = ?
+          AND tile_x = ?
+          AND tile_y = ?
+          AND expires_at > datetime('now', 'localtime')
+        LIMIT 1
+    `;
+
+    db.get(cacheSql, [layer, zoom, tileX, tileY], (err, row) => {
+        if (err) {
+            console.error('[TileAPI] 查询缓存失败:', err);
+            return res.status(500).json({ error: err.message });
+        }
+
+        // 如果缓存存在且有效，直接返回图片
+        if (row && row.tile_data) {
+            res.set('Content-Type', 'image/png');
+            res.set('Cache-Control', 'public, max-age=21600'); // 6小时缓存
+            return res.send(row.tile_data);
+        }
+
+        // 2. 缓存不存在或已过期，从 API 获取
+        const tileUrl = `${TILE_API_BASE}/${layer}/${zoom}/${tileX}/${tileY}.png?appid=${WEATHER_API_KEY}`;
+
+        https.get(tileUrl, (apiRes) => {
+            const chunks = [];
+
+            apiRes.on('data', (chunk) => {
+                chunks.push(chunk);
+            });
+
+            apiRes.on('end', () => {
+                const buffer = Buffer.concat(chunks);
+
+                // 检查是否成功获取
+                if (apiRes.statusCode !== 200) {
+                    return res.status(apiRes.statusCode).json({
+                        success: false,
+                        error: '获取瓦片失败'
+                    });
+                }
+
+                // 3. 保存到数据库
+                const now = new Date();
+                const utc8Now = new Date(now.getTime() + 8 * 60 * 60 * 1000);
+                const expiresAt = new Date(utc8Now.getTime() + 6 * 60 * 60 * 1000); // 6小时后过期
+
+                const insertSql = `
+                    INSERT INTO weather_json (
+                        city_name, layer_type, zoom_level, tile_x, tile_y,
+                        tile_data, cached_at, expires_at
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                `;
+
+                const params = [
+                    'global', // 瓦片是全球性的，使用 'global' 作为城市名
+                    layer,
+                    zoom,
+                    tileX,
+                    tileY,
+                    buffer,
+                    utc8Now.toISOString().slice(0, 19).replace('T', ' '),
+                    expiresAt.toISOString().slice(0, 19).replace('T', ' ')
+                ];
+
+                db.run(insertSql, params, function (insertErr) {
+                    if (insertErr) {
+                        console.error('[TileAPI] 保存瓦片缓存失败:', insertErr);
+                    }
+                });
+
+                // 4. 返回图片
+                res.set('Content-Type', 'image/png');
+                res.set('Cache-Control', 'public, max-age=21600');
+                res.send(buffer);
+            });
+        }).on('error', (error) => {
+            console.error('[TileAPI] 获取瓦片失败:', error);
+            res.status(500).json({
+                success: false,
+                error: '网络错误'
+            });
+        });
+    });
+});
+
+/**
+ * POST /api/weather/tile/cleanup
+ * 清理过期的瓦片缓存数据
+ */
+router.post('/tile/cleanup', (req, res) => {
+    const sql = `DELETE FROM weather_json WHERE expires_at <= datetime('now', 'localtime')`;
+
+    db.run(sql, [], function (err) {
+        if (err) {
+            res.status(500).json({ error: err.message });
+            return;
+        }
+
+        res.json({
+            success: true,
+            message: `已删除 ${this.changes} 条过期瓦片记录`
+        });
+    });
+});
