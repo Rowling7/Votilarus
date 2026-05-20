@@ -834,6 +834,15 @@ class ContextMenuHandler {
             ToastNotification.error('移除失败: ' + error.message);
         }
     }
+
+    /**
+     * 显示自定义菜单（供外部调用）
+     * @param {MouseEvent} e - 鼠标事件
+     * @param {Array} items - 菜单项数组
+     */
+    showCustomMenu(e, items) {
+        this.renderMenu(items, e.clientX, e.clientY);
+    }
 }
 
 export default new ContextMenuHandler();

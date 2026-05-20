@@ -284,6 +284,32 @@ router.put('/:id', (req, res) => {
     });
 });
 
+// 搜索图标（模糊搜索名称和链接）
+router.get('/search', (req, res) => {
+    const { q } = req.query;
+
+    if (!q || q.trim() === '') {
+        res.json([]);
+        return;
+    }
+
+    const searchTerm = `%${q.trim()}%`;
+    const sql = `
+        SELECT * FROM icon_items 
+        WHERE deleted_flag = ? 
+        AND (title LIKE ? OR link_url LIKE ?)
+        ORDER BY COALESCE(sort_order, 999999) ASC, id ASC
+    `;
+
+    db.all(sql, ['0', searchTerm, searchTerm], (err, rows) => {
+        if (err) {
+            res.status(500).json({ error: err.message });
+            return;
+        }
+        res.json(rows);
+    });
+});
+
 module.exports = {
     router,
     setDatabase

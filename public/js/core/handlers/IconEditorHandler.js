@@ -20,9 +20,9 @@ class IconEditorHandler {
      * 创建对话框 DOM
      */
     createDialog() {
-        // 遮罩层
+        // 遮罩层（使用更高的 z-index）
         this.overlay = document.createElement('div');
-        this.overlay.className = 'modal-overlay';
+        this.overlay.className = 'modal-overlay icon-editor-overlay';
 
         // 对话框
         this.dialog = document.createElement('div');

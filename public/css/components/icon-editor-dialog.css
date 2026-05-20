@@ -1,5 +1,11 @@
 /* ==================== 图标编辑对话框样式 ==================== */
 
+/* 编辑对话框专用遮罩层（更高的 z-index） */
+.icon-editor-overlay {
+    z-index: 10000 !important;
+    /* 确保在搜索模态框上层 */
+}
+
 .icon-editor-dialog {
     position: fixed;
     top: 50%;
@@ -10,7 +16,8 @@
     background: var(--bg-primary);
     border-radius: 1.4rem;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-    z-index: 9999;
+    z-index: 10000;
+    /* 比搜索模态框高一级 */
     opacity: 0;
     visibility: hidden;
     transition: all 0.3s ease;

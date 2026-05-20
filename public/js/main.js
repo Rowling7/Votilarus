@@ -21,6 +21,9 @@ import NavSidebar from './components/NavSidebar.js';
 // 将 ModalManager 暴露到全局
 window.modalManager = ModalManager;
 
+// 将 ContextMenuHandler 暴露到全局，供 SearchModal 使用
+window.ContextMenuHandler = ContextMenuHandler;
+
 class App {
     constructor() {
         this.init();

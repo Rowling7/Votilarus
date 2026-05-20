@@ -25,6 +25,7 @@
 @import 'modal/calendar-modal.css';
 @import 'modal/weather-forecast-modal.css';
 @import 'modal/notebook-edit-modal.css';
+@import 'modal/search-modal.css';
 
 /* Widgets */
 @import 'widgets/clock-widget.css';
