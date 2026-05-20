@@ -16,17 +16,61 @@ class SearchBox extends HTMLElement {
 
     connectedCallback() {
         this.bindEvents();
+
+        // 立即尝试应用设置
+        this.applySettingsFromManager();
+
+        // 如果 SettingsManager 还未就绪，等待其初始化完成
+        if (!window.settingsManager) {
+            console.log('[SearchBox] Waiting for SettingsManager to initialize...');
+            const checkInterval = setInterval(() => {
+                if (window.settingsManager) {
+                    clearInterval(checkInterval);
+                    console.log('[SearchBox] SettingsManager is now available, applying settings...');
+                    this.applySettingsFromManager();
+                }
+            }, 50);
+
+            // 最多等待 2 秒
+            setTimeout(() => clearInterval(checkInterval), 2000);
+        }
     }
 
     attributeChangedCallback(name, oldValue, newValue) {
         if (oldValue !== newValue) {
             this.currentEngine = this.getAttribute('engine') || 'baidu';
             // 延迟渲染，确保在 connectedCallback 之后
-            if (this.shadowRoot.innerHTML) {
+            if (this.shadowRoot && this.shadowRoot.innerHTML) {
                 this.render();
                 this.bindEvents();
             }
         }
+    }
+
+    // 从 SettingsManager 应用配置
+    applySettingsFromManager() {
+        const settingsManager = window.settingsManager;
+        if (!settingsManager) {
+            console.warn('[SearchBox] SettingsManager not available yet');
+            return;
+        }
+
+        // 应用搜索引擎设置
+        const engine = settingsManager.get('search_engine');
+        if (engine && this.searchEngines[engine]) {
+            console.log('[SearchBox] Applying search engine from settings:', engine);
+            this.setAttribute('engine', engine);
+        } else if (engine) {
+            console.warn('[SearchBox] Search engine from settings not found in loaded engines:', engine);
+        }
+
+        // 应用位置设置
+        const position = settingsManager.get('search_box_position') || 'center';
+        this.setAttribute('position', position);
+
+        // 应用样式设置
+        const style = settingsManager.get('search_box_style') || 'rounded';
+        this.setAttribute('style', style);
     }
 
     async loadSearchEngines() {
@@ -41,10 +85,22 @@ class SearchBox extends HTMLElement {
             // 将数据库返回的数据转换为前端使用的格式
             this.searchEngines = {};
             engines.forEach(engine => {
+                let iconPath = engine.icon_path || this.getFallbackIcon();
+
+                // 如果提供了图片路径且不是完整URL，则添加 static/ico/ 前缀
+                if (iconPath && !iconPath.startsWith('http://') && !iconPath.startsWith('https://') && !iconPath.startsWith('data:')) {
+                    // 将 Windows 路径分隔符 \ 转换为 /
+                    iconPath = iconPath.replace(/\\/g, '/');
+                    // 如果路径不以 static/ 开头，则添加 static/ico/ 前缀
+                    if (!iconPath.startsWith('static/')) {
+                        iconPath = 'static/ico/' + iconPath;
+                    }
+                }
+
                 this.searchEngines[engine.title_en] = {
                     id: engine.id,
                     name: engine.title,
-                    icon: engine.icon_path || this.getFallbackIcon(),
+                    icon: iconPath,
                     url: engine.url,
                     sort_order: engine.sort_order
                 };
@@ -53,6 +109,9 @@ class SearchBox extends HTMLElement {
             // 重新渲染以显示加载的搜索引擎
             this.render();
             this.bindEvents();
+
+            // 搜索引擎加载完成后，再次应用设置以确保使用正确的默认引擎
+            this.applySettingsFromManager();
         } catch (error) {
             console.error('Error loading search engines:', error);
             // 如果加载失败，使用默认的硬编码数据作为后备
@@ -63,6 +122,9 @@ class SearchBox extends HTMLElement {
             };
             this.render();
             this.bindEvents();
+
+            // 即使加载失败，也要应用设置
+            this.applySettingsFromManager();
         }
     }
 
@@ -107,189 +169,235 @@ class SearchBox extends HTMLElement {
             <style>
                 :host {
                     display: block;
-                    width: 100%;
+                    position: fixed;
+                    top: 6rem;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    z-index: 100;
+                    width: 90%;
+                    max-width: 700px;
+                }
+
+                :host([position="left"]) {
+                    left: 2rem;
+                    transform: none;
+                }
+
+                :host([position="right"]) {
+                    left: auto;
+                    right: 2rem;
+                    transform: none;
                 }
 
                 .search-container {
-                    ${positionStyle}
-                    padding: 1rem;
-                }
-
-                .search-wrapper {
                     display: flex;
+                    flex-direction: column;
                     align-items: center;
-                    gap: 0.5rem;
-                    max-width: 600px;
+                    gap: 1rem;
                     width: 100%;
-                }
-
-                .engine-selector {
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    width: 3rem;
-                    height: 3rem;
-                    background: rgba(255, 255, 255, 0.1);
-                    backdrop-filter: blur(10px);
-                    border-radius: ${borderRadius};
-                    cursor: pointer;
-                    transition: all 0.2s ease;
-                    user-select: none;
-                    overflow: hidden;
-                }
-
-                .engine-selector img {
-                    width: 1.5rem;
-                    height: 1.5rem;
-                    object-fit: contain;
-                }
-
-                .engine-selector:hover {
-                    background: rgba(255, 255, 255, 0.2);
-                    transform: scale(1.05);
                 }
 
                 .search-input-wrapper {
-                    flex: 1;
+                    width: 100%;
                     position: relative;
                 }
 
-                .search-input {
-                    width: 100%;
-                    height: 3rem;
-                    padding: 0 1.5rem;
-                    background: rgba(255, 255, 255, 0.1);
-                    backdrop-filter: blur(10px);
-                    border: 2px solid transparent;
+                .search-box {
+                    width: 88%;
+                    padding: 1rem 1.5rem 1rem 3.5rem;
+                    border: 2px solid var(--border-color, rgba(255, 255, 255, 0.1));
                     border-radius: ${borderRadius};
-                    color: white;
+                    background: var(--glass-bg, rgba(255, 255, 255, 0.1));
+                    backdrop-filter: blur(var(--glass-blur, 10px));
+                    -webkit-backdrop-filter: blur(var(--glass-blur, 10px));
+                    color: var(--text-primary, white);
                     font-size: 1rem;
                     outline: none;
                     transition: all 0.2s ease;
                 }
 
-                .search-input::placeholder {
-                    color: rgba(255, 255, 255, 0.5);
+                .search-box:focus {
+                    border-color: var(--theme-color, #3b82f6);
+                    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
                 }
 
-                .search-input:focus {
-                    background: rgba(255, 255, 255, 0.15);
-                    border-color: var(--theme-color, #667eea);
+                .search-box::placeholder {
+                    color: var(--text-tertiary, rgba(255, 255, 255, 0.5));
                 }
 
-                .engine-dropdown {
+                .search-engine-icon {
                     position: absolute;
-                    top: calc(100% + 0.5rem);
-                    left: 0;
-                    background: rgba(0, 0, 0, 0.9);
-                    backdrop-filter: blur(10px);
-                    border-radius: 0.5rem;
-                    padding: 0.5rem;
-                    min-width: 150px;
-                    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+                    left: 1rem;
+                    top: 50%;
+                    transform: translateY(-50%);
+                    width: 1.5rem;
+                    height: 1.5rem;
+                    cursor: pointer;
+                    transition: all 0.2s ease;
+                    z-index: 10;
+                    pointer-events: auto;
+                }
+
+                .search-engine-icon:hover {
+                    transform: translateY(-50%) scale(1.1);
+                }
+
+                .search-engine-icon img {
+                    width: 100%;
+                    height: 100%;
+                    object-fit: contain;
+                }
+
+                .search-engine-bar {
+                    display: grid;
+                    grid-template-columns: repeat(9, 1fr);
+                    gap: 0.5rem;
+                    padding: 0.75rem 1.5rem;
+                    background: var(--glass-bg, rgba(255, 255, 255, 0.1));
+                    backdrop-filter: blur(var(--glass-blur, 10px));
+                    -webkit-backdrop-filter: blur(var(--glass-blur, 10px));
+                    border-radius: ${borderRadius};
+                    box-shadow: var(--shadow-md, 0 4px 6px rgba(0, 0, 0, 0.1));
+                    max-height: 0;
+                    overflow: hidden;
                     opacity: 0;
                     visibility: hidden;
                     transform: translateY(-10px);
                     transition: all 0.2s ease;
-                    z-index: 1000;
+                    margin-top: 0;
                 }
 
-                .engine-dropdown.visible {
+                .search-engine-bar.visible {
+                    max-height: 500px;
+                    padding: 0.75rem 1.5rem;
                     opacity: 1;
                     visibility: visible;
                     transform: translateY(0);
+
                 }
 
-                .engine-option {
+                .search-engine-item {
                     display: flex;
+                    flex-direction: column;
                     align-items: center;
-                    gap: 0.5rem;
-                    padding: 0.5rem 1rem;
-                    border-radius: 0.25rem;
+                    justify-content: center;
+                    gap: 0.25rem;
+                    padding: 0.5rem 0.25rem;
+                    border-radius: ${borderRadius};
                     cursor: pointer;
-                    transition: background 0.2s ease;
+                    transition: all 0.2s ease;
+                    background: transparent;
+                    border: none;
+                    color: var(--text-primary, white);
+                    min-width: unset;
+                    flex-shrink: 0;
+                }
+
+                .search-engine-item:hover {
+                    background: var(--bg-tertiary, rgba(255, 255, 255, 0.1));
+                    transform: translateY(-2px);
+                }
+
+                .search-engine-item.active {
+                    background: var(--theme-color, #3b82f6);
                     color: white;
                 }
 
-                .engine-option img {
-                    width: 1.2rem;
-                    height: 1.2rem;
+                .search-engine-item img {
+                    width: 1.75rem;
+                    height: 1.75rem;
                     object-fit: contain;
                 }
 
-                .engine-option:hover {
-                    background: rgba(255, 255, 255, 0.1);
+                .search-engine-item span {
+                    font-size: 0.75rem;
+                    white-space: nowrap;
                 }
 
-                .engine-option.active {
-                    background: var(--theme-color, #667eea);
+                .search-engine-item .add-icon {
+                    width: 1.75rem;
+                    height: 1.75rem;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 1.25rem;
+                    color: var(--text-secondary, rgba(255, 255, 255, 0.7));
+                }
+
+                .search-engine-item:hover .add-icon {
+                    color: var(--theme-color, #3b82f6);
                 }
             </style>
             <div class="search-container">
-                <div class="search-wrapper">
-                    <div class="engine-selector" title="切换搜索引擎">
+                <div class="search-input-wrapper">
+                    <div class="search-engine-icon" id="searchEngineIcon" title="点击选择搜索引擎">
                         <img src="${currentEngineInfo.icon}" alt="${currentEngineInfo.name}" onerror="this.src='${this.getFallbackIcon()}'">
                     </div>
-                    <div class="search-input-wrapper">
-                        <input 
-                            type="text" 
-                            class="search-input" 
-                            placeholder="搜索..."
-                        >
-                        <div class="engine-dropdown">
-                            ${sortedEngines.map(([key, info]) => `
-                                <div class="engine-option ${key === engine ? 'active' : ''}" data-engine="${key}">
-                                    <img src="${info.icon}" alt="${info.name}" onerror="this.src='${this.getFallbackIcon()}'">
-                                    <span>${info.name}</span>
-                                </div>
-                            `).join('')}
-                        </div>
-                    </div>
+                    <input type="text" class="search-box" id="searchInput" placeholder="输入搜索内容">
+                </div>
+                <div class="search-engine-bar" id="searchEngineBar">
+                    ${sortedEngines.map(([key, info]) => `
+                        <button class="search-engine-item ${key === engine ? 'active' : ''}" data-engine="${key}">
+                            <img src="${info.icon}" alt="${info.name}" onerror="this.src='${this.getFallbackIcon()}'">
+                            <span>${info.name}</span>
+                        </button>
+                    `).join('')}
+                    <button class="search-engine-item" id="addEngineBtn">
+                        <div class="add-icon">+</div>
+                        <span>添加</span>
+                    </button>
                 </div>
             </div>
         `;
     }
 
     bindEvents() {
-        const input = this.shadowRoot.querySelector('.search-input');
-        const engineSelector = this.shadowRoot.querySelector('.engine-selector');
-        const dropdown = this.shadowRoot.querySelector('.engine-dropdown');
-        const engineOptions = this.shadowRoot.querySelectorAll('.engine-option');
+        const searchInput = this.shadowRoot.querySelector('#searchInput');
+        const searchEngineIcon = this.shadowRoot.querySelector('#searchEngineIcon');
+        const searchEngineBar = this.shadowRoot.querySelector('#searchEngineBar');
+
+        if (!searchInput || !searchEngineIcon || !searchEngineBar) {
+            console.error('SearchBox elements not found in shadow DOM');
+            return;
+        }
 
         // 搜索输入（回车）
-        input.addEventListener('keypress', (e) => {
+        searchInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
-                const query = input.value.trim();
+                const query = searchInput.value.trim();
                 if (query) {
                     this.performSearch(query);
                 }
             }
         });
 
-        // 显示/隐藏引擎选择器
-        engineSelector.addEventListener('click', () => {
-            dropdown.classList.toggle('visible');
+        // 显示/隐藏引擎列表
+        searchEngineIcon.addEventListener('click', (e) => {
+            e.stopPropagation();
+            searchEngineBar.classList.toggle('visible');
         });
 
-        // 选择搜索引擎
-        engineOptions.forEach(option => {
-            option.addEventListener('click', () => {
-                const engine = option.dataset.engine;
-                this.setAttribute('engine', engine);
-                dropdown.classList.remove('visible');
-
-                // 派发事件通知父组件
-                this.dispatchEvent(new CustomEvent('engine-change', {
-                    bubbles: true,
-                    detail: { engine }
-                }));
+        // 绑定搜索引擎选择事件
+        searchEngineBar.querySelectorAll('.search-engine-item[data-engine]').forEach(item => {
+            item.addEventListener('click', () => {
+                const engine = item.dataset.engine;
+                this.setSearchEngine(engine);
             });
         });
 
-        // 点击外部关闭下拉菜单
+        // 绑定添加按钮事件
+        const addBtn = searchEngineBar.querySelector('#addEngineBtn');
+        if (addBtn) {
+            addBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                this.showAddEngineDialog();
+            });
+        }
+
+        // 点击外部关闭引擎列表
         document.addEventListener('click', (e) => {
             if (!this.contains(e.target)) {
-                dropdown.classList.remove('visible');
+                searchEngineBar.classList.remove('visible');
             }
         });
     }
@@ -313,6 +421,85 @@ class SearchBox extends HTMLElement {
 
         // 在新标签页打开
         window.open(url, '_blank');
+
+        // 清空输入框
+        const searchInput = this.shadowRoot.querySelector('#searchInput');
+        if (searchInput) {
+            searchInput.value = '';
+        }
+    }
+
+    // 设置搜索引擎
+    setSearchEngine(engine) {
+        console.log('[SearchBox] Setting search engine to:', engine);
+
+        // 保存到 SettingsManager（如果可用）
+        if (window.settingsManager) {
+            window.settingsManager.set('search_engine', engine).then(() => {
+                console.log('[SearchBox] Search engine saved to database:', engine);
+            }).catch(err => {
+                console.error('[SearchBox] Failed to save search engine:', err);
+            });
+        }
+
+        this.setAttribute('engine', engine);
+
+        // 更新引擎列表的激活状态
+        const searchEngineBar = this.shadowRoot.querySelector('#searchEngineBar');
+        if (searchEngineBar) {
+            searchEngineBar.querySelectorAll('.search-engine-item').forEach(item => {
+                const itemEngine = item.dataset.engine;
+                if (itemEngine) {
+                    item.classList.toggle('active', itemEngine === engine);
+                }
+            });
+        }
+
+        // 更新搜索框左侧图标
+        this.updateSearchEngineIcon();
+
+        // 关闭引擎列表
+        const bar = this.shadowRoot.querySelector('#searchEngineBar');
+        if (bar) {
+            bar.classList.remove('visible');
+        }
+    }
+
+    // 更新搜索框左侧的搜索引擎图标
+    updateSearchEngineIcon() {
+        const engine = this.getAttribute('engine') || 'baidu';
+
+        // 使用已加载的搜索引擎，如果没有则使用默认值
+        const engines = Object.keys(this.searchEngines).length > 0 ? this.searchEngines : {
+            baidu: { name: '百度', icon: 'static/ico/svg-baidu.svg', url: 'https://www.baidu.com/s?wd=' },
+            bing: { name: 'Bing', icon: 'static/ico/bing.png', url: 'https://www.bing.com/search?q=' },
+            google: { name: '谷歌', icon: 'static/ico/google.png', url: 'https://www.google.com/search?q=' }
+        };
+
+        const config = engines[engine] || engines.baidu;
+        if (!config) return;
+
+        const searchEngineIcon = this.shadowRoot.querySelector('#searchEngineIcon');
+        if (searchEngineIcon) {
+            searchEngineIcon.innerHTML = `<img src="${config.icon}" alt="${config.name}" onerror="this.src='${this.getFallbackIcon()}'">`;
+        }
+    }
+
+    // 显示添加搜索引擎对话框
+    showAddEngineDialog() {
+        // 动态导入 AddEngineDialog
+        import('../dialogs/AddEngineDialog.js').then(module => {
+            const AddEngineDialog = module.default;
+
+            AddEngineDialog.show(async () => {
+                // 成功回调：重新加载搜索引擎列表
+                await this.loadSearchEngines();
+                // 更新搜索框图标
+                this.updateSearchEngineIcon();
+            });
+        }).catch(error => {
+            console.error('Failed to load AddEngineDialog:', error);
+        });
     }
 
     // 公共方法：获取当前搜索引擎

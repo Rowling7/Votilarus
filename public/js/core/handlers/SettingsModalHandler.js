@@ -3,7 +3,6 @@
 import SettingsManager from '../../managers/SettingsManager.js';
 import ConfirmModal from '../../components/ConfirmModal.js';
 import ToastNotification from '../../utils/ToastNotification.js';
-import SearchHandler from './SearchHandler.js';
 
 class SettingsModalHandler {
     constructor() {
@@ -1012,68 +1011,32 @@ class SettingsModalHandler {
      * 应用搜索框位置
      */
     applySearchBoxPosition(position) {
-        const searchContainer = document.querySelector('.search-container');
-        if (!searchContainer) return;
+        const searchBox = document.querySelector('search-box');
+        if (!searchBox) return;
 
-        // 重置所有位置样式
-        searchContainer.style.top = '';
-        searchContainer.style.bottom = '';
-        searchContainer.style.left = '';
-        searchContainer.style.right = '';
-        searchContainer.style.transform = '';
-
-        switch (position) {
-            case 'center':
-                searchContainer.style.top = '2rem';
-                searchContainer.style.left = '50%';
-                searchContainer.style.transform = 'translateX(-50%)';
-                break;
-            case 'left':
-                searchContainer.style.top = '2rem';
-                searchContainer.style.left = '2rem';
-                searchContainer.style.transform = 'none';
-                break;
-            case 'right':
-                searchContainer.style.top = '2rem';
-                searchContainer.style.right = '2rem';
-                searchContainer.style.left = 'auto';
-                searchContainer.style.transform = 'none';
-                break;
-        }
+        // 通过设置属性来更新位置
+        searchBox.setAttribute('position', position);
     }
 
     /**
      * 应用搜索框样式
      */
     applySearchBoxStyle(style) {
-        const searchBox = document.querySelector('.search-box');
-        const searchEngineBar = document.querySelector('.search-engine-bar');
-
+        const searchBox = document.querySelector('search-box');
         if (!searchBox) return;
 
-        switch (style) {
-            case 'rounded':
-                searchBox.style.borderRadius = '1.5rem';
-                if (searchEngineBar) {
-                    searchEngineBar.style.borderRadius = '1.5rem';
-                }
-                break;
-            case 'square':
-                searchBox.style.borderRadius = '0.5rem';
-                if (searchEngineBar) {
-                    searchEngineBar.style.borderRadius = '0.5rem';
-                }
-                break;
-        }
+        // 通过设置属性来更新样式
+        searchBox.setAttribute('style', style);
     }
 
     /**
      * 更新搜索引擎图标
      */
     updateSearchEngineIcon() {
-        // 调用 SearchHandler 的 updateSearchEngineIcon 方法
-        if (SearchHandler && SearchHandler.updateSearchEngineIcon) {
-            SearchHandler.updateSearchEngineIcon();
+        // 获取 SearchBox 组件并调用其方法
+        const searchBox = document.querySelector('search-box');
+        if (searchBox && searchBox.updateSearchEngineIcon) {
+            searchBox.updateSearchEngineIcon();
         }
     }
 

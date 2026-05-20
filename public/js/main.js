@@ -7,7 +7,6 @@ import WidgetManager from './managers/WidgetManager.js';
 import ModalManager from './managers/ModalManager.js';
 import IconRenderer from './core/renderers/IconRenderer.js';
 import SidebarRenderer from './core/renderers/SidebarRenderer.js';
-import SearchHandler from './core/handlers/SearchHandler.js';
 import DragHandler from './core/handlers/DragHandler.js';
 import ContextMenuHandler from './core/handlers/ContextMenuHandler.js';
 import SettingsModalHandler from './core/handlers/SettingsModalHandler.js';
@@ -44,9 +43,6 @@ class App {
 
             // 将 SettingsManager 暴露到全局，供其他模块使用
             window.settingsManager = SettingsManager;
-
-            // 初始化搜索处理器（需要在 SettingsManager 之后）
-            await SearchHandler.init();
 
             // 初始化分类和数据
             const dataLoadStart = performance.now();

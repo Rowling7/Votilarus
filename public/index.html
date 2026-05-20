@@ -26,19 +26,7 @@
     </aside>
 
     <!-- 搜索框 -->
-    <div class="search-container">
-        <div class="search-input-wrapper">
-            <!-- 搜索引擎图标（点击展开快捷栏） -->
-            <div class="search-engine-icon" id="searchEngineIcon" title="点击选择搜索引擎">
-                <!-- 通过 JS 动态生成 -->
-            </div>
-            <input type="text" class="search-box" id="searchBox" placeholder="输入搜索内容">
-        </div>
-        <!-- 搜索引擎快捷选择栏 -->
-        <div class="search-engine-bar" id="searchEngineBar">
-            <!-- 通过 JS 动态生成 -->
-        </div>
-    </div>
+    <search-box id="searchBox" engine="baidu" position="center" style="rounded"></search-box>
 
     <!-- 右侧内容区 -->
     <main class="content-area" id="contentArea">
