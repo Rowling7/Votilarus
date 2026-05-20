@@ -227,8 +227,8 @@ class NotebookWidget extends BaseWidget {
             item.addEventListener('click', () => {
 
                 const uuid = item.dataset.uuid;
-                if (uuid && window.ModalManager) {
-                    window.ModalManager.showNotebookModal(uuid);
+                if (uuid && window.modalManager) {
+                    window.modalManager.showNotebookModal(uuid);
                 }
             });
         });

@@ -1,7 +1,6 @@
 // ==================== 日历小组件 ====================
 
 import BaseWidget from './BaseWidget.js';
-import CalendarModal from '../modal/CalendarModal.js';
 import lunarConverter from '../utils/Lunar.js';
 
 // 从全局对象获取 TimeUtils（UMD 模式导出）
@@ -60,7 +59,9 @@ class CalendarWidget extends BaseWidget {
         const widgetEl = this.container.querySelector('.calendar-widget');
         if (widgetEl) {
             widgetEl.addEventListener('click', () => {
-                CalendarModal.open();
+                if (window.modalManager) {
+                    window.modalManager.showCalendarModal();
+                }
             });
         }
     }

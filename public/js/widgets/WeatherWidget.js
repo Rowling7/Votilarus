@@ -3,7 +3,6 @@
 import BaseWidget from './BaseWidget.js';
 import weatherCache from '../utils/WeatherCache.js';
 import CityModal from '../components/CityModal.js';
-import WeatherForecastModal from '../modal/WeatherForecastModal.js';
 
 class WeatherWidget extends BaseWidget {
     /**
@@ -480,14 +479,18 @@ class WeatherWidget extends BaseWidget {
      * 初始化天气预报详情模态框
      */
     initForecastModal() {
-        this.forecastModal = new WeatherForecastModal({
-            onCityChange: () => {
+        // 使用 ModalManager 获取天气预报模态框实例
+        if (window.modalManager) {
+            this.forecastModal = window.modalManager.getWeatherForecastModal();
+
+            // 设置城市切换回调
+            this.forecastModal.customOptions.onCityChange = () => {
                 // 打开城市选择模态框
                 if (this.cityModal) {
                     this.cityModal.open();
                 }
-            }
-        });
+            };
+        }
 
         // 绑定 weather-content 点击事件
         setTimeout(() => {
@@ -504,7 +507,9 @@ class WeatherWidget extends BaseWidget {
                     const cityName = locationNameEl ? locationNameEl.textContent : this.options.city;
 
                     // 打开预报模态框
-                    this.forecastModal.open(this.options.city, cityName, this.extractedColor);
+                    if (window.modalManager) {
+                        window.modalManager.showWeatherForecastModal(this.options.city, cityName, this.extractedColor);
+                    }
                 });
             }
         }, 100);
