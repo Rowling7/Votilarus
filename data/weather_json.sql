@@ -30,8 +30,8 @@ CREATE TABLE "weather_json" (
   -- 瓦片 x 坐标
   "tile_y" INTEGER NOT NULL,
   -- 瓦片 y 坐标
-  "tile_data" BLOB NOT NULL,
-  -- 瓦片图片数据（PNG）
+  "file_path" TEXT NOT NULL,
+  -- 瓦片文件路径（相对于 public/static/background/weather_json）
   "cached_at" DATETIME NOT NULL,
   "expires_at" DATETIME NOT NULL,
   "created_at" DATETIME DEFAULT (datetime('now', 'localtime')),

@@ -90,7 +90,7 @@ async function initializeDatabase() {
                         zoom_level INTEGER NOT NULL,
                         tile_x INTEGER NOT NULL,
                         tile_y INTEGER NOT NULL,
-                        tile_data BLOB NOT NULL,
+                        file_path TEXT NOT NULL,
                         cached_at DATETIME NOT NULL,
                         expires_at DATETIME NOT NULL,
                         created_at DATETIME DEFAULT (datetime('now', 'localtime')),
@@ -103,7 +103,87 @@ async function initializeDatabase() {
                         console.error("Error creating weather_json table:", err2);
                     } else {
                         console.log('[Database] weather_json 表已就绪');
-                        createIndexes();
+
+                        // 检查并升级表结构（如果存在旧字段 tile_data）
+                        db.all("PRAGMA table_info(weather_json)", [], (pragmaErr, columns) => {
+                            if (pragmaErr) {
+                                console.error('[Database] 检查表结构失败:', pragmaErr);
+                                return createIndexes();
+                            }
+
+                            const hasTileData = columns.some(col => col.name === 'tile_data');
+                            const hasFilePath = columns.some(col => col.name === 'file_path');
+
+                            if (hasTileData && !hasFilePath) {
+                                // 需要升级：添加 file_path 字段，删除 tile_data 字段
+                                console.log('[Database] 检测到旧表结构，正在升级...');
+
+                                // SQLite 不支持直接删除列，需要重建表
+                                db.serialize(() => {
+                                    db.run('BEGIN TRANSACTION');
+
+                                    // 1. 创建新表
+                                    db.run(`CREATE TABLE weather_json_new (
+                                        id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+                                        city_name TEXT NOT NULL,
+                                        layer_type TEXT NOT NULL,
+                                        zoom_level INTEGER NOT NULL,
+                                        tile_x INTEGER NOT NULL,
+                                        tile_y INTEGER NOT NULL,
+                                        file_path TEXT NOT NULL,
+                                        cached_at DATETIME NOT NULL,
+                                        expires_at DATETIME NOT NULL,
+                                        created_at DATETIME DEFAULT (datetime('now', 'localtime')),
+                                        updated_at DATETIME DEFAULT (datetime('now', 'localtime'))
+                                    )`, (tableErr) => {
+                                        if (tableErr) {
+                                            console.error('[Database] 创建新表失败:', tableErr);
+                                            db.run('ROLLBACK');
+                                            return createIndexes();
+                                        }
+
+                                        // 2. 迁移数据（清空，因为 BLOB 数据无法迁移）
+                                        db.run('INSERT INTO weather_json_new (id, city_name, layer_type, zoom_level, tile_x, tile_y, file_path, cached_at, expires_at, created_at, updated_at) SELECT id, city_name, layer_type, zoom_level, tile_x, tile_y, "", cached_at, expires_at, created_at, updated_at FROM weather_json', (insertErr) => {
+                                            if (insertErr) {
+                                                console.error('[Database] 迁移数据失败:', insertErr);
+                                                db.run('ROLLBACK');
+                                                return createIndexes();
+                                            }
+
+                                            // 3. 删除旧表
+                                            db.run('DROP TABLE weather_json', (dropErr) => {
+                                                if (dropErr) {
+                                                    console.error('[Database] 删除旧表失败:', dropErr);
+                                                    db.run('ROLLBACK');
+                                                    return createIndexes();
+                                                }
+
+                                                // 4. 重命名新表
+                                                db.run('ALTER TABLE weather_json_new RENAME TO weather_json', (renameErr) => {
+                                                    if (renameErr) {
+                                                        console.error('[Database] 重命名表失败:', renameErr);
+                                                        db.run('ROLLBACK');
+                                                        return createIndexes();
+                                                    }
+
+                                                    // 5. 提交事务
+                                                    db.run('COMMIT', (commitErr) => {
+                                                        if (commitErr) {
+                                                            console.error('[Database] 提交事务失败:', commitErr);
+                                                        } else {
+                                                            console.log('[Database] 表结构升级完成');
+                                                        }
+                                                        createIndexes();
+                                                    });
+                                                });
+                                            });
+                                        });
+                                    });
+                                });
+                            } else {
+                                createIndexes();
+                            }
+                        });
                     }
                 });
             }

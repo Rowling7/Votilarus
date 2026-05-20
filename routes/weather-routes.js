@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const https = require('https');
+const path = require('path');
+const fs = require('fs');
 
 // 需要注入 db 对象
 let db;
@@ -911,7 +913,7 @@ router.get('/tile/:layer/:z/:x/:y', (req, res) => {
 
     // 1. 查询缓存
     const cacheSql = `
-        SELECT tile_data FROM weather_json
+        SELECT file_path FROM weather_json
         WHERE layer_type = ?
           AND zoom_level = ?
           AND tile_x = ?
@@ -926,11 +928,16 @@ router.get('/tile/:layer/:z/:x/:y', (req, res) => {
             return res.status(500).json({ error: err.message });
         }
 
-        // 如果缓存存在且有效，直接返回图片
-        if (row && row.tile_data) {
-            res.set('Content-Type', 'image/png');
-            res.set('Cache-Control', 'public, max-age=21600'); // 6小时缓存
-            return res.send(row.tile_data);
+        // 如果缓存存在且有效，读取文件并返回
+        if (row && row.file_path) {
+            const filePath = path.join(__dirname, '..', 'public', 'static', 'background', 'weather_json', row.file_path);
+
+            // 检查文件是否存在
+            if (fs.existsSync(filePath)) {
+                res.set('Content-Type', 'image/png');
+                res.set('Cache-Control', 'public, max-age=21600'); // 6小时缓存
+                return res.sendFile(filePath);
+            }
         }
 
         // 2. 缓存不存在或已过期，从 API 获取
@@ -954,15 +961,35 @@ router.get('/tile/:layer/:z/:x/:y', (req, res) => {
                     });
                 }
 
-                // 3. 保存到数据库
+                // 3. 保存到文件系统
                 const now = new Date();
                 const utc8Now = new Date(now.getTime() + 8 * 60 * 60 * 1000);
                 const expiresAt = new Date(utc8Now.getTime() + 6 * 60 * 60 * 1000); // 6小时后过期
 
+                // 构建文件路径: layer/z{x}/x{x}_y{y}.png
+                const fileName = `x${tileX}_y${tileY}.png`;
+                const dirPath = path.join(__dirname, '..', 'public', 'static', 'background', 'weather_json', layer, `z${zoom}`);
+                const relativePath = path.join(layer, `z${zoom}`, fileName);
+                const fullPath = path.join(dirPath, fileName);
+
+                // 确保目录存在
+                if (!fs.existsSync(dirPath)) {
+                    fs.mkdirSync(dirPath, { recursive: true });
+                }
+
+                // 写入文件
+                try {
+                    fs.writeFileSync(fullPath, buffer);
+                } catch (writeErr) {
+                    console.error('[TileAPI] 保存瓦片文件失败:', writeErr);
+                    return res.status(500).json({ error: '保存文件失败' });
+                }
+
+                // 4. 保存到数据库（只存路径）
                 const insertSql = `
                     INSERT INTO weather_json (
                         city_name, layer_type, zoom_level, tile_x, tile_y,
-                        tile_data, cached_at, expires_at
+                        file_path, cached_at, expires_at
                     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
                 `;
 
@@ -972,18 +999,18 @@ router.get('/tile/:layer/:z/:x/:y', (req, res) => {
                     zoom,
                     tileX,
                     tileY,
-                    buffer,
+                    relativePath,
                     utc8Now.toISOString().slice(0, 19).replace('T', ' '),
                     expiresAt.toISOString().slice(0, 19).replace('T', ' ')
                 ];
 
                 db.run(insertSql, params, function (insertErr) {
                     if (insertErr) {
-                        console.error('[TileAPI] 保存瓦片缓存失败:', insertErr);
+                        console.error('[TileAPI] 保存瓦片记录失败:', insertErr);
                     }
                 });
 
-                // 4. 返回图片
+                // 5. 返回图片
                 res.set('Content-Type', 'image/png');
                 res.set('Cache-Control', 'public, max-age=21600');
                 res.send(buffer);
@@ -1000,20 +1027,49 @@ router.get('/tile/:layer/:z/:x/:y', (req, res) => {
 
 /**
  * POST /api/weather/tile/cleanup
- * 清理过期的瓦片缓存数据
+ * 清理过期的瓦片缓存数据（包括文件和数据库记录）
  */
 router.post('/tile/cleanup', (req, res) => {
-    const sql = `DELETE FROM weather_json WHERE expires_at <= datetime('now', 'localtime')`;
+    // 1. 先查询所有过期记录的文件路径
+    const selectSql = `SELECT file_path FROM weather_json WHERE expires_at <= datetime('now', 'localtime')`;
 
-    db.run(sql, [], function (err) {
+    db.all(selectSql, [], (err, rows) => {
         if (err) {
-            res.status(500).json({ error: err.message });
-            return;
+            console.error('[TileCleanup] 查询过期记录失败:', err);
+            return res.status(500).json({ error: err.message });
         }
 
-        res.json({
-            success: true,
-            message: `已删除 ${this.changes} 条过期瓦片记录`
+        // 2. 删除物理文件
+        let deletedFiles = 0;
+        if (rows && rows.length > 0) {
+            rows.forEach(row => {
+                if (row.file_path) {
+                    const filePath = path.join(__dirname, '..', 'public', 'static', 'background', 'weather_json', row.file_path);
+                    try {
+                        if (fs.existsSync(filePath)) {
+                            fs.unlinkSync(filePath);
+                            deletedFiles++;
+                        }
+                    } catch (fileErr) {
+                        console.error(`[TileCleanup] 删除文件失败: ${filePath}`, fileErr);
+                    }
+                }
+            });
+        }
+
+        // 3. 删除数据库记录
+        const deleteSql = `DELETE FROM weather_json WHERE expires_at <= datetime('now', 'localtime')`;
+
+        db.run(deleteSql, [], function (dbErr) {
+            if (dbErr) {
+                console.error('[TileCleanup] 删除数据库记录失败:', dbErr);
+                return res.status(500).json({ error: dbErr.message });
+            }
+
+            res.json({
+                success: true,
+                message: `已清理 ${this.changes} 条过期记录，删除 ${deletedFiles} 个文件`
+            });
         });
     });
 });
