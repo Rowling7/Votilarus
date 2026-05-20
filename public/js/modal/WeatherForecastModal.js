@@ -191,9 +191,15 @@ class WeatherForecastModal extends BaseModal {
                     预报天数: this.weatherData.forecast?.length || 0,
                     总卡片数: (this.weatherData.history?.length || 0) + 1 + (this.weatherData.forecast?.length || 0)
                 });
+                
+                // 重新渲染时添加动画效果
                 this.renderWeatherCards();
                 this.updateDateRange();
-                this.initChart();
+                
+                // 延迟初始化图表，等待卡片动画完成
+                setTimeout(() => {
+                    this.initChart();
+                }, 300);
             } else {
                 toast.error('获取天气数据失败');
                 this.close();
@@ -229,22 +235,32 @@ class WeatherForecastModal extends BaseModal {
     renderWeatherCards() {
         if (!this.weatherData) return;
 
-        let html = '';
+        // 添加淡出效果
+        this.cardsScroll.style.opacity = '0';
+        
+        setTimeout(() => {
+            let html = '';
 
-        // 历史数据
-        this.weatherData.history.forEach(day => {
-            html += this.createWeatherCard(day, 'history');
-        });
+            // 历史数据
+            this.weatherData.history.forEach(day => {
+                html += this.createWeatherCard(day, 'history');
+            });
 
-        // 当前数据
-        html += this.createWeatherCard(this.weatherData.current, 'current');
+            // 当前数据
+            html += this.createWeatherCard(this.weatherData.current, 'current');
 
-        // 预报数据
-        this.weatherData.forecast.forEach(day => {
-            html += this.createWeatherCard(day, 'forecast');
-        });
+            // 预报数据
+            this.weatherData.forecast.forEach(day => {
+                html += this.createWeatherCard(day, 'forecast');
+            });
 
-        this.cardsScroll.innerHTML = html;
+            this.cardsScroll.innerHTML = html;
+            
+            // 恢复透明度，触发动画
+            setTimeout(() => {
+                this.cardsScroll.style.opacity = '1';
+            }, 50);
+        }, 200);
     }
 
     /**
@@ -639,8 +655,23 @@ class WeatherForecastModal extends BaseModal {
             const chartData = this.prepareChartData();
             const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
 
-            this.chart.data.datasets = this.getDatasets(chartData, isDarkMode);
-            this.chart.update();
+            // 添加淡出效果
+            const chartContainer = document.querySelector('.chart-container');
+            if (chartContainer) {
+                chartContainer.style.opacity = '0.5';
+                chartContainer.style.transform = 'scale(0.98)';
+            }
+
+            setTimeout(() => {
+                this.chart.data.datasets = this.getDatasets(chartData, isDarkMode);
+                this.chart.update('active'); // 使用 'active' 模式实现平滑过渡
+                
+                // 恢复透明度
+                if (chartContainer) {
+                    chartContainer.style.opacity = '1';
+                    chartContainer.style.transform = 'scale(1)';
+                }
+            }, 150);
         }
     }
 

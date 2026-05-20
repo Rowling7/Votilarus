@@ -100,6 +100,26 @@
     font-size: 0.85rem;
     cursor: pointer;
     transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.city-switch-btn::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(var(--theme-color-rgb), 0.2);
+    transform: translate(-50%, -50%);
+    transition: width 0.5s, height 0.5s;
+}
+
+.city-switch-btn:active::after {
+    width: 200px;
+    height: 200px;
 }
 
 .city-switch-btn:hover {
@@ -158,6 +178,7 @@
     scroll-behavior: smooth;
     justify-content: space-between;
     -webkit-overflow-scrolling: touch;
+    transition: opacity 0.2s ease;
 }
 
 .weather-cards-scroll::-webkit-scrollbar {
@@ -198,19 +219,58 @@
     transition: all 0.2s ease;
     text-align: center;
     flex-shrink: 0;
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+    animation: cardFadeIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 }
+
+/* 卡片淡入动画 */
+@keyframes cardFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* 为每个卡片设置不同的延迟，形成级联效果 */
+.weather-card:nth-child(1) { animation-delay: 0.05s; }
+.weather-card:nth-child(2) { animation-delay: 0.1s; }
+.weather-card:nth-child(3) { animation-delay: 0.15s; }
+.weather-card:nth-child(4) { animation-delay: 0.2s; }
+.weather-card:nth-child(5) { animation-delay: 0.25s; }
+.weather-card:nth-child(6) { animation-delay: 0.3s; }
+.weather-card:nth-child(7) { animation-delay: 0.35s; }
+.weather-card:nth-child(8) { animation-delay: 0.4s; }
+.weather-card:nth-child(9) { animation-delay: 0.45s; }
+.weather-card:nth-child(10) { animation-delay: 0.5s; }
 
 .weather-card:hover {
     background: var(--bg-hover);
     border-color: var(--theme-color);
-    transform: translateY(-4px);
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+    transform: translateY(-4px) scale(1.02);
+    box-shadow: 0 8px 24px rgba(var(--theme-color-rgb), 0.25);
 }
 
 .weather-card.today {
     background: rgba(var(--theme-color-rgb), 0.1);
     border-color: var(--theme-color);
     box-shadow: 0 4px 12px rgba(var(--theme-color-rgb), 0.2);
+    animation: cardFadeIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards, todayPulse 2s ease-in-out infinite;
+    animation-delay: 0s, 1s;
+}
+
+/* 今天卡片的脉冲动画 */
+@keyframes todayPulse {
+    0%, 100% {
+        box-shadow: 0 4px 12px rgba(var(--theme-color-rgb), 0.2);
+    }
+    50% {
+        box-shadow: 0 4px 20px rgba(var(--theme-color-rgb), 0.4);
+    }
 }
 
 .card-date {
@@ -289,6 +349,22 @@
     gap: 0.75rem;
     flex-wrap: wrap;
     padding: 0.5rem 0;
+    opacity: 0;
+    transform: translateY(10px);
+    animation: controlsFadeIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    animation-delay: 0.2s;
+}
+
+/* 控制栏淡入动画 */
+@keyframes controlsFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .chart-metric-btn {
@@ -300,6 +376,26 @@
     font-size: 0.85rem;
     cursor: pointer;
     transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.chart-metric-btn::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(var(--theme-color-rgb), 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.chart-metric-btn:active::before {
+    width: 300px;
+    height: 300px;
 }
 
 .chart-metric-btn:hover {
@@ -324,6 +420,23 @@
     border-radius: 1rem;
     padding: 1.5rem;
     border: 1px solid var(--border-color);
+    opacity: 0;
+    transform: translateY(10px);
+    animation: chartFadeIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    animation-delay: 0.3s;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+/* 图表淡入动画 */
+@keyframes chartFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 /* 移动端适配 */
