@@ -1157,12 +1157,12 @@ class SettingsModalHandler {
      * 刷新所有图标以应用新设置
      */
     refreshAllIcons() {
-        // 获取所有图标容器
+        // 获取所有图标容器（排除 widget）
         let iconContainers = document.querySelectorAll('.nav-icon');
 
-        // 如果没找到，尝试其他可能的选择器
+        // 如果没找到，尝试其他可能的选择器（但排除 widget-item）
         if (iconContainers.length === 0) {
-            iconContainers = document.querySelectorAll('.grid-item');
+            iconContainers = document.querySelectorAll('.grid-item:not(.widget-item)');
         }
 
         // 获取当前的图标圆角值
@@ -1174,6 +1174,22 @@ class SettingsModalHandler {
 
             // 强制触发重排
             void container.offsetHeight;
+        });
+
+        // 清除 widget-item 上可能存在的错误内联样式
+        this.clearWidgetItemBorderRadius();
+    }
+
+    /**
+     * 清除 widget-item 上的错误 border-radius 内联样式
+     */
+    clearWidgetItemBorderRadius() {
+        const widgetItems = document.querySelectorAll('.grid-item.widget-item');
+        widgetItems.forEach(item => {
+            // 移除可能被错误设置的内联 borderRadius
+            if (item.style.borderRadius) {
+                item.style.removeProperty('border-radius');
+            }
         });
     }
 

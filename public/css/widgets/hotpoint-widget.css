@@ -1,0 +1,322 @@
+/* ==================== 热点资讯小组件样式 ==================== */
+
+/* ===== CSS 变量定义（亮色模式）===== */
+.grid-item[data-widget-type="hotpoint"] {
+    --hotpoint-text-primary: var(--text-primary, #1a1a1a);
+    --hotpoint-text-secondary: var(--text-secondary, #666666);
+    --hotpoint-text-tertiary: var(--text-tertiary, #999999);
+    --hotpoint-hot-value-color: #d32f2f;
+    --hotpoint-hot-value-bg: rgba(255, 0, 0, 0.1);
+    --hotpoint-border-color: var(--border-color, rgba(0, 0, 0, 0.1));
+    --hotpoint-item-bg: rgba(0, 0, 0, 0.05);
+    --hotpoint-item-hover-bg: rgba(0, 0, 0, 0.1);
+    --hotpoint-switch-btn-bg: rgba(0, 0, 0, 0.1);
+    --hotpoint-switch-btn-hover-bg: rgba(0, 0, 0, 0.15);
+    --hotpoint-loading-color: var(--text-secondary, #666666);
+    --hotpoint-spinner-border: rgba(0, 0, 0, 0.2);
+    --hotpoint-spinner-top: var(--text-primary, #1a1a1a);
+}
+
+/* ===== 暗黑模式 CSS 变量覆盖 ===== */
+[data-theme="dark"] .grid-item[data-widget-type="hotpoint"] {
+    --hotpoint-text-primary: var(--text-primary, #ffffff);
+    --hotpoint-text-secondary: var(--text-secondary, #b0b0b0);
+    --hotpoint-text-tertiary: var(--text-tertiary, #808080);
+    --hotpoint-hot-value-color: #ff6b6b;
+    --hotpoint-hot-value-bg: rgba(255, 107, 107, 0.2);
+    --hotpoint-border-color: var(--border-color, rgba(255, 255, 255, 0.1));
+    --hotpoint-item-bg: rgba(255, 255, 255, 0.05);
+    --hotpoint-item-hover-bg: rgba(255, 255, 255, 0.1);
+    --hotpoint-switch-btn-bg: rgba(255, 255, 255, 0.1);
+    --hotpoint-switch-btn-hover-bg: rgba(255, 255, 255, 0.15);
+    --hotpoint-loading-color: var(--text-secondary, #b0b0b0);
+    --hotpoint-spinner-border: rgba(255, 255, 255, 0.2);
+    --hotpoint-spinner-top: var(--text-primary, #ffffff);
+}
+
+/* 暗黑模式下 SVG 图标颜色适配 */
+[data-theme="dark"] svg.source-icon path {
+    fill: var(--hotpoint-text-primary);
+}
+
+/* ===== 基础容器样式 ===== */
+.grid-item[data-widget-type="hotpoint"] .widget-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    color: var(--hotpoint-text-primary);
+    padding: 0.75rem;
+    box-sizing: border-box;
+    background: var(--glass-bg, rgba(255, 255, 255, 0.1));
+    backdrop-filter: blur(var(--glass-blur, 10px));
+    border-radius: var(--widget-border-radius, 1.4rem);
+    position: relative;
+    border: 0px solid var(--hotpoint-border-color);
+    box-shadow: var(--shadow-md, 0 4px 6px rgba(0, 0, 0, 0.1));
+    transition: all var(--transition-normal);
+    overflow: hidden;
+}
+
+/* 统一内边距 */
+.grid-item[data-size="2x2"][data-widget-type="hotpoint"] .widget-container,
+.grid-item[data-size="2x3"][data-widget-type="hotpoint"] .widget-container,
+.grid-item[data-size="2x4"][data-widget-type="hotpoint"] .widget-container {
+    padding: 0.5rem;
+}
+
+/* hotpoint-widget 需要占满整个容器高度 */
+.hotpoint-widget {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0;
+}
+
+/* ===== 头部区域 ===== */
+.hotpoint-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.3rem;
+    padding: 0rem 0.3rem;
+    border-bottom: 1px solid var(--hotpoint-border-color);
+    flex-shrink: 0;
+}
+
+.hotpoint-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+/* 数据源图标 - 支持 img 和 svg */
+.source-icon {
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
+    vertical-align: middle;
+    display: inline-block;
+}
+
+/* SVG 图片的暗黑模式适配 */
+[data-theme="dark"] .source-icon {
+    filter: brightness(0) invert(1);
+}
+
+.source-name {
+    letter-spacing: 0.5px;
+}
+
+/* 切换按钮 */
+.hotpoint-switch-btn {
+    width: 28px;
+    height: 28px;
+    background: var(--hotpoint-switch-btn-bg);
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    transition: all var(--transition-fast);
+    backdrop-filter: blur(5px);
+    color: var(--hotpoint-text-primary);
+    line-height: 1;
+    padding: 0;
+}
+
+.hotpoint-switch-btn svg {
+    width: 16px;
+    height: 16px;
+}
+
+.hotpoint-switch-btn:hover {
+    background: var(--hotpoint-switch-btn-hover-bg);
+    transform: scale(1.1) rotate(180deg);
+}
+
+.hotpoint-switch-btn:active {
+    transform: scale(0.95);
+}
+
+/* ===== 内容区域 ===== */
+.hotpoint-content {
+    flex: 1;
+    overflow-y: auto !important;
+    overflow-x: hidden;
+    scrollbar-width: none;
+    /* Firefox */
+    -ms-overflow-style: none;
+    /* IE and Edge */
+    min-height: 0;
+    max-height: 100%;
+}
+
+.hotpoint-content::-webkit-scrollbar {
+    display: none;
+    /* Chrome, Safari, Opera */
+}
+
+/* 加载状态 */
+.hotpoint-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    gap: 0.5rem;
+    color: var(--hotpoint-loading-color);
+}
+
+.spinner {
+    width: 24px;
+    height: 24px;
+    border: 3px solid var(--hotpoint-spinner-border);
+    border-top-color: var(--hotpoint-spinner-top);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* 空状态 */
+.hotpoint-empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: var(--hotpoint-text-secondary);
+    font-size: 0.9rem;
+}
+
+/* 错误状态 */
+.hotpoint-error {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: var(--hotpoint-text-primary);
+    font-size: 0.9rem;
+    text-align: center;
+    padding: 1rem;
+}
+
+/* ===== 热点列表 ===== */
+.hotpoint-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    min-height: min-content;
+}
+
+.hotpoint-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.4rem 0.5rem;
+    background: var(--hotpoint-item-bg);
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    min-height: 28px;
+}
+
+.hotpoint-item:hover {
+    background: var(--hotpoint-item-hover-bg);
+    transform: translateX(2px);
+}
+
+.hotpoint-item:active {
+    transform: scale(0.98);
+}
+
+/* 排名 */
+.hotpoint-rank {
+    width: 24px;
+    height: 24px;
+    min-width: 24px;
+    min-height: 24px;
+    border-radius: 50%;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 12px;
+    position: relative;
+    background-color: #e53935;
+    flex-shrink: 0;
+}
+
+/* 标题 */
+.hotpoint-title-text {
+    flex: 1;
+    font-size: 0.8rem;
+    line-height: 1.4;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--hotpoint-text-primary);
+}
+
+/* 热度值 - 优化样式 */
+.hotpoint-hot-value {
+    font-size: 11px;
+    color: var(--hotpoint-hot-value-color);
+    background-color: var(--hotpoint-hot-value-bg);
+    border-radius: 4px;
+    padding: 1px 4px;
+    white-space: nowrap;
+    font-weight: 600;
+    flex-shrink: 0;
+    min-width: fit-content;
+}
+
+/* ===== 底部区域 ===== */
+.hotpoint-footer {
+    padding-top: 0.4rem;
+    border-top: 1px solid var(--hotpoint-border-color);
+    flex-shrink: 0;
+}
+
+.last-update {
+    font-size: 0.65rem;
+    color: var(--hotpoint-text-tertiary);
+    text-align: right;
+    display: block;
+}
+
+/* ===== 响应式调整 ===== */
+
+/* 2x2 尺寸优化 */
+.grid-item[data-size="2x2"][data-widget-type="hotpoint"] .hotpoint-item {
+    padding: 0.3rem 0.4rem;
+    min-height: 24px;
+}
+
+.grid-item[data-size="2x2"][data-widget-type="hotpoint"] .hotpoint-title-text {
+    font-size: 0.75rem;
+}
+
+.grid-item[data-size="2x2"][data-widget-type="hotpoint"] .hotpoint-rank {
+    min-width: 18px;
+    height: 18px;
+    font-size: 0.7rem;
+}
+
+/* 2x3 尺寸优化 */
+.grid-item[data-size="2x3"][data-widget-type="hotpoint"] .hotpoint-item {
+    padding: 0.35rem 0.45rem;
+}
+
+/* 2x4 尺寸优化 */
+.grid-item[data-size="2x4"][data-widget-type="hotpoint"] .hotpoint-item {
+    padding: 0.4rem 0.5rem;
+}

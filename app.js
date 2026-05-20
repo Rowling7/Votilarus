@@ -4,6 +4,7 @@ const path = require('path');
 const sqlite3 = require('sqlite3').verbose();
 const registerRoutes = require('./routes');
 const weatherRoutes = require('./routes/weather-routes');
+const hotpointRoutes = require('./routes/hotpoint-routes');
 const WeatherScheduler = require('./scheduler/weather-scheduler');
 
 const app = express();
@@ -206,9 +207,55 @@ async function initializeDatabase() {
                         completed++;
                         if (completed === createIndexes.length) {
                             console.log('[Database] weather_json 索引已创建');
-                            resolve();
+                            // 创建 hotpoint 表
+                            createHotpointTable();
                         }
                     });
+                });
+            }
+
+            function createHotpointTable() {
+                const createHotpointTableSQL = `
+                    CREATE TABLE IF NOT EXISTS hotpoint (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        source TEXT NOT NULL,
+                        rank INTEGER NOT NULL,
+                        title TEXT NOT NULL,
+                        hot_value TEXT,
+                        url TEXT,
+                        hot_date DATE NOT NULL,
+                        created_at DATETIME DEFAULT (datetime('now', 'localtime')),
+                        updated_at DATETIME DEFAULT (datetime('now', 'localtime'))
+                    )
+                `;
+
+                db.run(createHotpointTableSQL, [], (err2) => {
+                    if (err2) {
+                        console.error("Error creating hotpoint table:", err2);
+                    } else {
+                        console.log('[Database] hotpoint 表已就绪');
+
+                        // 创建索引
+                        const hotpointIndexes = [
+                            `CREATE INDEX IF NOT EXISTS idx_hotpoint_source_date ON hotpoint(source, hot_date)`,
+                            `CREATE INDEX IF NOT EXISTS idx_hotpoint_rank ON hotpoint(rank)`,
+                            `CREATE INDEX IF NOT EXISTS idx_hotpoint_created ON hotpoint(created_at)`
+                        ];
+
+                        let completed = 0;
+                        hotpointIndexes.forEach((indexSQL, idx) => {
+                            db.run(indexSQL, [], (err3) => {
+                                if (err3) {
+                                    console.error(`Error creating hotpoint index ${idx}:`, err3);
+                                }
+                                completed++;
+                                if (completed === hotpointIndexes.length) {
+                                    console.log('[Database] hotpoint 索引已创建');
+                                    resolve();
+                                }
+                            });
+                        });
+                    }
                 });
             }
         });
@@ -231,6 +278,10 @@ async function startServer() {
         // 注册天气 API 路由
         weatherRoutes.setDatabase(db);
         app.use('/api/weather', weatherRoutes.router);
+
+        // 注册热点 API 路由
+        hotpointRoutes.setDatabase(db);
+        app.use('/api/hotpoint', hotpointRoutes.router);
 
         // 静态文件服务 - data 目录（专门处理 SVG 等文件）
         app.use('/data', (req, res, next) => {
