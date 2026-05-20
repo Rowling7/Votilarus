@@ -16,7 +16,35 @@ import TooltipManager from './managers/TooltipManager.js';
 import AddIconDialog from './dialogs/AddIconDialog.js';
 import AddWidgetDialog from './dialogs/AddWidgetDialog.js';
 import CalendarModal from './modal/CalendarModal.js';
+import NotebookEditModal from './modal/NotebookEditModal.js';
 import NavSidebar from './components/NavSidebar.js';
+
+// ==================== ModalManager ====================
+// 统一管理所有模态框的访问
+class ModalManager {
+    constructor() {
+        this.calendarModal = CalendarModal;
+        this.notebookEditModal = NotebookEditModal;
+    }
+
+    /**
+     * 显示日历模态框
+     */
+    showCalendarModal() {
+        this.calendarModal.open();
+    }
+
+    /**
+     * 显示备忘录编辑模态框
+     * @param {string} uuid - 备忘录 UUID
+     */
+    showNotebookModal(uuid) {
+        this.notebookEditModal.open(uuid);
+    }
+}
+
+// 将 ModalManager 暴露到全局
+window.ModalManager = new ModalManager();
 
 class App {
     constructor() {
