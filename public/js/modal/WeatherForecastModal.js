@@ -261,7 +261,12 @@ class WeatherForecastModal extends BaseModal {
      */
     initMap() {
         const mapElement = document.getElementById('weatherMap');
-        if (!mapElement) return;
+        if (!mapElement) {
+            console.error('[WeatherMap] 地图容器不存在');
+            return;
+        }
+
+        console.log('[WeatherMap] 地图容器尺寸:', mapElement.offsetWidth, 'x', mapElement.offsetHeight);
 
         // 创建地图实例，默认中心为中国，缩放级别 6
         this.map = L.map('weatherMap', {
@@ -273,14 +278,21 @@ class WeatherForecastModal extends BaseModal {
             attributionControl: false
         });
 
-        // 添加基础图层（OpenStreetMap）
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 19,
-            attribution: '© OpenStreetMap contributors'
+        // 添加基础图层（使用高德地图，国内访问稳定）
+        L.tileLayer('https://webst0{s}.is.autonavi.com/appmaptile?style=6&x={x}&y={y}&z={z}', {
+            maxZoom: 18,
+            attribution: '© 高德地图',
+            subdomains: '1234'
         }).addTo(this.map);
 
         // 添加天气图层
         this.addWeatherTileLayer(this.currentMapLayer);
+
+        // 等待地图渲染后刷新视图
+        setTimeout(() => {
+            this.map.invalidateSize();
+            console.log('[WeatherMap] 地图刷新完成');
+        }, 100);
 
         console.log('[WeatherMap] 地图初始化完成');
     }
