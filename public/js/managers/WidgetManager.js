@@ -78,9 +78,10 @@ class WidgetManager {
      * @param {string} type - widget 类型
      * @param {string} size - widget 尺寸（如 '2x2'）
      * @param {number|null} widgetId - icon_widgets.id（数字ID）
+     * @param {string|null} titleCn - 中文标题（title_cn）
      * @returns {HTMLElement} 完整的 widget grid-item 元素
      */
-    createWidgetElement(type, size = '2x2', widgetId = null) {
+    createWidgetElement(type, size = '2x2', widgetId = null, titleCn = null) {
         // 创建 grid-item 容器
         const container = document.createElement('div');
         container.className = `grid-item widget-item widget-${size}`;
@@ -100,6 +101,15 @@ class WidgetManager {
         // 将 supportedSizes 保存到 dataset，以便右键菜单可以读取
         if (widgetInstance && widgetInstance.supportedSizes) {
             container.dataset.supportedSizes = JSON.stringify(widgetInstance.supportedSizes);
+        }
+
+        // 如果有中文标题，在组件下方添加标题显示
+        if (titleCn) {
+            const titleDiv = document.createElement('div');
+            titleDiv.className = 'widget-title-cn';
+            titleDiv.textContent = titleCn;
+            titleDiv.title = titleCn; // 完整标题作为 tooltip
+            container.appendChild(titleDiv);
         }
 
         return container;

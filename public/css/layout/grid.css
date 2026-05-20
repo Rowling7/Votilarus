@@ -38,7 +38,7 @@
     transition: opacity 0.3s ease, visibility 0.3s ease;
     pointer-events: none;
     overflow-y: auto;
-    overflow-x: hidden;
+    overflow-x: visible;
     display: flex;
     justify-content: center;
     align-items: flex-start;
@@ -63,6 +63,8 @@
     align-content: start;
     /* 确保不超出父容器 */
     box-sizing: border-box;
+    /* 为组件标题留出空间 */
+    padding-bottom: 2rem;
 }
 
 .grid-item {
@@ -285,4 +287,29 @@
     height: 100%;
     overflow: hidden;
     box-sizing: border-box;
+}
+
+/* Widget 中文标题 */
+.widget-title-cn {
+    position: absolute;
+    bottom: -1.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    font-size: var(--title-font-size, 12px);
+    color: var(--title-color, #ffffff);
+    padding: 0.25rem 0.5rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    opacity: 0.9;
+    transition: all var(--transition-normal);
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* 暗黑模式下的 Widget 标题 */
+[data-theme="dark"] .widget-title-cn {
+    color: var(--title-color-dark, rgba(255, 255, 255, 0.9));
 }

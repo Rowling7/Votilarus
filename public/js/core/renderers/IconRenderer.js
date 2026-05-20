@@ -182,9 +182,10 @@ class IconRenderer {
                     const widgetType = widgetTypeMap[widget.title] || widget.title.toLowerCase().replace('widget', '');
                     const size = `${widget.width}x${widget.height}`;
                     const widgetId = widget.id;
+                    const titleCn = widget.title_cn;  // 获取中文标题
 
                     // 创建 widget 元素
-                    const widgetElement = WidgetManager.createWidgetElement(widgetType, size, widgetId);
+                    const widgetElement = WidgetManager.createWidgetElement(widgetType, size, widgetId, titleCn);
 
                     // 添加 sort_order 属性
                     widgetElement.dataset.sortOrder = widget.sort_order !== undefined && widget.sort_order !== null ? widget.sort_order : 999999;
@@ -418,9 +419,10 @@ class IconRenderer {
         const height = layout.height || 2;
         const size = `${width}x${height}`;
         const widgetId = item.id;  // 直接使用 icon_widgets.id
+        const titleCn = item.title_cn;  // 获取中文标题
 
         // 使用 WidgetManager 创建 widget 元素
-        const widgetElement = WidgetManager.createWidgetElement(widgetType, size, widgetId);
+        const widgetElement = WidgetManager.createWidgetElement(widgetType, size, widgetId, titleCn);
 
         // 添加 sort_order 属性
         widgetElement.dataset.sortOrder = item.sort_order !== undefined && item.sort_order !== null ? item.sort_order : 999999;
