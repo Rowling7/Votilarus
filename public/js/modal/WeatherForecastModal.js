@@ -279,7 +279,7 @@ class WeatherForecastModal extends BaseModal {
             dateLabel = this.getRelativeDayLabel(dateObj, 1);
         }
 
-        const weatherIconUrl = `https://openweathermap.org/themes/openweathermap/assets/vendor/owm/img/widgets/${day.weather_icon}.png`;
+        const weatherIconUrl = `/static/ico/weather_icon/${day.weather_icon}.png`;
         const windDeg = day.wind_deg !== undefined ? day.wind_deg : (day.wind_deg_avg !== undefined ? day.wind_deg_avg : null);
         const windInfo = this.getWindDirection(windDeg);
 

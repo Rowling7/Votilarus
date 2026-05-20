@@ -262,7 +262,7 @@ class WeatherWidget extends BaseWidget {
                 this.updateWeatherDisplay(cachedData);
 
                 // 提取并应用图标颜色
-                const iconUrl = `https://openweathermap.org/themes/openweathermap/assets/vendor/owm/img/widgets/${cachedData.weather[0].icon}.png`;
+                const iconUrl = `/static/ico/weather_icon/${cachedData.weather[0].icon}.png`;
                 const color = await this.extractIconColor(iconUrl);
                 this.applyBackgroundColor(color);
 
@@ -283,7 +283,7 @@ class WeatherWidget extends BaseWidget {
                 await weatherCache.saveWeatherData(this.options.city, data);
 
                 // 提取并应用图标颜色
-                const iconUrl = `https://openweathermap.org/themes/openweathermap/assets/vendor/owm/img/widgets/${data.weather[0].icon}.png`;
+                const iconUrl = `/static/ico/weather_icon/${data.weather[0].icon}.png`;
                 const color = await this.extractIconColor(iconUrl);
                 this.applyBackgroundColor(color);
             } else {
@@ -308,7 +308,7 @@ class WeatherWidget extends BaseWidget {
         // 更新天气图标
         const iconEl = this.container.querySelector('.weather-icon');
         if (iconEl) {
-            const iconUrl = `https://openweathermap.org/themes/openweathermap/assets/vendor/owm/img/widgets/${weatherData.weather[0].icon}.png`;
+            const iconUrl = `/static/ico/weather_icon/${weatherData.weather[0].icon}.png`;
             iconEl.src = iconUrl;
         }
 
@@ -579,7 +579,7 @@ class WeatherWidget extends BaseWidget {
 
             // 重新提取颜色（因为新城市的天气图标可能不同）
             const iconUrl = this.weatherData ?
-                `https://openweathermap.org/themes/openweathermap/assets/vendor/owm/img/widgets/${this.weatherData.weather[0].icon}.png` :
+                `/static/ico/weather_icon/${this.weatherData.weather[0].icon}.png` :
                 '';
 
             if (iconUrl) {
