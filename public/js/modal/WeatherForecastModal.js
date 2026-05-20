@@ -191,11 +191,11 @@ class WeatherForecastModal extends BaseModal {
                     预报天数: this.weatherData.forecast?.length || 0,
                     总卡片数: (this.weatherData.history?.length || 0) + 1 + (this.weatherData.forecast?.length || 0)
                 });
-                
+
                 // 重新渲染时添加动画效果
                 this.renderWeatherCards();
                 this.updateDateRange();
-                
+
                 // 延迟初始化图表，等待卡片动画完成
                 setTimeout(() => {
                     this.initChart();
@@ -237,7 +237,7 @@ class WeatherForecastModal extends BaseModal {
 
         // 添加淡出效果
         this.cardsScroll.style.opacity = '0';
-        
+
         setTimeout(() => {
             let html = '';
 
@@ -255,7 +255,7 @@ class WeatherForecastModal extends BaseModal {
             });
 
             this.cardsScroll.innerHTML = html;
-            
+
             // 恢复透明度，触发动画
             setTimeout(() => {
                 this.cardsScroll.style.opacity = '1';
@@ -665,7 +665,7 @@ class WeatherForecastModal extends BaseModal {
             setTimeout(() => {
                 this.chart.data.datasets = this.getDatasets(chartData, isDarkMode);
                 this.chart.update('active'); // 使用 'active' 模式实现平滑过渡
-                
+
                 // 恢复透明度
                 if (chartContainer) {
                     chartContainer.style.opacity = '1';
