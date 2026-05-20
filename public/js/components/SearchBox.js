@@ -96,7 +96,7 @@ class SearchBox extends HTMLElement {
         }
 
         // 圆角样式
-        const borderRadius = style === 'square' ? '0.5rem' : '2rem';
+        const borderRadius = style === 'square' ? '0.5rem' : '1.5rem';
 
         // 按 sort_order 排序引擎列表
         const sortedEngines = Object.entries(engines).sort((a, b) => {

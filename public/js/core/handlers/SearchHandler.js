@@ -164,8 +164,8 @@ class SearchHandler {
             searchEngineBar.style.borderRadius = '0.5rem';
         } else {
             // rounded
-            searchBox.style.borderRadius = '2rem';
-            searchEngineBar.style.borderRadius = '2rem';
+            searchBox.style.borderRadius = '1.5rem';
+            searchEngineBar.style.borderRadius = '1.5rem';
         }
     }
 

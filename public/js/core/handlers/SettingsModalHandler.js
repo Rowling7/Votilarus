@@ -1053,9 +1053,9 @@ class SettingsModalHandler {
 
         switch (style) {
             case 'rounded':
-                searchBox.style.borderRadius = '2rem';
+                searchBox.style.borderRadius = '1.5rem';
                 if (searchEngineBar) {
-                    searchEngineBar.style.borderRadius = '2rem';
+                    searchEngineBar.style.borderRadius = '1.5rem';
                 }
                 break;
             case 'square':
