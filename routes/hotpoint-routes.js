@@ -154,15 +154,11 @@ function saveHotpointToDB(source, hotList) {
  */
 async function fetchAndSaveHotpoint(source) {
     try {
-        console.log('[HotPoint] 开始获取热点数据:', source);
-
         // 1. 从API获取数据
         const hotList = await fetchHotpointFromAPI(source);
 
         // 2. 保存到数据库
         await saveHotpointToDB(source, hotList);
-
-        console.log('[HotPoint] 已保存', hotList.length, '条', source, '热点数据');
 
         return {
             success: true,

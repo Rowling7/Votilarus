@@ -22,11 +22,9 @@ class SearchBox extends HTMLElement {
 
         // 如果 SettingsManager 还未就绪，等待其初始化完成
         if (!window.settingsManager) {
-            console.log('[SearchBox] Waiting for SettingsManager to initialize...');
             const checkInterval = setInterval(() => {
                 if (window.settingsManager) {
                     clearInterval(checkInterval);
-                    console.log('[SearchBox] SettingsManager is now available, applying settings...');
                     this.applySettingsFromManager();
                 }
             }, 50);
@@ -51,17 +49,13 @@ class SearchBox extends HTMLElement {
     applySettingsFromManager() {
         const settingsManager = window.settingsManager;
         if (!settingsManager) {
-            console.warn('[SearchBox] SettingsManager not available yet');
             return;
         }
 
         // 应用搜索引擎设置
         const engine = settingsManager.get('search_engine');
         if (engine && this.searchEngines[engine]) {
-            console.log('[SearchBox] Applying search engine from settings:', engine);
             this.setAttribute('engine', engine);
-        } else if (engine) {
-            console.warn('[SearchBox] Search engine from settings not found in loaded engines:', engine);
         }
 
         // 应用位置设置
@@ -431,13 +425,9 @@ class SearchBox extends HTMLElement {
 
     // 设置搜索引擎
     setSearchEngine(engine) {
-        console.log('[SearchBox] Setting search engine to:', engine);
-
         // 保存到 SettingsManager（如果可用）
         if (window.settingsManager) {
-            window.settingsManager.set('search_engine', engine).then(() => {
-                console.log('[SearchBox] Search engine saved to database:', engine);
-            }).catch(err => {
+            window.settingsManager.set('search_engine', engine).catch(err => {
                 console.error('[SearchBox] Failed to save search engine:', err);
             });
         }
