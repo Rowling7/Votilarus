@@ -5,6 +5,18 @@ import SidebarRenderer from '../renderers/SidebarRenderer.js';
 import CategoryManager from '../../managers/CategoryManager.js';
 import ToastNotification from '../../utils/ToastNotification.js';
 
+// 节流函数 - 限制函数执行频率
+function throttle(func, limit) {
+    let inThrottle;
+    return function (...args) {
+        if (!inThrottle) {
+            func.apply(this, args);
+            inThrottle = true;
+            setTimeout(() => inThrottle = false, limit);
+        }
+    };
+}
+
 class DragHandler {
     constructor() {
         this.draggedElement = null;
@@ -20,6 +32,10 @@ class DragHandler {
 
         // 防抖定时器
         this.saveSortTimeout = null;
+
+        // 性能优化：使用 requestAnimationFrame
+        this.rafId = null;
+        this.pendingReorder = false;
     }
 
     /**
@@ -119,6 +135,9 @@ class DragHandler {
 
         this.draggedElement = element;
 
+        // 保存网格容器引用
+        this.gridContainer = element.closest('.grid-container');
+
         // 保存原始位置信息用于撤销
         this.originalPosition = {
             itemId: isWidget ? element.dataset.widgetId : element.dataset.itemId,
@@ -140,16 +159,33 @@ class DragHandler {
         e.dataTransfer.setData('text/plain', JSON.stringify(this.draggedData));
         e.dataTransfer.effectAllowed = 'move';
 
-        // 添加拖拽中的样式 - 半透明效果
-        setTimeout(() => {
+        // 使用 requestAnimationFrame 添加拖拽样式，避免阻塞主线程
+        requestAnimationFrame(() => {
             element.classList.add('dragging');
-        }, 0);
+        });
     }
 
     /**
-     * 处理拖拽结束
+     * 处理拖拽结束 - 清理所有定时器
      */
     handleDragEnd(e) {
+        // 取消 pending 的 RAF
+        if (this.rafId) {
+            cancelAnimationFrame(this.rafId);
+            this.rafId = null;
+        }
+
+        // 如果有待保存的排序，立即保存（不等待防抖）
+        if (this.pendingReorder && this.gridContainer) {
+            // 清除防抖定时器
+            if (this.saveSortTimeout) {
+                clearTimeout(this.saveSortTimeout);
+                this.saveSortTimeout = null;
+            }
+            // 立即保存
+            this.saveSortOrder(this.gridContainer);
+        }
+
         if (this.draggedElement) {
             this.draggedElement.classList.remove('dragging');
             // 清除临时样式
@@ -173,21 +209,25 @@ class DragHandler {
         this.draggedElement = null;
         this.draggedData = null;
         this.dropZone = null;
+        this.gridContainer = null; // 清除网格容器引用
+        this.pendingReorder = false;
     }
 
     /**
-     * 处理拖拽经过
+     * 处理拖拽经过 - 使用节流优化
      */
-    handleDragOver(e, panel) {
+    handleDragOver = throttle((e, panel) => {
         e.preventDefault();
         e.dataTransfer.dropEffect = 'move';
 
-        // 高亮当前放置区域
-        document.querySelectorAll('.category-panel').forEach(p => {
-            p.classList.remove('drag-over');
+        // 高亮当前放置区域 - 使用 RAF 优化
+        requestAnimationFrame(() => {
+            document.querySelectorAll('.category-panel').forEach(p => {
+                p.classList.remove('drag-over');
+            });
+            panel.classList.add('drag-over');
         });
-        panel.classList.add('drag-over');
-    }
+    }, 50);
 
     /**
      * 处理在主内容区面板上的放置（同分类内排序）
@@ -533,7 +573,7 @@ class DragHandler {
     }
 
     /**
-     * 处理拖拽进入另一个图标上方
+     * 处理拖拽进入另一个图标上方 - 使用 RAF 优化
      */
     async handleDragEnter(e, targetItem) {
         if (!this.draggedElement || !targetItem) return;
@@ -549,19 +589,34 @@ class DragHandler {
 
         if (draggedIndex === -1 || targetIndex === -1) return;
 
-        // 交换位置
-        if (draggedIndex < targetIndex) {
-            gridContainer.insertBefore(this.draggedElement, targetItem.nextSibling);
-        } else {
-            gridContainer.insertBefore(this.draggedElement, targetItem);
+        // 如果位置没有变化，不做任何操作
+        if (draggedIndex === targetIndex) return;
+
+        // 使用 requestAnimationFrame 优化 DOM 操作
+        if (this.rafId) {
+            cancelAnimationFrame(this.rafId);
         }
 
-        // 使用防抖保存排序到数据库（避免频繁调用）
-        this.debounceSaveSortOrder(gridContainer);
+        this.rafId = requestAnimationFrame(() => {
+            // 交换位置
+            if (draggedIndex < targetIndex) {
+                gridContainer.insertBefore(this.draggedElement, targetItem.nextSibling);
+            } else {
+                gridContainer.insertBefore(this.draggedElement, targetItem);
+            }
+
+            // 标记需要保存排序
+            this.pendingReorder = true;
+
+            // 使用防抖保存排序到数据库（避免频繁调用）
+            this.debounceSaveSortOrder(gridContainer);
+
+            this.rafId = null;
+        });
     }
 
     /**
-     * 防抖保存排序（500ms 后执行）
+     * 防抖保存排序（300ms 后执行，减少延迟）
      */
     debounceSaveSortOrder(gridContainer) {
         // 清除之前的定时器
@@ -569,10 +624,10 @@ class DragHandler {
             clearTimeout(this.saveSortTimeout);
         }
 
-        // 设置新的定时器
+        // 设置新的定时器 - 缩短到 300ms 提高响应速度
         this.saveSortTimeout = setTimeout(() => {
             this.saveSortOrder(gridContainer);
-        }, 500);
+        }, 300);
     }
 
     /**
@@ -595,7 +650,7 @@ class DragHandler {
 
                 // 从 DOM 读取 data-sort-order，如果不存在则使用 index
                 const currentSortOrder = item.dataset.sortOrder;
-                const currentSortOrderNum = currentSortOrder !== undefined ? parseInt(currentSortOrder) : null;
+                const currentSortOrderNum = currentSortOrder !== undefined && currentSortOrder !== null ? parseInt(currentSortOrder) : null;
 
                 // 只有当 sort_order 发生变化时才更新
                 if (currentSortOrderNum !== index) {

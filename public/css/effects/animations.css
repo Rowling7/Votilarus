@@ -16,20 +16,19 @@
     animation: fadeIn 0.3s ease forwards;
 }
 
-/* 图标进入动画（延迟递增） */
+/* 图标进入动画（延迟递增）- 优化性能 */
 .grid-item {
     animation: fadeIn 0.2s ease backwards;
 }
 
-/* 为每个图标设置不同的延迟，创造级联效果 */
+/* 为前10个图标设置不同的延迟，创造级联效果 */
+/* 使用 CSS 变量减少重复代码 */
 .grid-container .grid-item:nth-child(1) {
     animation-delay: 0.02s;
-    box-shadow: var(--shadow-md, 0 4px 6px rgba(0, 0, 0, 0.1));
 }
 
 .grid-container .grid-item:nth-child(2) {
     animation-delay: 0.04s;
-    box-shadow: var(--shadow-md, 0 4px 6px rgba(0, 0, 0, 0.1));
 }
 
 .grid-container .grid-item:nth-child(3) {

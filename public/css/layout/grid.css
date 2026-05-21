@@ -44,6 +44,9 @@
     align-items: flex-start;
     /* 确保子元素不超出 */
     box-sizing: border-box;
+    /* 性能优化：启用 GPU 加速 */
+    transform: translateZ(0);
+    will-change: opacity, visibility;
 }
 
 .category-panel.active {
@@ -65,14 +68,17 @@
     box-sizing: border-box;
     /* 为组件标题留出空间 */
     padding-bottom: 2rem;
+    /* 性能优化：启用 GPU 加速 */
+    transform: translateZ(0);
+    will-change: auto;
 }
 
 .grid-item {
     position: relative;
-    transition: all var(--transition-normal);
+    transition: opacity var(--transition-normal), transform var(--transition-normal);
     cursor: pointer;
     user-select: none;
-    will-change: transform;
+    will-change: transform, opacity;
     transform: translateZ(0);
     backface-visibility: hidden;
 }
@@ -82,18 +88,23 @@
 }
 
 .grid-item.dragging {
-    opacity: 0.5;
-    transform: scale(0.95);
+    opacity: 0.4;
+    transform: scale(0.95) translateZ(0);
     z-index: 1000;
+    pointer-events: none;
+    transition: opacity 0.15s ease, transform 0.15s ease;
 }
 
-/* 占位符样式 */
+/* 占位符样式 - 优化性能 */
 .grid-item.placeholder {
     opacity: 0.3;
     border: 2px dashed var(--theme-color);
     background: rgba(var(--theme-color-rgb), 0.1);
     border-radius: var(--icon-radius, 0.5rem);
     pointer-events: none;
+    /* 性能优化：禁用过渡动画 */
+    transition: none;
+    will-change: auto;
 }
 
 .category-panel.drag-over {

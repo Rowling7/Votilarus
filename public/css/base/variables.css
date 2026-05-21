@@ -49,9 +49,9 @@
     --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
 
     /* 毛玻璃效果 */
-    --glass-bg: rgba(255, 255, 255, 0.7);
+    --glass-bg: rgba(255, 255, 255, 0.9);
     --glass-border: rgba(145, 143, 143, 0.3);
-    --glass-blur: 10px;
+    --glass-blur: 15px;
 
     /* 背景设置 */
     --bg-blur: 5px;
@@ -107,7 +107,7 @@
     --shadow-md: 0 4px 6px rgba(0, 0, 0, 0);
     --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.5);
 
-    --glass-bg: rgba(30, 30, 30, 0.7);
+    --glass-bg: rgba(30, 30, 30, 0.9);
     --glass-border: rgba(255, 255, 255, 0.1);
 
     --theme-color-rgb: 59, 130, 246;
