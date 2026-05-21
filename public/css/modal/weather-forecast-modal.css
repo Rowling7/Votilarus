@@ -240,7 +240,8 @@
     text-align: center;
     color: var(--text-tertiary);
     font-size: 0.95rem;
-    width: 100%;
+    /* 确保加载状态有足够高度 */
+    min-height: 360px;
 }
 
 /* 天气卡片 */
