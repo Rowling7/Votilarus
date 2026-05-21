@@ -41,6 +41,7 @@
     padding: 2rem;
     max-width: 800px;
     width: 90%;
+    min-height: 80vh;
     max-height: 80vh;
     overflow: hidden;
     display: flex;

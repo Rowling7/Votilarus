@@ -153,6 +153,7 @@
     /* IE and Edge */
     min-height: 0;
     max-height: 100%;
+    padding: 0 0.4rem;
 }
 
 .hotpoint-content::-webkit-scrollbar {
