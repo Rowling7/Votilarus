@@ -1193,16 +1193,19 @@ class SettingsModalHandler {
             // 计算网格所需宽度
             const cellSize = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--cell-base-size')) || 64;
             const cellGap = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--cell-gap')) || 32;
-            const gridCols = settings.gridCols || 13;
-            const gridWidth = gridCols * cellSize + (gridCols - 1) * cellGap;
+
+            // 使用自动计算的列数（优先级最高）
+            const settingsManager = window.settingsManager;
+            const autoCols = settingsManager ? settingsManager.calculateAutoGridCols() : (settings.gridCols || 13);
+            const gridWidth = autoCols * cellSize + (autoCols - 1) * cellGap;
 
             // 如果网格宽度大于可用宽度，自动调整列数
             if (gridWidth > availableWidth) {
                 const maxCols = Math.floor((availableWidth + cellGap) / (cellSize + cellGap));
-                const actualCols = Math.max(maxCols, 1);
+                const actualCols = Math.max(maxCols, 4); // 至少 4 列
                 container.style.gridTemplateColumns = `repeat(${actualCols}, var(--cell-base-size))`;
             } else {
-                container.style.gridTemplateColumns = `repeat(${gridCols}, var(--cell-base-size))`;
+                container.style.gridTemplateColumns = `repeat(${autoCols}, var(--cell-base-size))`;
             }
         });
     }

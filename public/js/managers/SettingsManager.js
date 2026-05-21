@@ -64,13 +64,39 @@ class SettingsManager {
             this.applySettings();
             // 设置主题变化监听器
             this.setupThemeChangeListener();
+            // 设置窗口 resize 监听器，实现响应式网格调整
+            this.setupResizeListener();
         } catch (error) {
             // 使用默认设置
             this.settings = { ...this.defaultSettings };
             this.applySettings();
             // 设置主题变化监听器
             this.setupThemeChangeListener();
+            // 设置窗口 resize 监听器，实现响应式网格调整
+            this.setupResizeListener();
         }
+    }
+
+    /**
+     * 设置窗口 resize 监听器
+     */
+    setupResizeListener() {
+        let resizeTimeout;
+
+        const handleResize = () => {
+            // 清除之前的定时器（防抖）
+            clearTimeout(resizeTimeout);
+
+            // 延迟执行，避免频繁计算
+            resizeTimeout = setTimeout(() => {
+                // 重新应用网格设置
+                const gridCols = parseInt(this.settings.grid_cols) || 13;
+                const gridRows = parseInt(this.settings.grid_rows) || 5;
+                this.applyGridDimensions(gridCols, gridRows);
+            }, 200); // 200ms 防抖
+        };
+
+        window.addEventListener('resize', handleResize);
     }
 
     applySettings() {
@@ -351,6 +377,35 @@ class SettingsManager {
     }
 
     /**
+     * 根据视口宽度计算合适的列数
+     */
+    calculateAutoGridCols() {
+        const viewportWidth = window.innerWidth;
+
+        // 定义断点和对应的列数
+        const breakpoints = [
+            { width: 500, cols: 4 },    // 小屏手机
+            { width: 768, cols: 6 },    // 大屏手机
+            { width: 1024, cols: 8 },   // 平板
+            { width: 1280, cols: 10 },  // 小屏笔记本
+            { width: 1440, cols: 11 },  // 普通桌面
+            { width: 1600, cols: 12 },  // 大屏桌面
+            { width: 1920, cols: 13 },  // 超大屏
+            { width: 2560, cols: 14 },  // 4K屏幕
+            { width: Infinity, cols: 20 } // 超宽屏
+        ];
+
+        // 找到合适的断点
+        for (const breakpoint of breakpoints) {
+            if (viewportWidth <= breakpoint.width) {
+                return Math.min(Math.max(breakpoint.cols, 4), 20); // 确保在4-20范围内
+            }
+        }
+
+        return 20; // 默认最大值
+    }
+
+    /**
      * 应用网格行列数
      */
     applyGridDimensions(cols, rows) {
@@ -370,17 +425,20 @@ class SettingsManager {
                 // 计算网格所需宽度
                 const cellSize = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--cell-base-size')) || 64;
                 const cellGap = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--cell-gap')) || 32;
-                const gridWidth = cols * cellSize + (cols - 1) * cellGap;
+
+                // 使用自动计算的列数（优先级最高）
+                const autoCols = this.calculateAutoGridCols();
+                const gridWidth = autoCols * cellSize + (autoCols - 1) * cellGap;
 
                 // 如果网格宽度大于可用宽度，自动调整列数
                 if (gridWidth > availableWidth) {
                     // 计算最大可容纳列数
                     const maxCols = Math.floor((availableWidth + cellGap) / (cellSize + cellGap));
-                    const actualCols = Math.max(maxCols, 1); // 至少 1 列
+                    const actualCols = Math.max(maxCols, 4); // 至少 4 列
                     container.style.gridTemplateColumns = `repeat(${actualCols}, var(--cell-base-size))`;
                 } else {
-                    // 使用设置的列数
-                    container.style.gridTemplateColumns = `repeat(${cols}, var(--cell-base-size))`;
+                    // 使用自动计算的列数
+                    container.style.gridTemplateColumns = `repeat(${autoCols}, var(--cell-base-size))`;
                 }
             });
         }, 100);

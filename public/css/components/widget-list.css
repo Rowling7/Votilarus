@@ -15,7 +15,7 @@
     border-radius: 1.4rem;
     transition: all var(--transition-fast);
     cursor: pointer;
-    flex-direction: column;
+
 }
 
 .widget-item:hover {
