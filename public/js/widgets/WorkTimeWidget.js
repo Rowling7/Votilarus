@@ -91,16 +91,16 @@ class WorkTimeWidget extends BaseWidget {
                 <div class="worktime-widget">
                     <div class="worktime-countdown-row">
                         <div class="worktime-countdown-item">
-                            <div class="worktime-label">午饭</div>
+                            <div class="worktime-label">🍚吃！吃！吃！</div>
                             <div class="worktime-value" id="lunchCountdown">--:--:--</div>
                         </div>
                         <div class="worktime-countdown-item">
-                            <div class="worktime-label">下班</div>
+                            <div class="worktime-label">🏃撤！撤！撤！</div>
                             <div class="worktime-value" id="endCountdown">--:--:--</div>
                         </div>
                     </div>
                     <div class="worktime-salary-row">
-                        <div class="worktime-label">窝囊费</div>
+                        <div class="worktime-label">💵窝囊费</div>
                         <div class="worktime-salary-value" id="salaryEarned">¥0</div>
                     </div>
                 </div>
@@ -114,16 +114,16 @@ class WorkTimeWidget extends BaseWidget {
                     </div>
                     <div class="worktime-countdown-row-wide">
                         <div class="worktime-countdown-item">
-                            <div class="worktime-label">吃！吃！吃！</div>
+                            <div class="worktime-label">🍚吃！吃！吃！</div>
                             <div class="worktime-value" id="lunchCountdown">--:--:--</div>
                         </div>
                         <div class="worktime-countdown-item">
-                            <div class="worktime-label">撤！撤！撤！</div>
+                            <div class="worktime-label">🏃撤！撤！撤！</div>
                             <div class="worktime-value" id="endCountdown">--:--:--</div>
                         </div>
                     </div>
                     <div class="worktime-salary-row-wide">
-                        <div class="worktime-label">窝囊费</div>
+                        <div class="worktime-label">💵窝囊费</div>
                         <div class="worktime-salary-value" id="salaryEarned">¥0</div>
                     </div>
                 </div>
