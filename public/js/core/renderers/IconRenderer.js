@@ -178,7 +178,8 @@ class IconRenderer {
                         'WeatherWidget': 'weather',
                         'NotebookWidget': 'notebook',
                         'WorkTimeWidget': 'worktime',
-                        'CompleteLeaveWidget': 'compleave'
+                        'CompleteLeaveWidget': 'compleave',
+                        'YiyanWidget': 'yiyan'
                     };
 
                     const widgetType = widgetTypeMap[widget.title] || widget.title.toLowerCase().replace('widget', '');
@@ -414,7 +415,8 @@ class IconRenderer {
             'WeatherWidget': 'weather',
             'NotebookWidget': 'notebook',
             'WorkTimeWidget': 'worktime',
-            'CompleteLeaveWidget': 'compleave'
+            'CompleteLeaveWidget': 'compleave',
+            'YiyanWidget': 'yiyan'
         };
 
         const widgetType = widgetTypeMap[item.title] || item.title.toLowerCase().replace('widget', '');

@@ -133,12 +133,6 @@
     text-align: center;
 }
 
-/* ===== 悬停效果 ===== */
-.grid-item[data-widget-type="compleave"]:hover .widget-container {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-lg, 0 8px 16px rgba(0, 0, 0, 0.15));
-    border-color: var(--glass-border-hover, rgba(255, 255, 255, 0.3));
-}
 
 /* ===== 暗黑模式适配 ===== */
 body.dark-mode .grid-item[data-widget-type="compleave"] .widget-container {

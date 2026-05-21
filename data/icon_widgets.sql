@@ -182,4 +182,22 @@ VALUES
     '加班调休'
   );
 
+INSERT INTO
+  "icon_widgets"
+VALUES
+  (
+    9010,
+    -1,
+    8,
+    'YiyanWidget',
+    2,
+    3,
+    1,
+    '2026-05-21 22:40:00',
+    '2026-05-21 22:40:00',
+    NULL,
+    0,
+    '心语'
+  );
+
 PRAGMA foreign_keys = true;
