@@ -50,7 +50,7 @@
 
     /* 毛玻璃效果 */
     --glass-bg: rgba(255, 255, 255, 0.7);
-    --glass-border: rgba(255, 255, 255, 0.3);
+    --glass-border: rgba(145, 143, 143, 0.3);
     --glass-blur: 10px;
 
     /* 背景设置 */

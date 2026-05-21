@@ -10,7 +10,7 @@ class NotebookWidget extends BaseWidget {
     constructor(container, widgetId = null, widgetName = 'NotebookWidget') {
         super(container, widgetId, widgetName);
         // 备忘录组件支持 2x3 和 2x4 尺寸
-        this.supportedSizes = ['2x3', '2x4'];
+        this.supportedSizes = ['2x2','2x3', '2x4'];
     }
 
     /**
@@ -191,11 +191,7 @@ class NotebookWidget extends BaseWidget {
                 <div class="note-info">
                     <div class="note-title">
                         <span class="note-title-text">${note.title || '无标题'}</span>
-                    </div>
-                    <div class="note-meta">
-                        <div class="note-deadline">
-                            <span>Deadline: ${deadlineFormatted}</span>
-                        </div>
+
                     </div>
                 </div>
                 ${topTagHTML}

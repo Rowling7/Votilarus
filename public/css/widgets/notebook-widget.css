@@ -32,10 +32,9 @@
 /* ===== 头部区域 ===== */
 .notebook-header {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
     padding: 0.4rem 1rem;
-    margin-bottom: 0.3rem;
     background: linear-gradient(0deg, #ffc927, #ffa403);
     border-radius: var(--widget-border-radius, 1.4rem) var(--widget-border-radius, 1.4rem) 0 0;
     flex-shrink: 0;
@@ -139,7 +138,7 @@
     flex: 1;
     overflow-y: auto;
     min-height: 0;
-    padding-right: 0.25rem;
+    padding-top: 0.3rem;
 }
 
 /* 自定义滚动条样式 - 保持可滚动但视觉上不显眼 */
@@ -164,19 +163,13 @@
 .notebook-list {
     display: flex;
     flex-direction: column;
-    gap: 0.4rem;
-    padding: 0rem 1rem
 }
 
 /* ===== 笔记项 ===== */
 .note-item {
     display: flex;
     align-items: center;
-    gap: 0.6rem;
-    padding: 0.2rem;
-    background: var(--glass-bg-secondary, rgba(255, 255, 255, 0.5));
-    border-radius: 0.75rem;
-    border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.2));
+    border-bottom: 1px solid var(--glass-border, rgba(255, 255, 255, 0.2));
     cursor: pointer;
     transition: all var(--transition-fast);
     position: relative;
@@ -184,8 +177,8 @@
 }
 
 .note-item:hover {
-    background: var(--weather-hover, rgba(59, 130, 246, 0.08));
-    transform: translateX(4px);
+    background: var(--weather-hover, rgba(57, 126, 236, 0.493));
+    transform: translateX(6px);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
@@ -239,13 +232,11 @@
 .note-info {
     flex: 1;
     min-width: 0;
-    padding: 0rem 0.6rem 0rem;
+    padding: 0.4rem 0.6rem 0rem;
 }
 
 .note-title {
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: var(--theme-color, #1a1a1a);
+    font-size: 0.8rem;
     margin-bottom: 0.2rem;
     white-space: nowrap;
     overflow: hidden;
@@ -253,6 +244,8 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
+    color: #343232;
+    justify-content: space-between;
 }
 
 .note-title .top-tag {
@@ -262,11 +255,12 @@
 }
 
 .note-meta {
-    font-size: 0.7rem;
+    font-size: 0.6rem;
     color: var(--text-secondary, rgba(26, 26, 26, 0.6));
     display: flex;
     align-items: center;
     gap: 0.5rem;
+    justify-content: flex-end;
 }
 
 .note-deadline {
@@ -396,17 +390,13 @@
     color: white;
 }
 
-[data-theme="dark"] .grid-item[data-widget-type="notebook"] .widget-container .note-item {
-    background: var(--glass-bg-secondary-dark, rgba(255, 255, 255, 0.05));
-    border-color: var(--glass-border-dark, rgba(255, 255, 255, 0.1));
-}
 
 [data-theme="dark"] .grid-item[data-widget-type="notebook"] .widget-container .note-item:hover {
     background: rgba(255, 255, 255, 0.08);
 }
 
 [data-theme="dark"] .grid-item[data-widget-type="notebook"] .widget-container .note-title {
-    color: var(--theme-color, #1a1a1a);
+    color:  rgba(255, 255, 255, 0.8);
 }
 
 [data-theme="dark"] .grid-item[data-widget-type="notebook"] .widget-container .note-meta {
