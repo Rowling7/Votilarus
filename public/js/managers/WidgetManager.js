@@ -6,6 +6,7 @@ import WeatherWidget from '../widgets/WeatherWidget.js';
 import NotebookWidget from '../widgets/NotebookWidget.js';
 import SearchWidget from '../widgets/SearchWidget.js';
 import HotPointWidget from '../widgets/HotPointWidget.js';
+import WorkTimeWidget from '../widgets/WorkTimeWidget.js';
 
 class WidgetManager {
     constructor() {
@@ -24,6 +25,7 @@ class WidgetManager {
         this.register('notebook', NotebookWidget);
         this.register('search', SearchWidget);
         this.register('hotpoint', HotPointWidget);
+        this.register('worktime', WorkTimeWidget);
     }
 
     /**

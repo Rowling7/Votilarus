@@ -10,6 +10,7 @@ const notebookRoute = require('./notebook-routes');
 const weatherRoute = require('./weather-routes');
 const cityRoute = require('./city-routes');
 const hotpointRoute = require('./hotpoint-routes');
+const worktimeRoute = require('./worktime-routes');
 
 /**
  * 注册所有路由到 Express 应用
@@ -30,6 +31,7 @@ function registerRoutes(app, db) {
     weatherRoute.setDatabase(db);
     cityRoute.setDatabase(db);
     hotpointRoute.setDatabase(db);
+    worktimeRoute.setDatabase(db);
 
     // 注册路由
     app.use('/api/categories', categoriesRoute.router);
@@ -44,6 +46,7 @@ function registerRoutes(app, db) {
     app.use('/api/weather', weatherRoute.router);
     app.use('/api/cities', cityRoute.router);
     app.use('/api/hotpoint', hotpointRoute.router);
+    app.use('/api/worktime', worktimeRoute.router);
 }
 
 module.exports = registerRoutes;

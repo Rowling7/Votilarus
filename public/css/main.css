@@ -33,6 +33,7 @@
 @import 'widgets/weather-widget.css';
 @import 'widgets/notebook-widget.css';
 @import 'widgets/hotpoint-widget.css';
+@import 'widgets/worktime-widget.css';
 
 /* Effects */
 @import 'effects/glassmorphism.css';
