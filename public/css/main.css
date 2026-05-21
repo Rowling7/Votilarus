@@ -34,6 +34,7 @@
 @import 'widgets/notebook-widget.css';
 @import 'widgets/hotpoint-widget.css';
 @import 'widgets/worktime-widget.css';
+@import 'widgets/compleave-widget.css';
 
 /* Effects */
 @import 'effects/glassmorphism.css';

@@ -1,0 +1,107 @@
+/* 调休组件样式 */
+/* 调休组件中类型选择占满两列的样式 */
+.compleave-full-width {
+    grid-column: span 2;
+}
+
+.compleave-widget {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    padding-top: 14px !important;
+}
+
+.compleave-info-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    width: 100%;
+    margin-bottom: 12px;
+}
+
+.compleave-item {
+    flex: 1;
+    text-align: center;
+    border-radius: 10px;
+    /*background-color: var(--widget-blur-color);*/
+}
+
+.compleave-label {
+    font-size: 12px;
+    color: #5a5a5a;
+    margin-bottom: 2px;
+}
+
+.compleave-value {
+    font-size: 22px;
+    font-weight: bold;
+}
+
+/*#totalOvertime{
+    color: var(--toast-success-bg);
+}
+#usedLeave{
+    color: var(--navbar-brand-color);
+}*/
+#availableLeave {
+    color: var(--highlight-color);
+}
+
+.compleave-settings-form {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.compleave-settings-form.compact-form {
+    padding: 8px;
+}
+
+/* 调休组件中类型选择按钮的特殊样式 */
+#compLeaveTypeButtons .btn {
+    padding: 0 !important;
+}
+
+.viewer-container {
+    z-index: 11;
+}
+
+.viewer-title {
+    font-family: "Microsoft YaHei", sans-serif;
+}
+
+.viewer-toolbar>li {
+    background-color: rgba(0, 0, 0, 0.5);
+    border-radius: 4px;
+}
+
+.viewer-toolbar>li:hover {
+    background-color: rgba(0, 0, 0, 0.8);
+}
+
+.viewer-button {
+    background-color: rgba(0, 0, 0, 0.5);
+    border-radius: 50%;
+}
+
+.viewer-button:hover {
+    background-color: rgba(0, 0, 0, 0.8);
+}
+
+
+.compleave-flip-button {
+    position: absolute;
+    bottom: 8px;
+    right: 10px;
+    background-color: var(--widget-blur-color);
+    border: none;
+    border-radius: 6px;
+    padding: 4px 8px;
+    font-size: 10px;
+    cursor: pointer;
+    color: inherit;
+}
+
+.compleave-flip-button:hover {
+    background: rgba(255, 255, 255, 0.2);
+}

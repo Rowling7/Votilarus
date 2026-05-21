@@ -177,7 +177,8 @@ class IconRenderer {
                         'CalendarWidget': 'calendar',
                         'WeatherWidget': 'weather',
                         'NotebookWidget': 'notebook',
-                        'WorkTimeWidget': 'worktime'
+                        'WorkTimeWidget': 'worktime',
+                        'CompleteLeaveWidget': 'compleave'
                     };
 
                     const widgetType = widgetTypeMap[widget.title] || widget.title.toLowerCase().replace('widget', '');
@@ -412,7 +413,8 @@ class IconRenderer {
             'CalendarWidget': 'calendar',
             'WeatherWidget': 'weather',
             'NotebookWidget': 'notebook',
-            'WorkTimeWidget': 'worktime'
+            'WorkTimeWidget': 'worktime',
+            'CompleteLeaveWidget': 'compleave'
         };
 
         const widgetType = widgetTypeMap[item.title] || item.title.toLowerCase().replace('widget', '');

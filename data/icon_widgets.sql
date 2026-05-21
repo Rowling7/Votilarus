@@ -164,4 +164,22 @@ VALUES
     '工作倒计时'
   );
 
+INSERT INTO
+  "icon_widgets"
+VALUES
+  (
+    9009,
+    -1,
+    7,
+    'CompleteLeaveWidget',
+    2,
+    4,
+    1,
+    '2026-05-21 22:35:00',
+    '2026-05-21 22:35:00',
+    NULL,
+    0,
+    '加班调休'
+  );
+
 PRAGMA foreign_keys = true;

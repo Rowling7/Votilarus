@@ -1,0 +1,201 @@
+/* ==================== 加班调休小组件样式 ==================== */
+
+/* ===== 基础容器样式 ===== */
+.grid-item[data-widget-type="compleave"] .widget-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    color: var(--text-primary, white);
+    padding: 0.75rem;
+    box-sizing: border-box;
+    background: var(--glass-bg, rgba(255, 255, 255, 0.1));
+    backdrop-filter: blur(var(--glass-blur, 10px));
+    border-radius: var(--widget-border-radius, 1.4rem);
+    position: relative;
+    border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.2));
+    box-shadow: var(--shadow-md, 0 4px 6px rgba(0, 0, 0, 0.1));
+    transition: all var(--transition-normal);
+    overflow: hidden;
+}
+
+/* ===== 加班调休主容器 ===== */
+.compleave-widget {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    justify-content: center;
+    align-items: center;
+}
+
+/* ===== 2x2 尺寸样式 ===== */
+.compleave-2x2 {
+    gap: 0.5rem;
+}
+
+.compleave-2x2 .compleave-label {
+    font-size: 0.85rem;
+    opacity: 0.8;
+    text-align: center;
+    font-weight: 500;
+}
+
+.compleave-2x2 .compleave-value {
+    font-size: 1.2rem;
+    font-weight: 700;
+    text-align: center;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* ===== 2x3 尺寸样式 ===== */
+.compleave-2x3 {
+    flex-direction: row;
+    gap: 0.75rem;
+    padding: 0.5rem;
+}
+
+/* ===== 2x4 尺寸样式 ===== */
+.compleave-2x4 {
+    flex-direction: row;
+    gap: 1rem;
+    padding: 0.5rem;
+}
+
+.compleave-left {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 0.5rem;
+}
+
+.compleave-right {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.compleave-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.compleave-item-label {
+    font-size: 0.75rem;
+    opacity: 0.7;
+    font-weight: 500;
+}
+
+.compleave-item-value {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary, white);
+}
+
+.compleave-divider {
+    height: 1px;
+    background: linear-gradient(90deg,
+            transparent 0%,
+            rgba(255, 255, 255, 0.3) 50%,
+            transparent 100%);
+    margin: 0.25rem 0;
+}
+
+.compleave-available {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 0.75rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.compleave-available-label {
+    font-size: 0.8rem;
+    opacity: 0.8;
+    font-weight: 500;
+}
+
+.compleave-available-value {
+    font-size: 1.3rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-align: center;
+}
+
+/* ===== 悬停效果 ===== */
+.grid-item[data-widget-type="compleave"]:hover .widget-container {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg, 0 8px 16px rgba(0, 0, 0, 0.15));
+    border-color: var(--glass-border-hover, rgba(255, 255, 255, 0.3));
+}
+
+/* ===== 暗黑模式适配 ===== */
+body.dark-mode .grid-item[data-widget-type="compleave"] .widget-container {
+    background: var(--dark-glass-bg, rgba(0, 0, 0, 0.3));
+    border-color: var(--dark-glass-border, rgba(255, 255, 255, 0.1));
+}
+
+body.dark-mode .compleave-2x2 .compleave-value {
+    background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+body.dark-mode .compleave-2x3 .compleave-main-value {
+    background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+body.dark-mode .compleave-available {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.15);
+}
+
+body.dark-mode .compleave-available-value {
+    background: linear-gradient(135deg, #89f7fe 0%, #66a6ff 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+body.dark-mode .compleave-divider {
+    background: linear-gradient(90deg,
+            transparent 0%,
+            rgba(255, 255, 255, 0.2) 50%,
+            transparent 100%);
+}
+
+/* ===== 响应式调整 ===== */
+@media (max-width: 768px) {
+    .compleave-2x4 {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .compleave-left,
+    .compleave-right {
+        width: 100%;
+    }
+
+    .compleave-right {
+        padding: 0.5rem;
+    }
+
+    .compleave-available-value {
+        font-size: 1.1rem;
+    }
+}
