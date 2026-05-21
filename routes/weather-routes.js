@@ -463,10 +463,10 @@ router.get('/forecast/:city', async (req, res) => {
     try {
         const cityName = req.params.city;
 
-        // 1. 从数据库获取历史数据（最近7天）
+        // 1. 从数据库获取历史数据（最近1天）
         const historyRows = await new Promise((resolve, reject) => {
             const historySql = `
-                SELECT 
+                SELECT
                     wc.*,
                     DATE(wc.weather_date) as date_key
                 FROM weather_cache wc
@@ -477,7 +477,7 @@ router.get('/forecast/:city', async (req, res) => {
                       AND weather_date < DATE('now', 'localtime')
                     GROUP BY DATE(weather_date)
                     ORDER BY DATE(weather_date) DESC
-                    LIMIT 7
+                    LIMIT 1
                 ) latest ON DATE(wc.weather_date) = latest.date_key AND wc.cached_at = latest.max_cached
                 WHERE wc.city_name = ?
                 ORDER BY wc.weather_date ASC

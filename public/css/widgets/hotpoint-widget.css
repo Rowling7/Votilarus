@@ -212,20 +212,15 @@
 .hotpoint-list {
     display: flex;
     flex-direction: column;
-    gap: 0.4rem;
     min-height: min-content;
 }
 
 .hotpoint-item {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    padding: 0.4rem 0.5rem;
-    background: var(--hotpoint-item-bg);
-    border-radius: 0.5rem;
+    border-radius: 0.1rem;
     cursor: pointer;
     transition: all var(--transition-fast);
-    min-height: 28px;
 }
 
 .hotpoint-item:hover {
@@ -239,19 +234,16 @@
 
 /* 排名 */
 .hotpoint-rank {
-    width: 24px;
-    height: 24px;
-    min-width: 24px;
-    min-height: 24px;
-    border-radius: 50%;
-    color: white;
+    width: 22px;
+    height: 22px;
+    min-width: 22px;
+    min-height: 22px;
     display: flex;
     align-items: center;
     justify-content: center;
     font-weight: bold;
     font-size: 12px;
     position: relative;
-    background-color: #e53935;
     flex-shrink: 0;
 }
 
@@ -311,12 +303,3 @@
     font-size: 0.7rem;
 }
 
-/* 2x3 尺寸优化 */
-.grid-item[data-size="2x3"][data-widget-type="hotpoint"] .hotpoint-item {
-    padding: 0.35rem 0.45rem;
-}
-
-/* 2x4 尺寸优化 */
-.grid-item[data-size="2x4"][data-widget-type="hotpoint"] .hotpoint-item {
-    padding: 0.4rem 0.5rem;
-}
