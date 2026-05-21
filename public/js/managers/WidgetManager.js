@@ -8,6 +8,7 @@ import SearchWidget from '../widgets/SearchWidget.js';
 import HotPointWidget from '../widgets/HotPointWidget.js';
 import WorkTimeWidget from '../widgets/WorkTimeWidget.js';
 import CompleteLeaveWidget from '../widgets/CompleteLeaveWidget.js';
+import YiyanWidget from '../widgets/YiyanWidget.js';
 
 class WidgetManager {
     constructor() {
@@ -28,6 +29,7 @@ class WidgetManager {
         this.register('hotpoint', HotPointWidget);
         this.register('worktime', WorkTimeWidget);
         this.register('compleave', CompleteLeaveWidget);
+        this.register('yiyan', YiyanWidget);
     }
 
     /**
