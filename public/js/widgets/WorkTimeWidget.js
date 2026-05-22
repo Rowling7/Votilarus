@@ -100,8 +100,8 @@ class WorkTimeWidget extends BaseWidget {
                         </div>
                     </div>
                     <div class="worktime-salary-row">
-                        <div class="worktime-label">💵窝囊费</div>
-                        <div class="worktime-salary-value" id="salaryEarned">¥0</div>
+                        <div class="worktime-label">💵窝囊费¥</div>
+                        <div class="worktime-salary-value" id="salaryEarned">0</div>
                     </div>
                 </div>
             `;
@@ -123,8 +123,8 @@ class WorkTimeWidget extends BaseWidget {
                         </div>
                     </div>
                     <div class="worktime-salary-row-wide">
-                        <div class="worktime-label">💵窝囊费</div>
-                        <div class="worktime-salary-value" id="salaryEarned">¥0</div>
+                        <div class="worktime-label">💵窝囊费¥</div>
+                        <div class="worktime-salary-value" id="salaryEarned">0</div>
                     </div>
                 </div>
             `;
@@ -196,7 +196,7 @@ class WorkTimeWidget extends BaseWidget {
             salaryEarned = this.config.dailySalary;
         }
 
-        safeUpdate('salaryEarned', `¥${salaryEarned.toFixed(3)}`);
+        safeUpdate('salaryEarned', `${salaryEarned.toFixed(3)}`);
     }
 
     /**
