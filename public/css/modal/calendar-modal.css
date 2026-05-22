@@ -200,7 +200,7 @@
 .calendar-modal-day {
     aspect-ratio: 1;
     border-radius: 16px;
-    border: 1px solid var(--glass-border, rgba(0, 0, 0, 0.08));
+    border: 1px solid rgba(0, 0, 0, 0.08);
     background: var(--glass-bg, rgba(255, 255, 255, 0.5));
     padding: 0.5rem;
     display: flex;
@@ -312,6 +312,11 @@
 
 .calendar-modal-day.workday .calendar-modal-day-festival {
     color: #ff9800;
+}
+
+/* 最大化状态下的日期单元格 */
+.calendar-modal.modal-maximized .calendar-modal-grid .calendar-modal-day {
+    aspect-ratio: 0 !important;
 }
 
 /* 暗黑模式适配 */
