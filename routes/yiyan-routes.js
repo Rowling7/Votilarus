@@ -303,6 +303,83 @@ router.get('/check', async (req, res) => {
     }
 });
 
+/**
+ * GET /api/yiyan/favorites
+ * 获取所有收藏的一言列表
+ */
+router.get('/favorites', async (req, res) => {
+    try {
+        const sql = `
+            SELECT id, content, created_at 
+            FROM yiyan 
+            WHERE delete_flag = '0' 
+            ORDER BY created_at DESC
+        `;
+
+        db.all(sql, [], (err, rows) => {
+            if (err) {
+                return res.status(500).json({
+                    success: false,
+                    error: err.message
+                });
+            }
+
+            res.json({
+                success: true,
+                data: rows || []
+            });
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            error: error.message
+        });
+    }
+});
+
+/**
+ * DELETE /api/yiyan/favorite/:id
+ * 根据ID删除收藏（软删除）
+ */
+router.delete('/favorite/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const now = new Date().toISOString().slice(0, 19).replace('T', ' ');
+
+        const sql = `
+            UPDATE yiyan 
+            SET delete_flag = '1', deleted_at = ?, updated_at = ? 
+            WHERE id = ? AND delete_flag = '0'
+        `;
+
+        db.run(sql, [now, now, id], function (err) {
+            if (err) {
+                return res.status(500).json({
+                    success: false,
+                    error: err.message
+                });
+            }
+
+            if (this.changes === 0) {
+                return res.status(404).json({
+                    success: false,
+                    error: '未找到该收藏或已被删除'
+                });
+            }
+
+            res.json({
+                success: true,
+                message: '删除成功'
+            });
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            error: error.message
+        });
+    }
+});
+
 module.exports = {
     router,
     setDatabase
