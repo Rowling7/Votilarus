@@ -13,7 +13,6 @@ function setDatabase(database) {
  */
 router.get('/:widgetId/items', (req, res) => {
     const { widgetId } = req.params;
-    console.log(`[FolderRoutes] GET /api/folder/${widgetId}/items`);
 
     const sql = `
         SELECT
@@ -39,7 +38,6 @@ router.get('/:widgetId/items', (req, res) => {
         }
         // 过滤掉已删除图标（ii.id 为 NULL 的）
         const validRows = rows.filter(row => row.item_id !== null);
-        console.log(`[FolderRoutes] 返回 ${validRows.length} 个图标 (总行数: ${rows.length})`, JSON.stringify(validRows.map(r => ({ item_id: r.item_id, title: r.title }))));
         res.json(validRows);
     });
 });
@@ -52,7 +50,6 @@ router.get('/:widgetId/items', (req, res) => {
 router.post('/:widgetId/add-item', (req, res) => {
     const { widgetId } = req.params;
     const { item_id } = req.body;
-    console.log(`[FolderRoutes] POST /api/folder/${widgetId}/add-item, body:`, req.body);
 
     if (!item_id) {
         res.status(400).json({ error: '缺少 item_id 参数' });
@@ -109,7 +106,6 @@ router.post('/:widgetId/add-item', (req, res) => {
  */
 router.delete('/:widgetId/remove-item/:itemId', (req, res) => {
     const { widgetId, itemId } = req.params;
-    console.log(`[FolderRoutes] DELETE /api/folder/${widgetId}/remove-item/${itemId}`);
 
     const sql = 'DELETE FROM folder_widget_items WHERE folder_widget_id = ? AND item_id = ?';
     db.run(sql, [parseInt(widgetId), parseInt(itemId)], function (err) {

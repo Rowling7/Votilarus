@@ -43,14 +43,10 @@ class FolderWidget extends BaseWidget {
 
     async loadItems() {
         try {
-            console.log(`[FolderWidget#${this.widgetId}] 加载文件夹图标, URL: /api/folder/${this.widgetId}/items`);
             const response = await fetch(`/api/folder/${this.widgetId}/items`);
-            console.log(`[FolderWidget#${this.widgetId}] 响应状态: ${response.status}, content-type: ${response.headers.get('content-type')}`);
             if (!response.ok) throw new Error(`加载文件夹失败, status: ${response.status}`);
             const text = await response.text();
-            console.log(`[FolderWidget#${this.widgetId}] 原始响应 (前200字符):`, text.substring(0, 200));
             this.folderItems = JSON.parse(text);
-            console.log(`[FolderWidget#${this.widgetId}] 解析成功, 图标数量: ${this.folderItems.length}`, this.folderItems);
             this.renderGrid();
         } catch (error) {
             console.error(`[FolderWidget#${this.widgetId}] 加载文件夹图标失败:`, error);
