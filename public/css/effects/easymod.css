@@ -1,0 +1,134 @@
+/* ==================== Easymod 效果样式 ==================== */
+
+/* ---------- 时间容器 ---------- */
+.easymod-time-container {
+    position: fixed;
+    top: calc(50vh - 180px);
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 99;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    pointer-events: auto;
+    user-select: none;
+    -webkit-user-select: none;
+
+    /* GPU 加速 */
+    will-change: opacity;
+    backface-visibility: hidden;
+
+    /* 初始透明，10秒内均匀提升到90% */
+    opacity: 0;
+    transition: opacity 10s linear;
+}
+
+/* 显示状态：不透明度提升到90% */
+.easymod-time-container.visible {
+    opacity: 0.9;
+    transition: opacity 10s linear;
+}
+
+/* 鼠标悬停：2秒内降低到0 */
+.easymod-time-container:hover {
+    opacity: 0 !important;
+    transition: opacity 2s ease !important;
+}
+
+/* ---------- 时间文字 ---------- */
+.easymod-time {
+    font-family: 'Noto Sans SC', 'Noto Sans SC Bold', sans-serif;
+    font-size: 82px;
+    font-weight: bold;
+    color: var(--text-primary, #ffffff);
+    line-height: 1;
+    text-align: center;
+    letter-spacing: 0.02em;
+}
+
+/* ---------- 日期文字 ---------- */
+.easymod-date {
+    font-family: 'Noto Sans SC', sans-serif;
+    font-size: 48px;
+    font-weight: normal;
+    color: var(--text-secondary, #b0b0b0);
+    line-height: 1;
+    text-align: center;
+}
+
+/* ---------- 侧边栏隐藏动画 ---------- */
+#sidebar.easymod-hidden {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.35s cubic-bezier(0.65, 0, 0.35, 1),
+                visibility 0s 0.35s;
+    visibility: hidden;
+}
+
+/* ---------- 内容区隐藏动画 ---------- */
+#contentArea.easymod-hidden {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.35s cubic-bezier(0.65, 0, 0.35, 1),
+                visibility 0s 0.35s;
+    visibility: hidden;
+}
+
+/* ---------- 搜索框移动到视口中心 ---------- */
+/* 通过 CSS 自定义属性注入到宿主（Web Component），配合内联样式覆盖 */
+/* 主过渡使用贝塞尔曲线 bounce 效果 */
+#searchBox.easymod-centered {
+    /* 内联样式会覆盖 Shadow DOM 中的 :host，这里作为回退 */
+    transition: all 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+}
+
+/* 按钮旋转指示激活状态 */
+#easymod-button.easymod-active {
+    transform: rotate(45deg);
+    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+#easymod-button:not(.easymod-active) {
+    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* ---------- 响应式：移动端适配 ---------- */
+@media (max-width: 768px) {
+    .easymod-time {
+        font-size: 48px;
+    }
+
+    .easymod-date {
+        font-size: 28px;
+    }
+
+    .easymod-time-container {
+        top: calc(50vh - 120px);
+    }
+}
+
+@media (max-width: 480px) {
+    .easymod-time {
+        font-size: 36px;
+    }
+
+    .easymod-date {
+        font-size: 22px;
+    }
+
+    .easymod-time-container {
+        top: calc(50vh - 100px);
+    }
+}
+
+/* ---------- 减少动画偏好 ---------- */
+@media (prefers-reduced-motion: reduce) {
+    #searchBox.easymod-centered,
+    #sidebar.easymod-hidden,
+    #contentArea.easymod-hidden,
+    #easymod-button {
+        transition-duration: 0.01ms !important;
+    }
+}

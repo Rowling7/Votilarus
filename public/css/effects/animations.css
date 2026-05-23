@@ -70,6 +70,8 @@
 /* 侧边栏渐入 */
 .sidebar {
     animation: fadeIn 0.3s ease backwards;
+        border-top-left-radius: 0rem !important;
+    border-bottom-left-radius: 0rem !important;
 }
 
 /* 搜索框渐入 */
