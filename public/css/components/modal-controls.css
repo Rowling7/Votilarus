@@ -7,7 +7,14 @@
     position: relative;
 }
 
-/* 控制按钮容器 - 悬浮在 modal 右上角 */
+/* 拖拽相关样式 */
+.modal-dragging {
+    cursor: grabbing;
+    user-select: none;
+    transition: none;
+}
+
+/* 控制器按钮容器 - 悬浮在 modal 右上角 */
 .modal-control-buttons {
     position: absolute;
     top: 1rem;

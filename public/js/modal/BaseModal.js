@@ -19,6 +19,8 @@ class BaseModal {
             closeOnOverlayClick: true,
             closeOnEscape: true,
             enableMaximize: true, // 是否启用最大化功能
+            draggable: true,      // 是否启用拖拽，默认启用
+            dragHandle: null,     // 拖拽手柄选择器，null 表示整个 modal 可拖拽（交互元素除外）
             ...options
         };
 
@@ -29,6 +31,18 @@ class BaseModal {
         this._handleOverlayClick = null;
         this._handleEscapeKey = null;
         this._originalSize = null; // 保存原始尺寸
+
+        // 拖拽相关状态
+        this._isDragging = false;
+        this._dragStartX = 0;
+        this._dragStartY = 0;
+        this._modalStartLeft = 0;
+        this._modalStartTop = 0;
+        this._translateX = 0;
+        this._translateY = 0;
+        this._handleDragStart = null;
+        this._handleDragMove = null;
+        this._handleDragEnd = null;
     }
 
     /**
@@ -53,6 +67,8 @@ class BaseModal {
         this._renderControlButtons();
         // 绑定通用事件
         this._bindCommonEvents();
+        // 绑定拖拽事件
+        this._bindDragEvents();
     }
 
     /**
@@ -135,6 +151,9 @@ class BaseModal {
         if (this._isMaximized) {
             this._restoreFromMaximize();
         }
+
+        // 重置拖拽偏移，让模态框居中显示
+        this._resetDragPosition();
 
         // 显示模态框
         this.overlay.classList.remove('hidden');
@@ -227,6 +246,144 @@ class BaseModal {
     }
 
     /**
+     * 绑定拖拽事件
+     * @private
+     */
+    _bindDragEvents() {
+        if (!this.options.draggable || !this.modal) return;
+
+        // 设置拖拽光标
+        this.modal.style.cursor = 'grab';
+
+        this._handleDragStart = (e) => {
+            this._onDragStart(e);
+        };
+
+        this._handleDragMove = (e) => {
+            this._onDragMove(e);
+        };
+
+        this._handleDragEnd = () => {
+            this._onDragEnd();
+        };
+
+        // 确定拖拽触发元素：dragHandle 指定的元素 或 整个 modal
+        const dragTarget = this.options.dragHandle
+            ? this.modal.querySelector(this.options.dragHandle)
+            : this.modal;
+
+        if (dragTarget) {
+            dragTarget.addEventListener('mousedown', this._handleDragStart);
+        }
+    }
+
+    /**
+     * 拖拽开始 - mousedown 事件处理
+     * @param {MouseEvent} e
+     * @private
+     */
+    _onDragStart(e) {
+        // 最大化状态下不允许拖拽
+        if (this._isMaximized) return;
+
+        // 忽略来自交互元素的拖拽（input/textarea/select/button/a）
+        const target = e.target;
+        if (target.closest('input, textarea, select, button, a, .modal-control-buttons, [data-no-drag]')) {
+            return;
+        }
+
+        // 如果指定了 dragHandle，只在 handle 上触发（此处为二次检查）
+        if (this.options.dragHandle && !target.closest(this.options.dragHandle)) {
+            return;
+        }
+
+        this._isDragging = true;
+
+        // 记录鼠标起始位置
+        this._dragStartX = e.clientX;
+        this._dragStartY = e.clientY;
+
+        // 保存当前累积的 translate 偏移
+        this._modalStartLeft = this._translateX;
+        this._modalStartTop = this._translateY;
+
+        // 禁止文本选择
+        document.body.style.userSelect = 'none';
+        document.body.style.webkitUserSelect = 'none';
+
+        // 给 modal 添加拖拽中的视觉反馈
+        this.modal.style.cursor = 'grabbing';
+        this.modal.style.transition = 'none';
+        this.modal.classList.add('modal-dragging');
+
+        // 全局监听 mousemove 和 mouseup
+        document.addEventListener('mousemove', this._handleDragMove);
+        document.addEventListener('mouseup', this._handleDragEnd);
+    }
+
+    /**
+     * 拖拽移动 - mousemove 事件处理
+     * @param {MouseEvent} e
+     * @private
+     */
+    _onDragMove(e) {
+        if (!this._isDragging) return;
+
+        const deltaX = e.clientX - this._dragStartX;
+        const deltaY = e.clientY - this._dragStartY;
+
+        this._translateX = this._modalStartLeft + deltaX;
+        this._translateY = this._modalStartTop + deltaY;
+
+        this._applyTransform();
+    }
+
+    /**
+     * 拖拽结束 - mouseup 事件处理
+     * @private
+     */
+    _onDragEnd() {
+        if (!this._isDragging) return;
+
+        this._isDragging = false;
+
+        // 恢复文本选择
+        document.body.style.userSelect = '';
+        document.body.style.webkitUserSelect = '';
+
+        // 移除拖拽中的视觉反馈
+        this.modal.style.cursor = 'grab';
+        this.modal.style.transition = '';
+        this.modal.classList.remove('modal-dragging');
+
+        // 移除全局监听
+        document.removeEventListener('mousemove', this._handleDragMove);
+        document.removeEventListener('mouseup', this._handleDragEnd);
+    }
+
+    /**
+     * 应用 transform 到 modal 元素
+     * @private
+     */
+    _applyTransform() {
+        if (this._translateX === 0 && this._translateY === 0) {
+            this.modal.style.transform = '';
+        } else {
+            this.modal.style.transform = `translate(${this._translateX}px, ${this._translateY}px)`;
+        }
+    }
+
+    /**
+     * 重置拖拽偏移
+     * @private
+     */
+    _resetDragPosition() {
+        this._translateX = 0;
+        this._translateY = 0;
+        this._applyTransform();
+    }
+
+    /**
      * 检查模态框是否打开
      * @returns {boolean}
      */
@@ -238,6 +395,20 @@ class BaseModal {
      * 销毁模态框，清理事件监听和资源
      */
     destroy() {
+        // 移除拖拽全局监听（安全清理）
+        document.removeEventListener('mousemove', this._handleDragMove);
+        document.removeEventListener('mouseup', this._handleDragEnd);
+
+        // 移除拖拽 mousedown 监听
+        if (this._handleDragStart && this.modal) {
+            const dragTarget = this.options.dragHandle
+                ? this.modal.querySelector(this.options.dragHandle)
+                : this.modal;
+            if (dragTarget) {
+                dragTarget.removeEventListener('mousedown', this._handleDragStart);
+            }
+        }
+
         // 移除事件监听
         if (this._handleOverlayClick && this.overlay) {
             this.overlay.removeEventListener('click', this._handleOverlayClick);
