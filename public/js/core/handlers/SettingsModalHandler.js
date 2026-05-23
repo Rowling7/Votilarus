@@ -1026,7 +1026,7 @@ class SettingsModalHandler {
         if (!searchBox) return;
 
         // 通过设置属性来更新样式
-        searchBox.setAttribute('style', style);
+        searchBox.setAttribute('box-style', style);
     }
 
     /**

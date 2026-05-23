@@ -2,7 +2,7 @@
 
 class SearchBox extends HTMLElement {
     static get observedAttributes() {
-        return ['engine', 'position', 'style'];
+        return ['engine', 'position', 'box-style'];
     }
 
     constructor() {
@@ -64,7 +64,7 @@ class SearchBox extends HTMLElement {
 
         // 应用样式设置
         const style = settingsManager.get('search_box_style') || 'rounded';
-        this.setAttribute('style', style);
+        this.setAttribute('box-style', style);
     }
 
     async loadSearchEngines() {
@@ -125,7 +125,7 @@ class SearchBox extends HTMLElement {
     render() {
         const engine = this.getAttribute('engine') || 'baidu';
         const position = this.getAttribute('position') || 'center';
-        const style = this.getAttribute('style') || 'rounded';
+        const style = this.getAttribute('box-style') || 'rounded';
 
         this.currentEngine = engine;
 
