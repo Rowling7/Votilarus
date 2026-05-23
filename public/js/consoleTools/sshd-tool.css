@@ -1,0 +1,252 @@
+/* ==================== SSHD 状态管理工具样式 ==================== */
+
+.sshd-tool {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    gap: 1.5rem;
+}
+
+.sshd-tool-title {
+    margin: 0;
+    font-size: 1.3rem;
+    color: var(--text-primary, #1a1a1a);
+    flex-shrink: 0;
+}
+
+.sshd-tool-desc {
+    margin: -0.5rem 0 0 0;
+    color: var(--text-secondary, #666666);
+    font-size: 0.85rem;
+    flex-shrink: 0;
+}
+
+/* ==================== 状态指示灯 ==================== */
+.sshd-tool-status-row {
+    padding: 1.25rem;
+    background: rgba(59, 130, 246, 0.04);
+    border-radius: 14px;
+    border: 1px solid var(--glass-border, rgba(145, 143, 143, 0.15));
+    flex-shrink: 0;
+}
+
+.sshd-tool-status-indicator {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    font-size: 0.95rem;
+    font-weight: 500;
+}
+
+.sshd-tool-status-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #9ca3af;
+    flex-shrink: 0;
+    transition: background 0.3s ease;
+}
+
+/* 运行中 — 绿色 */
+.sshd-tool-status-indicator.running .sshd-tool-status-dot {
+    background: #22c55e;
+    box-shadow: 0 0 8px rgba(34, 197, 94, 0.5);
+    animation: sshd-pulse-green 2s infinite;
+}
+
+/* 停止 — 红色 */
+.sshd-tool-status-indicator.stopped .sshd-tool-status-dot {
+    background: #ef4444;
+    box-shadow: 0 0 8px rgba(239, 68, 68, 0.4);
+}
+
+/* 错误 — 橙色 */
+.sshd-tool-status-indicator.error .sshd-tool-status-dot {
+    background: #f59e0b;
+    box-shadow: 0 0 8px rgba(245, 158, 11, 0.4);
+}
+
+/* 加载中 */
+.sshd-tool-status-indicator.loading .sshd-tool-status-dot {
+    background: #3b82f6;
+    animation: sshd-pulse-blue 0.8s infinite;
+}
+
+@keyframes sshd-pulse-green {
+    0%, 100% { box-shadow: 0 0 4px rgba(34, 197, 94, 0.4); }
+    50% { box-shadow: 0 0 14px rgba(34, 197, 94, 0.8); }
+}
+
+@keyframes sshd-pulse-blue {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.3); opacity: 0.6; }
+}
+
+.sshd-tool-status-text {
+    color: var(--text-primary, #1a1a1a);
+}
+
+/* ==================== 按钮区域 ==================== */
+.sshd-tool-actions {
+    display: flex;
+    gap: 0.85rem;
+    flex-shrink: 0;
+}
+
+.sshd-tool-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    flex: 1;
+    padding: 0.85rem 0;
+    border: 1px solid var(--glass-border, rgba(145, 143, 143, 0.3));
+    border-radius: 14px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background: transparent;
+    color: var(--text-primary, #1a1a1a);
+    user-select: none;
+}
+
+.sshd-tool-btn:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+}
+
+.sshd-tool-btn:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+.sshd-tool-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.sshd-tool-btn-icon {
+    width: 17px;
+    height: 17px;
+    flex-shrink: 0;
+}
+
+/* 查看状态按钮 */
+.sshd-tool-btn-status {
+    background: rgba(59, 130, 246, 0.08);
+    border-color: rgba(59, 130, 246, 0.25);
+    color: var(--theme-color, #3b82f6);
+}
+
+.sshd-tool-btn-status:hover:not(:disabled) {
+    background: rgba(59, 130, 246, 0.14);
+    border-color: var(--theme-color, #3b82f6);
+}
+
+/* 启动按钮 */
+.sshd-tool-btn-start {
+    background: rgba(34, 197, 94, 0.08);
+    border-color: rgba(34, 197, 94, 0.25);
+    color: #22c55e;
+}
+
+.sshd-tool-btn-start:hover:not(:disabled) {
+    background: rgba(34, 197, 94, 0.14);
+    border-color: #22c55e;
+}
+
+/* 重启按钮 */
+.sshd-tool-btn-restart {
+    background: rgba(245, 158, 11, 0.08);
+    border-color: rgba(245, 158, 11, 0.25);
+    color: #f59e0b;
+}
+
+.sshd-tool-btn-restart:hover:not(:disabled) {
+    background: rgba(245, 158, 11, 0.14);
+    border-color: #f59e0b;
+}
+
+/* ==================== 操作反馈消息 ==================== */
+.sshd-tool-feedback {
+    margin-top: auto;
+    padding: 0.85rem 1rem;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+}
+
+.sshd-tool-feedback.visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+.sshd-tool-feedback.success {
+    background: rgba(34, 197, 94, 0.08);
+    border: 1px solid rgba(34, 197, 94, 0.25);
+    color: #16a34a;
+}
+
+.sshd-tool-feedback.error {
+    background: rgba(239, 68, 68, 0.08);
+    border: 1px solid rgba(239, 68, 68, 0.25);
+    color: #dc2626;
+}
+
+.sshd-tool-feedback-text {
+    margin: 0;
+}
+
+/* ==================== 暗黑模式适配 ==================== */
+[data-theme="dark"] .sshd-tool-status-row {
+    background: rgba(59, 130, 246, 0.06);
+    border-color: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme="dark"] .sshd-tool-btn {
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .sshd-tool-btn-status {
+    background: rgba(59, 130, 246, 0.15);
+    border-color: rgba(59, 130, 246, 0.3);
+}
+
+[data-theme="dark"] .sshd-tool-btn-start {
+    background: rgba(34, 197, 94, 0.12);
+    border-color: rgba(34, 197, 94, 0.25);
+}
+
+[data-theme="dark"] .sshd-tool-btn-restart {
+    background: rgba(245, 158, 11, 0.12);
+    border-color: rgba(245, 158, 11, 0.25);
+}
+
+[data-theme="dark"] .sshd-tool-feedback.success {
+    background: rgba(34, 197, 94, 0.12);
+    border-color: rgba(34, 197, 94, 0.3);
+}
+
+[data-theme="dark"] .sshd-tool-feedback.error {
+    background: rgba(239, 68, 68, 0.12);
+    border-color: rgba(239, 68, 68, 0.3);
+}
+
+/* ==================== 移动端适配 ==================== */
+@media (max-width: 768px) {
+    .sshd-tool-actions {
+        flex-direction: column;
+    }
+
+    .sshd-tool-btn {
+        flex: unset;
+    }
+
+    .sshd-tool-status-row {
+        padding: 1rem;
+    }
+}

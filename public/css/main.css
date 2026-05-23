@@ -21,6 +21,7 @@
 @import 'components/tooltip.css';
 @import 'components/city-modal.css';
 @import '../js/consoleTools/image-parser.css';
+@import '../js/consoleTools/sshd-tool.css';
 
 /*modal*/
 @import 'modal/calendar-modal.css';

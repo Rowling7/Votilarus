@@ -2,6 +2,7 @@
 
 import BaseModal from './BaseModal.js';
 import ImageParserTool from '../consoleTools/ImageParser.js';
+import SSHDTool from '../consoleTools/SSHDTool.js';
 
 class ConsoleModal extends BaseModal {
     constructor() {
@@ -120,6 +121,15 @@ class ConsoleModal extends BaseModal {
             icon: '🖼️',
             description: '查看图片EXIF信息、尺寸、大小',
             render: (container) => imageParser.render(container)
+        });
+
+        // 注册 SSHD 状态管理工具
+        const sshdTool = new SSHDTool();
+        this.registerTool('sshd', {
+            name: 'SSHD 管理',
+            icon: '🔌',
+            description: '查看和管理 Termux SSHD 服务',
+            render: (container) => sshdTool.render(container)
         });
 
         this._renderToolList();
