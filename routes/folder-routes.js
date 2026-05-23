@@ -33,12 +33,18 @@ router.get('/:widgetId/items', (req, res) => {
     db.all(sql, [parseInt(widgetId)], (err, rows) => {
         if (err) {
             console.error(`[FolderRoutes] 查询失败:`, err.message);
-            res.status(500).json({ error: err.message });
+            res.status(500).json({
+                success: false,
+                error: err.message
+            });
             return;
         }
         // 过滤掉已删除图标（ii.id 为 NULL 的）
         const validRows = rows.filter(row => row.item_id !== null);
-        res.json(validRows);
+        res.json({
+            success: true,
+            data: validRows
+        });
     });
 });
 
@@ -52,7 +58,10 @@ router.post('/:widgetId/add-item', (req, res) => {
     const { item_id } = req.body;
 
     if (!item_id) {
-        res.status(400).json({ error: '缺少 item_id 参数' });
+        res.status(400).json({
+            success: false,
+            error: '缺少 item_id 参数'
+        });
         return;
     }
 
@@ -60,12 +69,18 @@ router.post('/:widgetId/add-item', (req, res) => {
     const checkSql = 'SELECT id FROM folder_widget_items WHERE folder_widget_id = ? AND item_id = ?';
     db.get(checkSql, [parseInt(widgetId), parseInt(item_id)], (err, existing) => {
         if (err) {
-            res.status(500).json({ error: err.message });
+            res.status(500).json({
+                success: false,
+                error: err.message
+            });
             return;
         }
 
         if (existing) {
-            res.status(409).json({ error: '该图标已在文件夹中' });
+            res.status(409).json({
+                success: false,
+                error: '该图标已在文件夹中'
+            });
             return;
         }
 
@@ -73,7 +88,10 @@ router.post('/:widgetId/add-item', (req, res) => {
         const maxSql = 'SELECT MAX(sort_order) AS max_order FROM folder_widget_items WHERE folder_widget_id = ?';
         db.get(maxSql, [parseInt(widgetId)], (err, row) => {
             if (err) {
-                res.status(500).json({ error: err.message });
+                res.status(500).json({
+                    success: false,
+                    error: err.message
+                });
                 return;
             }
 
@@ -86,13 +104,18 @@ router.post('/:widgetId/add-item', (req, res) => {
 
             db.run(insertSql, [parseInt(widgetId), parseInt(item_id), nextOrder], function (err) {
                 if (err) {
-                    res.status(500).json({ error: err.message });
+                    res.status(500).json({
+                        success: false,
+                        error: err.message
+                    });
                     return;
                 }
 
                 res.json({
                     success: true,
-                    id: this.lastID,
+                    data: {
+                        id: this.lastID
+                    },
                     message: '图标已添加到文件夹'
                 });
             });
@@ -110,12 +133,18 @@ router.delete('/:widgetId/remove-item/:itemId', (req, res) => {
     const sql = 'DELETE FROM folder_widget_items WHERE folder_widget_id = ? AND item_id = ?';
     db.run(sql, [parseInt(widgetId), parseInt(itemId)], function (err) {
         if (err) {
-            res.status(500).json({ error: err.message });
+            res.status(500).json({
+                success: false,
+                error: err.message
+            });
             return;
         }
 
         if (this.changes === 0) {
-            res.status(404).json({ error: '未找到该图标' });
+            res.status(404).json({
+                success: false,
+                error: '未找到该图标'
+            });
             return;
         }
 
@@ -136,7 +165,10 @@ router.post('/:widgetId/reorder', (req, res) => {
     const { items } = req.body;
 
     if (!items || !Array.isArray(items)) {
-        res.status(400).json({ error: '缺少 items 数组' });
+        res.status(400).json({
+            success: false,
+            error: '缺少 items 数组'
+        });
         return;
     }
 
@@ -152,10 +184,16 @@ router.post('/:widgetId/reorder', (req, res) => {
 
     Promise.all(promises)
         .then(() => {
-            res.json({ success: true });
+            res.json({
+                success: true,
+                message: '排序更新成功'
+            });
         })
         .catch(err => {
-            res.status(500).json({ error: err.message });
+            res.status(500).json({
+                success: false,
+                error: err.message
+            });
         });
 });
 

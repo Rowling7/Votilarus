@@ -48,9 +48,10 @@ class WidgetManager {
      * @param {string} type - widget 类型
      * @param {HTMLElement} container - 容器元素
      * @param {number|null} widgetId - icon_widgets.id（数字ID）
+     * @param {string|null} titleCn - 中文标题
      * @returns {Object|null} widget 实例或 null
      */
-    create(type, container, widgetId = null) {
+    create(type, container, widgetId = null, titleCn = null) {
         const widgetType = type.toLowerCase();
         const WidgetClass = this.widgetRegistry.get(widgetType);
 
@@ -64,8 +65,8 @@ class WidgetManager {
         container.dataset.widgetId = widgetId;  // 使用 widgetId
         container.dataset.type = widgetType;
 
-        // 创建 widget 实例，传递 widgetId
-        const widget = new WidgetClass(container, widgetId);
+        // 创建 widget 实例，传递 widgetId 和 titleCn
+        const widget = new WidgetClass(container, widgetId, null, titleCn);
         const result = widget.render();
 
         // 如果 widget 有 init 方法，则调用它来初始化组件（加载数据）
@@ -103,8 +104,8 @@ class WidgetManager {
         widgetContainer.className = 'widget-content';
         container.appendChild(widgetContainer);
 
-        // 使用 WidgetManager 创建 widget
-        const widgetInstance = this.create(type, widgetContainer, widgetId);
+        // 使用 WidgetManager 创建 widget，传入 titleCn
+        const widgetInstance = this.create(type, widgetContainer, widgetId, titleCn);
 
         // 将 supportedSizes 保存到 dataset，以便右键菜单可以读取
         if (widgetInstance && widgetInstance.supportedSizes) {

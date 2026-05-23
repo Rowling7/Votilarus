@@ -6,8 +6,8 @@ import folderExpandModal from '../modal/FolderExpandModal.js';
 import ToastNotification from '../utils/ToastNotification.js';
 
 class FolderWidget extends BaseWidget {
-    constructor(container, widgetId = null) {
-        super(container, widgetId, 'FolderWidget');
+    constructor(container, widgetId = null, widgetName = null, titleCn = null) {
+        super(container, widgetId, widgetName || 'FolderWidget', titleCn);
         this.supportedSizes = ['2x2', '2x3', '2x4'];
         this.folderItems = [];
         this.addToFolderCallback = null;
@@ -29,7 +29,7 @@ class FolderWidget extends BaseWidget {
             if (e.target === this.container ||
                 e.target.classList.contains('folder-widget') ||
                 e.target === this.gridEl) {
-                folderExpandModal.open(this.widgetId, this.folderItems);
+                folderExpandModal.open(this.widgetId, this.folderItems, this.titleCn);
             }
         });
 
@@ -46,8 +46,8 @@ class FolderWidget extends BaseWidget {
         try {
             const response = await fetch(`/api/folder/${this.widgetId}/items`);
             if (!response.ok) throw new Error(`加载文件夹失败, status: ${response.status}`);
-            const text = await response.text();
-            this.folderItems = JSON.parse(text);
+            const result = await response.json();
+            this.folderItems = result.data || [];
             this.renderGrid();
         } catch (error) {
             console.error(`[FolderWidget#${this.widgetId}] 加载文件夹图标失败:`, error);

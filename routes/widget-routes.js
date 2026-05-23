@@ -174,7 +174,7 @@ router.delete('/:id', (req, res) => {
 // 更新组件信息
 router.put('/:id', (req, res) => {
     const { id } = req.params;
-    const { title, active_flag } = req.body;
+    const { title, title_cn, active_flag } = req.body;
 
     const updates = [];
     const params = [];
@@ -183,13 +183,20 @@ router.put('/:id', (req, res) => {
         updates.push('title = ?');
         params.push(title);
     }
+    if (title_cn !== undefined) {
+        updates.push('title_cn = ?');
+        params.push(title_cn);
+    }
     if (active_flag !== undefined) {
         updates.push('active_flag = ?');
         params.push(active_flag);
     }
 
     if (updates.length === 0) {
-        res.status(400).json({ error: '没有提供要更新的字段' });
+        res.status(400).json({
+            success: false,
+            error: '没有提供要更新的字段'
+        });
         return;
     }
 
@@ -200,16 +207,25 @@ router.put('/:id', (req, res) => {
 
     db.run(sql, params, function (err) {
         if (err) {
-            res.status(500).json({ error: err.message });
+            res.status(500).json({
+                success: false,
+                error: err.message
+            });
             return;
         }
 
         if (this.changes === 0) {
-            res.status(404).json({ error: '组件不存在' });
+            res.status(404).json({
+                success: false,
+                error: '组件不存在'
+            });
             return;
         }
 
-        res.json({ success: true, changes: this.changes });
+        res.json({
+            success: true,
+            data: { changes: this.changes }
+        });
     });
 });
 

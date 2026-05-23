@@ -23,7 +23,7 @@
     position: relative;
     width: 80vw;
     max-width: 800px;
-    height: 70vh;
+    height: 35vh;
     max-height: 650px;
     background: var(--bg-primary, #1a1a1a);
     border-radius: 1rem;
@@ -39,7 +39,7 @@
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
 }
 
 .folder-expand-header h3 {
