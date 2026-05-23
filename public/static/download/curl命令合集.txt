@@ -1,0 +1,53 @@
+# 获取系统信息
+curl -H "Authorization: ckms@9827" http://localhost:3000/api/manage/system-info
+
+# 获取磁盘使用情况
+curl -H "Authorization: ckms@9827" http://localhost:3000/api/manage/disk-usage
+
+# 获取内存使用情况
+curl -H "Authorization: ckms@9827" http://localhost:3000/api/manage/memory-usage
+
+# 查看所有进程
+curl -H "Authorization: ckms@9827" http://localhost:3000/api/manage/processes
+
+# 查看Node.js进程
+curl -H "Authorization: ckms@9827" http://localhost:3000/api/manage/processes/node
+
+# 查看项目目录文件
+curl -H "Authorization: ckms@9827" http://localhost:3000/api/manage/files
+
+# 查看日志文件（最近100行）
+curl -H "Authorization: ckms@9827" http://localhost:3000/api/manage/logs
+
+# 查看网络连接
+curl -H "Authorization: ckms@9827" http://localhost:3000/api/manage/network-connections
+
+# 查看端口占用 (需要替换 {port} 为实际端口号)
+curl -H "Authorization: ckms@9827" http://localhost:3000/api/manage/port-usage/{port}
+
+# 更新Termux包
+curl -X POST -H "Authorization: ckms@9827" http://localhost:3000/api/manage/update-packages
+
+# 安装新包 (需要替换 package_name 为实际包名)
+curl -X POST -H "Authorization: ckms@9827" -H "Content-Type: application/json" -d "{\"packageName\": \"package_name\"}" http://localhost:3000/api/manage/install-package
+
+# 备份项目文件
+curl -X POST -H "Authorization: ckms@9827" http://localhost:3000/api/manage/backup
+
+# 执行自定义命令 (极度危险！需要替换 your_command 为实际命令)
+curl -X POST -H "Authorization: ckms@9827" -H "Content-Type: application/json" -d "{\"command\": \"your_command\"}" http://localhost:3000/api/manage/execute
+
+# 清理缓存和临时文件
+curl -X POST -H "Authorization: ckms@9827" http://localhost:3000/api/manage/cleanup
+
+# 查看系统负载
+curl -H "Authorization: ckms@9827" http://localhost:3000/api/manage/system-load
+
+# 查看 SSHD 状态
+curl -H "Authorization: ckms@9827" http://localhost:3000/api/manage/sshd/status
+
+# 启动 SSHD 服务
+curl -X POST -H "Authorization: ckms@9827" http://localhost:3000/api/manage/sshd/start
+
+# 重启 SSHD 服务
+curl -X POST -H "Authorization: ckms@9827" http://localhost:3000/api/manage/sshd/restart

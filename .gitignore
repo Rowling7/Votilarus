@@ -1,5 +1,3 @@
 daemon/
-service.js
 node_modules/
-Pitahaya/package-lock.json
 data/thumbnail_cache/
