@@ -27,6 +27,7 @@
 @import 'modal/notebook-edit-modal.css';
 @import 'modal/search-modal.css';
 @import 'modal/yiyan-favorites-modal.css';
+@import 'modal/folder-expand-modal.css';
 
 /* Widgets */
 @import 'widgets/clock-widget.css';
@@ -37,6 +38,7 @@
 @import 'widgets/worktime-widget.css';
 @import 'widgets/compleave-widget.css';
 @import 'widgets/yiyan-widget.css';
+@import 'widgets/folder-widget.css';
 
 /* Effects */
 @import 'effects/glassmorphism.css';

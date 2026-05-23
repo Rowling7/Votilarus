@@ -1,0 +1,153 @@
+/* ==================== 文件夹展开弹窗样式 ==================== */
+
+.folder-expand-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.65);
+    z-index: 9998;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+}
+
+.folder-expand-modal-overlay.hidden {
+    display: none;
+}
+
+.folder-expand-modal {
+    position: relative;
+    width: 80vw;
+    max-width: 800px;
+    height: 70vh;
+    max-height: 650px;
+    background: var(--bg-primary, #1a1a1a);
+    border-radius: 1rem;
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.4);
+    border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.folder-expand-header {
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.folder-expand-header h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    color: var(--text-primary, #fff);
+    font-weight: 600;
+}
+
+.folder-expand-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1.25rem;
+}
+
+.folder-expand-body::-webkit-scrollbar {
+    width: 6px;
+}
+
+.folder-expand-body::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.12);
+    border-radius: 3px;
+}
+
+.folder-expand-body::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.folder-expand-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 12px;
+    align-content: start;
+}
+
+.folder-expand-item {
+    position: relative;
+    aspect-ratio: 1 / 1;
+    border-radius: 10px;
+    overflow: visible;
+    cursor: default;
+    transition: transform 0.15s ease;
+}
+
+.folder-expand-item:hover {
+    transform: scale(1.04);
+}
+
+.folder-expand-icon-wrapper {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.25);
+}
+
+.folder-expand-icon-bg {
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+}
+
+.folder-expand-icon-letter {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.2rem;
+    font-weight: bold;
+    color: white;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.folder-expand-remove {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    background: rgba(0, 0, 0, 0.8);
+    border-radius: 50%;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.15s ease, transform 0.15s ease;
+    z-index: 2;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.folder-expand-item:hover .folder-expand-remove {
+    opacity: 1;
+}
+
+.folder-expand-remove:hover {
+    transform: scale(1.25);
+    background: rgba(220, 38, 38, 0.9);
+}
+
+.folder-expand-empty {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 3rem 1rem;
+    color: var(--text-tertiary, rgba(255, 255, 255, 0.4));
+    font-size: 1rem;
+}

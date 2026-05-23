@@ -13,6 +13,7 @@ const hotpointRoute = require('./hotpoint-routes');
 const worktimeRoute = require('./worktime-routes');
 const compleaveRoute = require('./compleave-routes');
 const yiyanRoute = require('./yiyan-routes');
+const folderRoute = require('./folder-routes');
 
 /**
  * 注册所有路由到 Express 应用
@@ -36,6 +37,7 @@ function registerRoutes(app, db) {
     worktimeRoute.setDatabase(db);
     compleaveRoute.setDatabase(db);
     yiyanRoute.setDatabase(db);
+    folderRoute.setDatabase(db);
 
     // 注册路由
     app.use('/api/categories', categoriesRoute.router);
@@ -53,6 +55,7 @@ function registerRoutes(app, db) {
     app.use('/api/worktime', worktimeRoute.router);
     app.use('/api/compleave', compleaveRoute.router);
     app.use('/api/yiyan', yiyanRoute.router);
+    app.use('/api/folder', folderRoute.router);
 }
 
 module.exports = registerRoutes;

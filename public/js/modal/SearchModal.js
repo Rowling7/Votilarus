@@ -17,6 +17,8 @@ class SearchModal extends BaseModal {
         this.searchResults = [];
         this.selectedIndex = -1; // 当前选中的结果索引（键盘导航）
         this.debounceTimer = null;
+        this.mode = 'openLink';     // 模式：'openLink' | 'addToFolder'
+        this.onSelect = null;       // addToFolder 模式下的回调"
 
         this.init();
     }
@@ -129,9 +131,16 @@ class SearchModal extends BaseModal {
 
     /**
      * 显示模态弹窗
+     * @param {Object} options - 可选配置
+     * @param {string} options.mode - 'openLink'（默认）| 'addToFolder'
+     * @param {Function} options.onSelect - addToFolder 模式下选中回调
      */
-    async open() {
+    async open(options = {}) {
         if (this._isOpen) return;
+
+        // 设置模式
+        this.mode = options.mode || 'openLink';
+        this.onSelect = options.onSelect || null;
 
         // 清空之前的搜索结果
         this.clearResults();
@@ -148,14 +157,18 @@ class SearchModal extends BaseModal {
     }
 
     /**
-     * 关闭模态弹窗
-     */
+ * 关闭模态弹窗
+ */
     close() {
         // 清除 debounce 定时器
         if (this.debounceTimer) {
             clearTimeout(this.debounceTimer);
             this.debounceTimer = null;
         }
+
+        // 重置模式
+        this.mode = 'openLink';
+        this.onSelect = null;
 
         // 调用父类的 close 方法
         super.close();
@@ -304,7 +317,13 @@ class SearchModal extends BaseModal {
             return;
         }
 
-        // 获取链接地址
+        // addToFolder 模式：调用回调，不打开链接，不关闭模态框
+        if (this.mode === 'addToFolder' && typeof this.onSelect === 'function') {
+            this.onSelect(itemId);
+            return;
+        }
+
+        // openLink 模式（默认）：打开链接
         const linkUrl = item.link_url;
 
         if (!linkUrl) {

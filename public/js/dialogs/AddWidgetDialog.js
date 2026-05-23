@@ -10,15 +10,16 @@ class AddWidgetDialogHandler {
 
         // 可用的小组件列表
         this.availableWidgets = [
-                { id: 'clock', name: 'ClockWidget', icon: '⏰', description: '显示当前时间' },
-                { id: 'calendar', name: 'CalendarWidget', icon: '📅', description: '显示日期、周数、农历信息' },
-                { id: 'weather', name: 'WeatherWidget', icon: '☀️', description: '显示天气信息' },
-                { id: 'notebook', name: 'NotebookWidget', icon: '📒', description: '备忘录，支持重要/紧急/完成状态筛选' },
-                { id: 'worktime', name: 'WorkTimeWidget', icon: '⌛', description: '工作时间' },
-                { id: 'completeleave', name: 'CompleteLeaveWidget', icon: '🏖️', description: '调休时间' },
-                { id: 'yiyan', name: 'YiyanWidget', icon: '💬', description: '一言' },
-                { id: 'search', name: 'SearchWidget', icon: '🔍', description: '搜索快捷方式' },
-                { id: 'hotpoint', name: 'HotPointWidget', icon: '🔥', description: '热搜' }
+            { id: 'clock', name: 'ClockWidget', icon: '⏰', description: '显示当前时间' },
+            { id: 'calendar', name: 'CalendarWidget', icon: '📅', description: '显示日期、周数、农历信息' },
+            { id: 'weather', name: 'WeatherWidget', icon: '☀️', description: '显示天气信息' },
+            { id: 'notebook', name: 'NotebookWidget', icon: '📒', description: '备忘录，支持重要/紧急/完成状态筛选' },
+            { id: 'worktime', name: 'WorkTimeWidget', icon: '⌛', description: '工作时间' },
+            { id: 'completeleave', name: 'CompleteLeaveWidget', icon: '🏖️', description: '调休时间' },
+            { id: 'yiyan', name: 'YiyanWidget', icon: '💬', description: '一言' },
+            { id: 'search', name: 'SearchWidget', icon: '🔍', description: '搜索快捷方式' },
+            { id: 'hotpoint', name: 'HotPointWidget', icon: '🔥', description: '热搜' },
+            { id: 'folder', name: 'FolderWidget', icon: '📁', description: '收纳常用图标，快速访问' }
         ];
     }
 
@@ -149,25 +150,26 @@ class AddWidgetDialogHandler {
                 'completeleave': { title: 'CompleteLeaveWidget', width: 2, height: 2 },
                 'yiyan': { title: 'YiyanWidget', width: 2, height: 4 },
                 'search': { title: 'SearchWidget', width: 2, height: 3 },
-                'hotpoint': { title: 'HotPointWidget', width: 2, height: 3 }
-            };
+                'hotpoint': { title: 'HotPointWidget', width: 2, height: 3 },
+                'folder': { title: 'FolderWidget', width: 2, height: 2 }
+        }; 
 
-            const config = widgetConfigs[widgetId] || { title: widgetId, width: 2, height: 2 };
+        const config = widgetConfigs[widgetId] || { title: widgetId, width: 2, height: 2 };
 
-            const result = await createWidget({
-                title: config.title,
-                category_id: this.currentCategoryId,
-                width: config.width,
-                height: config.height,
-                active_flag: 1
-            });
+        const result = await createWidget({
+            title: config.title,
+            category_id: this.currentCategoryId,
+            width: config.width,
+            height: config.height,
+            active_flag: 1
+        });
 
-            ToastNotification.success(`小组件 "${config.title}" 添加成功！请刷新页面查看`);
-            this.close();
-        } catch (error) {
-            ToastNotification.error('添加失败: ' + error.message);
-        }
+        ToastNotification.success(`小组件 "${config.title}" 添加成功！请刷新页面查看`);
+        this.close();
+    } catch(error) {
+        ToastNotification.error('添加失败: ' + error.message);
     }
+}
 }
 
 export default new AddWidgetDialogHandler();

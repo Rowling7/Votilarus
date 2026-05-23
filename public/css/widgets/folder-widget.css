@@ -1,0 +1,346 @@
+/* ==================== Folder 小组件样式 ==================== */
+
+/* ===== 基础容器样式 ===== */
+.grid-item[data-widget-type="folder"] .widget-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    color: var(--text-primary, white);
+    padding: 0.75rem;
+    box-sizing: border-box;
+    background: var(--glass-bg, rgba(255, 255, 255, 0.1));
+    backdrop-filter: blur(var(--glass-blur, 10px));
+    -webkit-backdrop-filter: blur(var(--glass-blur, 10px));
+    border-radius: var(--widget-border-radius, 1.4rem);
+    position: relative;
+    border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.2));
+    box-shadow: var(--shadow-md, 0 4px 6px rgba(0, 0, 0, 0.1));
+    transition: all var(--transition-normal);
+    overflow: hidden;
+}
+
+/* ===== 文件夹滚动容器 ===== */
+.folder-widget {
+    width: 100%;
+    height: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 2px;
+    box-sizing: border-box;
+}
+
+/* ===== 滚动条美化 ===== */
+.folder-widget::-webkit-scrollbar {
+    width: 4px;
+}
+
+.folder-widget::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 2px;
+}
+
+.folder-widget::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+/* ===== 图标网格 ===== */
+.folder-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(48px, 1fr));
+    gap: 8px;
+    align-content: start;
+}
+
+/* ===== 图标项 ===== */
+.folder-grid-item {
+    position: relative;
+    aspect-ratio: 1 / 1;
+    border-radius: 12px;
+    overflow: visible;
+    cursor: pointer;
+    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+                box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.folder-grid-item:hover {
+    transform: scale(1.08);
+    z-index: 3;
+}
+
+/* ===== 图标包装容器 ===== */
+.folder-icon-wrapper {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    transition: all 0.2s ease;
+}
+
+.folder-grid-item:hover .folder-icon-wrapper {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+    border-color: rgba(255, 255, 255, 0.35);
+    background: rgba(255, 255, 255, 0.14);
+}
+
+/* ===== 图标背景图 ===== */
+.folder-icon-bg {
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    transition: transform 0.3s ease;
+}
+
+.folder-grid-item:hover .folder-icon-bg {
+    transform: scale(1.06);
+}
+
+/* ===== 图标首字母占位 ===== */
+.folder-icon-letter {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: white;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    transition: all 0.2s ease;
+}
+
+.folder-grid-item:hover .folder-icon-letter {
+    background: linear-gradient(135deg, #7b8cf0 0%, #8b5fc0 100%);
+}
+
+/* ===== 移除按钮 ===== */
+.folder-icon-remove {
+    position: absolute;
+    top: -7px;
+    right: -7px;
+    width: 22px;
+    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    color: rgba(255, 255, 255, 0.9);
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    border-radius: 50%;
+    cursor: pointer;
+    opacity: 0;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 4;
+    border: 1.5px solid rgba(255, 255, 255, 0.25);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+.folder-grid-item:hover .folder-icon-remove {
+    opacity: 1;
+}
+
+.folder-icon-remove:hover {
+    transform: scale(1.2);
+    background: rgba(220, 38, 38, 0.85);
+    border-color: rgba(255, 255, 255, 0.5);
+    box-shadow: 0 2px 10px rgba(220, 38, 38, 0.4);
+    color: white;
+}
+
+/* ===== 添加按钮 ===== */
+.folder-grid-add {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.folder-add-btn {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    color: rgba(255, 255, 255, 0.5);
+    border-radius: 12px;
+    border: 2px dashed rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.04);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: inset 0 0 0 rgba(255, 255, 255, 0);
+}
+
+.folder-add-btn:hover {
+    border-color: rgba(255, 255, 255, 0.55);
+    background: rgba(255, 255, 255, 0.12);
+    color: rgba(255, 255, 255, 0.9);
+    transform: scale(1.06);
+    border-style: solid;
+    box-shadow: 0 2px 12px rgba(59, 130, 246, 0.25),
+                inset 0 0 20px rgba(255, 255, 255, 0.03);
+}
+
+/* ===== 空状态 ===== */
+.folder-grid-empty {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 60px;
+    gap: 0.4rem;
+}
+
+.folder-empty-add {
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    opacity: 0.5;
+    border-radius: 50%;
+    border: 2px dashed rgba(255, 255, 255, 0.25);
+    background: rgba(255, 255, 255, 0.06);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+}
+
+.folder-empty-add:hover {
+    transform: scale(1.15);
+    opacity: 1;
+    border-color: rgba(255, 255, 255, 0.55);
+    background: rgba(255, 255, 255, 0.14);
+    border-style: solid;
+    box-shadow: 0 2px 14px rgba(59, 130, 246, 0.3);
+}
+
+/* ===== 空状态提示文字 ===== */
+.folder-empty-hint {
+    font-size: 0.7rem;
+    color: rgba(255, 255, 255, 0.35);
+    text-align: center;
+    font-weight: 400;
+    user-select: none;
+}
+
+/* ===== 暗黑模式适配 ===== */
+body.dark-mode .grid-item[data-widget-type="folder"] .widget-container {
+    background: var(--dark-glass-bg, rgba(0, 0, 0, 0.3));
+    border-color: var(--dark-glass-border, rgba(255, 255, 255, 0.1));
+}
+
+body.dark-mode .folder-icon-wrapper {
+    border-color: rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.04);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+body.dark-mode .folder-grid-item:hover .folder-icon-wrapper {
+    border-color: rgba(255, 255, 255, 0.25);
+    background: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.45);
+}
+
+body.dark-mode .folder-icon-letter {
+    background: linear-gradient(135deg, #a8b4f0 0%, #b8a0d8 100%);
+}
+
+body.dark-mode .folder-grid-item:hover .folder-icon-letter {
+    background: linear-gradient(135deg, #c0caf8 0%, #ccb8e8 100%);
+}
+
+body.dark-mode .folder-add-btn {
+    border-color: rgba(255, 255, 255, 0.12);
+    background: rgba(255, 255, 255, 0.02);
+    color: rgba(255, 255, 255, 0.35);
+}
+
+body.dark-mode .folder-add-btn:hover {
+    border-color: rgba(255, 255, 255, 0.35);
+    background: rgba(255, 255, 255, 0.08);
+    color: rgba(255, 255, 255, 0.8);
+    box-shadow: 0 2px 14px rgba(59, 130, 246, 0.2),
+                inset 0 0 20px rgba(255, 255, 255, 0.02);
+}
+
+body.dark-mode .folder-empty-add {
+    border-color: rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.03);
+}
+
+body.dark-mode .folder-empty-add:hover {
+    border-color: rgba(255, 255, 255, 0.35);
+    background: rgba(255, 255, 255, 0.08);
+}
+
+body.dark-mode .folder-empty-hint {
+    color: rgba(255, 255, 255, 0.25);
+}
+
+body.dark-mode .folder-icon-remove {
+    background: rgba(0, 0, 0, 0.75);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+body.dark-mode .folder-icon-remove:hover {
+    background: rgba(220, 38, 38, 0.8);
+    border-color: rgba(255, 255, 255, 0.4);
+}
+
+body.dark-mode .folder-widget::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.12);
+}
+
+/* ===== 响应式调整 ===== */
+@media (max-width: 768px) {
+    .folder-grid {
+        grid-template-columns: repeat(auto-fill, minmax(42px, 1fr));
+        gap: 6px;
+    }
+
+    .folder-icon-letter {
+        font-size: 1.2rem;
+    }
+
+    .folder-icon-remove {
+        width: 18px;
+        height: 18px;
+        top: -5px;
+        right: -5px;
+        font-size: 8px;
+    }
+
+    .folder-add-btn {
+        font-size: 1.2rem;
+        border-radius: 10px;
+    }
+
+    .folder-icon-wrapper {
+        border-radius: 10px;
+    }
+
+    .folder-grid-item {
+        border-radius: 10px;
+    }
+
+    .folder-empty-add {
+        width: 38px;
+        height: 38px;
+        font-size: 1.3rem;
+    }
+}
