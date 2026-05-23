@@ -244,6 +244,15 @@ class ConsoleModal extends BaseModal {
     }
 
     /**
+     * 打开模态框 - 默认选中 welcome
+     */
+    open() {
+        super.open();
+        // 默认选中第一个工具（welcome）
+        this._activateTool('welcome');
+    }
+
+    /**
      * 关闭模态框前清理
      */
     close() {

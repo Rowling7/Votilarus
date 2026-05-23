@@ -28,6 +28,9 @@
 @import 'modal/calendar-modal.css';
 @import 'modal/weather-forecast-modal.css';
 @import 'modal/notebook-edit-modal.css';
+
+/* Effects */
+@import 'effects/easymod.css';
 @import 'modal/search-modal.css';
 @import 'modal/yiyan-favorites-modal.css';
 @import 'modal/folder-expand-modal.css';
@@ -64,19 +67,3 @@
     user-select: none;
 }
 
-.easymod-button {
-    position: fixed;
-    bottom: 20px;
-    top: 0%;
-    right: 0%;
-    transform: translateX(-50%);
-    z-index: 9999;
-    border-radius: 50%;
-    width: 26px;
-    height: 26px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}

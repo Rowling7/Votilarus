@@ -16,6 +16,7 @@ import TooltipManager from './managers/TooltipManager.js';
 import AddIconDialog from './dialogs/AddIconDialog.js';
 import AddWidgetDialog from './dialogs/AddWidgetDialog.js';
 import NavSidebar from './components/NavSidebar.js';
+import easymodRenderer from './core/renderers/easymodRenderer.js';
 
 // 将 ModalManager 暴露到全局
 window.modalManager = ModalManager;
@@ -92,6 +93,9 @@ class App {
 
             // 绑定头像点击事件（打开设置）
             this.bindAvatarClick();
+
+            // 初始化 EasyMod 简洁模式
+            easymodRenderer.init();
 
             // 设置横向滚动支持（Shift + 滚轮）
             this.setupHorizontalScroll();
