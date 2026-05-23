@@ -2,7 +2,8 @@
 
 /* 确保 modal 有正确的定位上下文 */
 .weather-forecast-modal,
-.calendar-modal {
+.calendar-modal,
+.yiyan-favorites-modal {
     position: relative;
 }
 

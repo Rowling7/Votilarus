@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const https = require('https');
+const TimeUtils = require('../public/js/utils/TimeUtils.js');
 
 // 需要注入 db 对象
 let db;
@@ -105,7 +106,7 @@ function checkFavorite(content) {
  */
 function addToFavorites(content) {
     return new Promise((resolve, reject) => {
-        const now = new Date().toISOString().slice(0, 19).replace('T', ' ');
+        const now = TimeUtils.formatBeijingTime();
 
         // 先检查是否已存在
         const checkSql = `SELECT id, delete_flag FROM yiyan WHERE content = ? LIMIT 1`;
@@ -158,7 +159,7 @@ function addToFavorites(content) {
  */
 function removeFromFavorites(content) {
     return new Promise((resolve, reject) => {
-        const now = new Date().toISOString().slice(0, 19).replace('T', ' ');
+        const now = TimeUtils.formatBeijingTime();
 
         const sql = `UPDATE yiyan SET delete_flag = '1', deleted_at = ?, updated_at = ? WHERE content = ? AND delete_flag = '0'`;
 
@@ -344,7 +345,7 @@ router.get('/favorites', async (req, res) => {
 router.delete('/favorite/:id', async (req, res) => {
     try {
         const { id } = req.params;
-        const now = new Date().toISOString().slice(0, 19).replace('T', ' ');
+        const now = TimeUtils.formatBeijingTime();
 
         const sql = `
             UPDATE yiyan 

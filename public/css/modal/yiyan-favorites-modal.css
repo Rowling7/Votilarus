@@ -1,0 +1,341 @@
+/*==================== 一言收藏列表模态弹窗样式 ==================== */
+
+/* 遮罩层 */
+.yiyan-favorites-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 0.3s ease,
+    visibility 0.3s ease;
+}
+
+.yiyan-favorites-overlay.hidden {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.yiyan-favorites-overlay:not(.hidden) {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* 弹窗主体 */
+.yiyan-favorites-modal {
+  background: var(--bg-primary);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 1.4rem;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+  width: 90%;
+  max-width: 700px;
+  height: 600px;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transform: scale(0.9) translateY(20px);
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  position: relative;
+}
+
+.yiyan-favorites-overlay:not(.hidden) .yiyan-favorites-modal {
+  transform: scale(1) translateY(0);
+}
+
+/* 最大化时去除宽高限制，内部内容居中限制最大宽度 */
+.yiyan-favorites-modal.modal-maximized {
+  width: 100vw !important;
+  height: 100vh !important;
+  max-width: 100vw !important;
+  max-height: 100vh !important;
+  border-radius: 0 !important;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ===== 内容包裹器（限制最大内容宽度）===== */
+.yiyan-favorites-content-wrapper {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* 头部 */
+.yiyan-favorites-header {
+  padding: 1.5rem 2rem 1rem;
+  flex-shrink: 0;
+}
+
+.yiyan-favorites-title {
+  margin: 0;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* 列表容器 */
+.yiyan-favorites-list-container {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0.1rem 1.5rem 1.5rem;
+  position: relative;
+  min-height: 0;
+}
+
+.yiyan-favorites-list-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.yiyan-favorites-list-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.yiyan-favorites-list-container::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 3px;
+}
+
+.yiyan-favorites-list-container::-webkit-scrollbar-thumb:hover {
+  background: var(--text-tertiary);
+}
+
+/* 列表 */
+.yiyan-favorites-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+/* ===== 空状态 ===== */
+.yiyan-favorites-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+  color: var(--text-tertiary);
+  text-align: center;
+}
+
+.yiyan-favorites-empty.hidden {
+  display: none;
+}
+
+.yiyan-favorites-empty-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  opacity: 0.6;
+}
+
+.yiyan-favorites-empty p {
+  font-size: 1rem;
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* ===== 加载状态 ===== */
+.yiyan-favorites-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+  color: var(--text-tertiary);
+  gap: 0.75rem;
+}
+
+.yiyan-favorites-loading.hidden {
+  display: none;
+}
+
+.yiyan-favorites-loading .spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid rgba(255, 255, 255, 0.15);
+  border-top-color: var(--text-primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.yiyan-favorites-loading p {
+  font-size: 0.9rem;
+  margin: 0;
+  color: var(--text-secondary);
+}
+
+/* ===== 卡片式条目 ===== */
+.yiyan-favorites-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1.25rem;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 1rem;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.yiyan-favorites-item:hover {
+  background: var(--bg-hover);
+  border-color: rgba(255, 107, 107, 0.3);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  transform: translateY(-1px);
+}
+
+/* 条目主体 */
+.yiyan-favorites-item-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+/* 一言内容 */
+.yiyan-favorites-item-content {
+  font-size: 0.95rem;
+  line-height: 1.8;
+  color: var(--text-primary);
+  word-break: break-word;
+  white-space: pre-wrap;
+}
+
+/* 元信息（收藏时间） */
+.yiyan-favorites-item-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.yiyan-favorites-item-time {
+  font-size: 0.78rem;
+  color: var(--text-tertiary);
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+/* 操作按钮区域 */
+.yiyan-favorites-item-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+/* 操作按钮 */
+.yiyan-favorites-action-btn {
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 0.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+  transition: all 0.2s ease;
+}
+
+.yiyan-favorites-action-btn:hover {
+  transform: scale(1.1);
+}
+
+/* 复制按钮 */
+.yiyan-favorites-copy-btn:hover {
+  background: rgba(59, 130, 246, 0.15);
+  color: #3b82f6;
+}
+
+.yiyan-favorites-copy-btn:active {
+  transform: scale(0.95);
+}
+
+/* 删除按钮 */
+.yiyan-favorites-delete-btn:hover {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+}
+
+.yiyan-favorites-delete-btn:active {
+  transform: scale(0.95);
+}
+
+/* ===== 刷新按钮旋转动画 ===== */
+.modal-refresh-btn.spinning {
+  animation: refreshSpin 0.6s ease-in-out;
+}
+
+@keyframes refreshSpin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ===== 暗色模式适配 ===== */
+[data-theme="dark"] .yiyan-favorites-modal {
+  background: var(--bg-primary);
+  border-color: var(--border-color);
+}
+
+[data-theme="dark"] .yiyan-favorites-item {
+  background: var(--bg-secondary);
+  border-color: var(--border-color);
+}
+
+[data-theme="dark"] .yiyan-favorites-item:hover {
+  background: var(--bg-hover);
+  border-color: rgba(255, 107, 107, 0.25);
+}
+
+[data-theme="dark"] .yiyan-favorites-action-btn {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme="dark"] .yiyan-favorites-copy-btn:hover {
+  background: rgba(59, 130, 246, 0.2);
+}
+
+[data-theme="dark"] .yiyan-favorites-delete-btn:hover {
+  background: rgba(239, 68, 68, 0.2);
+}
+
+/* ===== 响应式 ===== */
+@media (max-width: 768px) {
+  .yiyan-favorites-modal {
+    width: 95%;
+    height: 80vh;
+    max-height: 90vh;
+  }
+}

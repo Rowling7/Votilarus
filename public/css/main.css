@@ -26,6 +26,7 @@
 @import 'modal/weather-forecast-modal.css';
 @import 'modal/notebook-edit-modal.css';
 @import 'modal/search-modal.css';
+@import 'modal/yiyan-favorites-modal.css';
 
 /* Widgets */
 @import 'widgets/clock-widget.css';
