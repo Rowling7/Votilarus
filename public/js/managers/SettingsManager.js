@@ -19,6 +19,7 @@ class SettingsManager {
             username: 'Votilarus',
             bio: 'Everything will be OK!',
             bg_image_url: 'static/background/backImage/image061.png',
+            bg_video_url: '',
             // 背景样式开关（默认关闭）
             bg_image_enabled: '0',
             bg_blur_enabled: '0',
@@ -285,22 +286,35 @@ class SettingsManager {
     }
 
     /**
-     * 应用背景设置
+     * 应用背景设置（支持图片和视频）
      */
     applyBackgroundSettings() {
-        // 应用背景图片(根据开关状态)
         const bgImageEnabled = this.settings.bg_image_enabled === '1' || this.settings.bg_image_enabled === true;
         const bgImageUrl = this.settings.bg_image_url || '';
+        const bgVideoUrl = this.settings.bg_video_url || '';
 
-        if (bgImageEnabled && bgImageUrl) {
-            // 如果路径已经以 / 开头,直接使用;否则添加 / 前缀
-            const imageUrl = bgImageUrl.startsWith('/') ? bgImageUrl : `/${bgImageUrl}`;
-            document.body.style.backgroundImage = `url(${imageUrl})`;
-            document.body.style.backgroundSize = 'cover';
-            document.body.style.backgroundPosition = 'center';
-            document.body.style.backgroundRepeat = 'no-repeat';
+        // 清除旧的视频背景
+        this._removeVideoBackground();
+
+        if (bgImageEnabled) {
+            if (bgVideoUrl) {
+                // 视频背景优先
+                const videoUrl = bgVideoUrl.startsWith('/') ? bgVideoUrl : `/${bgVideoUrl}`;
+                this._applyVideoBackground(videoUrl);
+                document.body.style.backgroundImage = 'none';
+            } else if (bgImageUrl) {
+                // 图片背景
+                const imageUrl = bgImageUrl.startsWith('/') ? bgImageUrl : `/${bgImageUrl}`;
+                document.body.style.backgroundImage = `url(${imageUrl})`;
+                document.body.style.backgroundSize = 'cover';
+                document.body.style.backgroundPosition = 'center';
+                document.body.style.backgroundRepeat = 'no-repeat';
+            } else {
+                document.body.style.backgroundImage = 'none';
+            }
         } else {
             document.body.style.backgroundImage = 'none';
+            this._removeVideoBackground();
         }
 
         // 应用背景模糊度(根据开关状态)
@@ -325,6 +339,46 @@ class SettingsManager {
 
         // 更新 body 的伪元素样式以应用背景效果
         this.updateBodyBackgroundStyles();
+    }
+
+    /**
+     * 应用视频背景
+     * @param {string} videoUrl - 视频文件路径
+     * @private
+     */
+    _applyVideoBackground(videoUrl) {
+        const videoEl = document.createElement('video');
+        videoEl.id = 'bg-video';
+        videoEl.src = videoUrl;
+        videoEl.autoplay = true;
+        videoEl.loop = true;
+        videoEl.muted = true;
+        videoEl.playsInline = true;
+        videoEl.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: -2;
+            pointer-events: none;
+        `;
+        document.body.appendChild(videoEl);
+    }
+
+    /**
+     * 移除视频背景
+     * @private
+     */
+    _removeVideoBackground() {
+        const videoEl = document.getElementById('bg-video');
+        if (videoEl) {
+            videoEl.pause();
+            videoEl.src = '';
+            videoEl.load();
+            videoEl.remove();
+        }
     }
 
     /**
@@ -480,6 +534,7 @@ class SettingsManager {
             globalFont: this.settings.global_font || 'NotoSansSC-Regular',
             bgImageEnabled: this.settings.bg_image_enabled === '1',
             bgImageUrl: this.settings.bg_image_url || '',
+            bgVideoUrl: this.settings.bg_video_url || '',
             bgBlurEnabled: this.settings.bg_blur_enabled === '1',
             bgBlur: parseInt(this.settings.bg_blur) || 5,
             bgOpacityEnabled: this.settings.bg_opacity_enabled === '1',
@@ -545,6 +600,7 @@ class SettingsManager {
             global_font: newSettings.globalFont,
             bg_image_enabled: newSettings.bgImageEnabled ? '1' : '0',
             bg_image_url: newSettings.bgImageUrl,
+            bg_video_url: newSettings.bgVideoUrl || '',
             bg_blur_enabled: newSettings.bgBlurEnabled ? '1' : '0',
             bg_blur: newSettings.bgBlur,
             bg_opacity_enabled: newSettings.bgOpacityEnabled ? '1' : '0',

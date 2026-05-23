@@ -151,6 +151,7 @@ router.post('/reset', (req, res) => {
         global_font: 'NotoSansSC-Regular',
         bg_image_enabled: '0',
         bg_image_url: 'static/background/backImage/image061.png',
+        bg_video_url: '',
         bg_blur_enabled: '0',
         bg_blur: '5',
         bg_opacity_enabled: '0',

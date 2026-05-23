@@ -3,6 +3,7 @@
 import BaseModal from './BaseModal.js';
 import ImageParserTool from '../consoleTools/ImageParser.js';
 import SSHDTool from '../consoleTools/SSHDTool.js';
+import BackgroundTool from '../consoleTools/BackgroundTool.js';
 
 class ConsoleModal extends BaseModal {
     constructor() {
@@ -130,6 +131,15 @@ class ConsoleModal extends BaseModal {
             icon: '🔌',
             description: '查看和管理 Termux SSHD 服务',
             render: (container) => sshdTool.render(container)
+        });
+
+        // 注册背景图设置工具
+        const bgTool = new BackgroundTool();
+        this.registerTool('background', {
+            name: '背景图',
+            icon: '🖼️',
+            description: '浏览并设置页面背景图片/视频',
+            render: (container) => bgTool.render(container)
         });
 
         this._renderToolList();
