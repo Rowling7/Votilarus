@@ -1249,42 +1249,24 @@ class SettingsModalHandler {
 
     /**
      * 应用背景设置(包括开关状态)
+     * 委托给 SettingsManager，它完整支持图片和视频背景
      */
     applyBackgroundSettings(settings) {
-        // 应用背景图片(根据开关状态)
-        const bgImageEnabled = settings.bgImageEnabled === true || settings.bgImageEnabled === '1';
-        if (bgImageEnabled && settings.bgImageUrl) {
-            const imageUrl = settings.bgImageUrl.startsWith('/') ? settings.bgImageUrl : `/${settings.bgImageUrl}`;
-            document.body.style.backgroundImage = `url(${imageUrl})`;
-            document.body.style.backgroundSize = 'cover';
-            document.body.style.backgroundPosition = 'center';
-            document.body.style.backgroundRepeat = 'no-repeat';
-        } else {
-            document.body.style.backgroundImage = 'none';
-        }
+        // 将 settings 映射回 SettingsManager 内部格式并委托
+        SettingsManager.settings.bg_image_enabled = settings.bgImageEnabled ? '1' : '0';
+        SettingsManager.settings.bg_image_url = settings.bgImageUrl || '';
+        SettingsManager.settings.bg_video_url = settings.bgVideoUrl || '';
+        SettingsManager.settings.bg_blur_enabled = settings.bgBlurEnabled ? '1' : '0';
+        SettingsManager.settings.bg_blur = settings.bgBlur;
+        SettingsManager.settings.bg_opacity_enabled = settings.bgOpacityEnabled ? '1' : '0';
+        SettingsManager.settings.bg_opacity = settings.bgOpacity;
+        SettingsManager.settings.overlay_color_enabled = settings.overlayColorEnabled ? '1' : '0';
+        SettingsManager.settings.overlay_color = settings.overlayColor;
+        SettingsManager.settings.overlay_opacity_enabled = settings.overlayOpacityEnabled ? '1' : '0';
+        SettingsManager.settings.overlay_opacity = settings.overlayOpacity;
 
-        // 应用背景模糊度(根据开关状态)
-        const bgBlurEnabled = settings.bgBlurEnabled === true || settings.bgBlurEnabled === '1';
-        const bgBlur = bgBlurEnabled ? (settings.bgBlur || 5) : 0;
-        document.documentElement.style.setProperty('--bg-blur', `${bgBlur}px`);
-
-        // 应用背景透明度(根据开关状态)
-        const bgOpacityEnabled = settings.bgOpacityEnabled === true || settings.bgOpacityEnabled === '1';
-        const bgOpacity = bgOpacityEnabled ? (settings.bgOpacity || 0.8) : 1;
-        document.documentElement.style.setProperty('--bg-opacity', bgOpacity);
-
-        // 应用遮罩层颜色(根据开关状态)
-        const overlayColorEnabled = settings.overlayColorEnabled === true || settings.overlayColorEnabled === '1';
-        const overlayColor = overlayColorEnabled ? (settings.overlayColor || '#000000') : 'transparent';
-        document.documentElement.style.setProperty('--overlay-color', overlayColor);
-
-        // 应用遮罩层透明度(根据开关状态)
-        const overlayOpacityEnabled = settings.overlayOpacityEnabled === true || settings.overlayOpacityEnabled === '1';
-        const overlayOpacity = overlayOpacityEnabled ? (settings.overlayOpacity || 0.3) : 0;
-        document.documentElement.style.setProperty('--overlay-opacity', overlayOpacity);
-
-        // 更新 body 的伪元素样式以应用背景效果
-        this.updateBodyBackgroundStyles();
+        // 委托给 SettingsManager 应用（支持视频背景）
+        SettingsManager.applyBackgroundSettings();
     }
 
     /**
@@ -1332,6 +1314,12 @@ class SettingsModalHandler {
                 background-color: ${overlayColor};
                 z-index: -1;
                 opacity: ${overlayOpacity};
+            }
+
+            /* 视频背景模式下隐藏伪元素（视频在 z-index: -2，需要透出） */
+            body.bg-video-mode::before,
+            body.bg-video-mode::after {
+                display: none !important;
             }
         `;
     }

@@ -137,7 +137,7 @@ class ConsoleModal extends BaseModal {
         const bgTool = new BackgroundTool();
         this.registerTool('background', {
             name: '背景图',
-            icon: '🖼️',
+            icon: '🏞️',
             description: '浏览并设置页面背景图片/视频',
             render: (container) => bgTool.render(container)
         });

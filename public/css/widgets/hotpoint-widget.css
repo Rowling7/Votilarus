@@ -51,7 +51,7 @@
     backdrop-filter: blur(var(--glass-blur, 10px));
     border-radius: var(--widget-border-radius, 1.4rem);
     position: relative;
-    border: 0px solid var(--hotpoint-border-color);
+    border: 1px solid var(--hotpoint-border-color);
     box-shadow: var(--shadow-md, 0 4px 6px rgba(0, 0, 0, 0.1));
     transition: all var(--transition-normal);
     overflow: hidden;

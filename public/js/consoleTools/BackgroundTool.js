@@ -108,7 +108,7 @@ class BackgroundTool {
 
         container.innerHTML = `
             <div class="bg-tool">
-                <h2 class="bg-tool-title">🖼️ 背景图</h2>
+                <h2 class="bg-tool-title">🏞️ 背景图</h2>
 
                 <!-- 页签切换 -->
                 <div class="bg-tool-tabs" id="bgTabs">

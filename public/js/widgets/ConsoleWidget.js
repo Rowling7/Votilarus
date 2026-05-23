@@ -12,7 +12,7 @@ class ConsoleWidget extends BaseWidget {
     constructor(container, widgetId = null) {
         super(container, widgetId, 'ConsoleWidget');
         // 控制台组件仅支持 1x1 尺寸
-        this.supportedSizes = ['1x1'];
+        this.supportedSizes = ['1x1','2x2'];
     }
 
     /**
