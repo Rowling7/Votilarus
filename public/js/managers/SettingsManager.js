@@ -18,7 +18,7 @@ class SettingsManager {
             avatar_url: 'static/ico/loading2.gif\n',
             username: 'Votilarus',
             bio: 'Everything will be OK!',
-            bg_image_url: 'static/background/image061.png',
+            bg_image_url: 'static/background/backImage/image061.png',
             // 背景样式开关（默认关闭）
             bg_image_enabled: '0',
             bg_blur_enabled: '0',

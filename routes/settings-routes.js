@@ -150,7 +150,7 @@ router.post('/reset', (req, res) => {
         theme_color: '#3b82f6',
         global_font: 'NotoSansSC-Regular',
         bg_image_enabled: '0',
-        bg_image_url: 'static/background/image061.png',
+        bg_image_url: 'static/background/backImage/image061.png',
         bg_blur_enabled: '0',
         bg_blur: '5',
         bg_opacity_enabled: '0',
