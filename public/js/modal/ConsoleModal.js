@@ -1,6 +1,7 @@
 // ==================== 控制台模态弹窗 ====================
 
 import BaseModal from './BaseModal.js';
+import ImageParserTool from '../consoleTools/ImageParser.js';
 
 class ConsoleModal extends BaseModal {
     constructor() {
@@ -111,6 +112,15 @@ class ConsoleModal extends BaseModal {
                 render: (container) => this._renderWelcomeTool(container)
             }
         ];
+
+        // 注册图片解析工具
+        const imageParser = new ImageParserTool();
+        this.registerTool('image-parser', {
+            name: '图片解析',
+            icon: '🖼️',
+            description: '查看图片EXIF信息、尺寸、大小',
+            render: (container) => imageParser.render(container)
+        });
 
         this._renderToolList();
     }

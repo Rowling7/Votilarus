@@ -20,6 +20,7 @@
 @import 'components/dock.css';
 @import 'components/tooltip.css';
 @import 'components/city-modal.css';
+@import '../js/consoleTools/image-parser.css';
 
 /*modal*/
 @import 'modal/calendar-modal.css';
