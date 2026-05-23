@@ -8,6 +8,7 @@ import ToastNotification from '../utils/ToastNotification.js';
 class FolderWidget extends BaseWidget {
     constructor(container, widgetId = null) {
         super(container, widgetId, 'FolderWidget');
+        this.supportedSizes = ['2x2', '2x3', '2x4'];
         this.folderItems = [];
         this.addToFolderCallback = null;
     }

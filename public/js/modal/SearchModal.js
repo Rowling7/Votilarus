@@ -395,9 +395,6 @@ class SearchModal extends BaseModal {
                 }
             },
             {
-                type: 'separator'
-            },
-            {
                 label: '删除图标',
                 icon: '🗑️',
                 className: 'danger',

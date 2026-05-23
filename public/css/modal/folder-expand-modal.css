@@ -118,8 +118,8 @@
 
 .folder-expand-remove {
     position: absolute;
-    top: -8px;
-    right: -8px;
+    top: -1px;
+    right: -1px;
     width: 24px;
     height: 24px;
     display: flex;
