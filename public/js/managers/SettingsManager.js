@@ -302,19 +302,26 @@ class SettingsManager {
                 const videoUrl = bgVideoUrl.startsWith('/') ? bgVideoUrl : `/${bgVideoUrl}`;
                 this._applyVideoBackground(videoUrl);
                 document.body.style.backgroundImage = 'none';
-            } else if (bgImageUrl) {
-                // 图片背景
-                const imageUrl = bgImageUrl.startsWith('/') ? bgImageUrl : `/${bgImageUrl}`;
-                document.body.style.backgroundImage = `url(${imageUrl})`;
-                document.body.style.backgroundSize = 'cover';
-                document.body.style.backgroundPosition = 'center';
-                document.body.style.backgroundRepeat = 'no-repeat';
+                // 视频背景模式下，body::before/::after 不需要显示（视频已覆盖全屏）
+                document.body.classList.add('bg-video-mode');
             } else {
-                document.body.style.backgroundImage = 'none';
+                this._removeVideoBackground();
+                document.body.classList.remove('bg-video-mode');
+                if (bgImageUrl) {
+                    // 图片背景
+                    const imageUrl = bgImageUrl.startsWith('/') ? bgImageUrl : `/${bgImageUrl}`;
+                    document.body.style.backgroundImage = `url(${imageUrl})`;
+                    document.body.style.backgroundSize = 'cover';
+                    document.body.style.backgroundPosition = 'center';
+                    document.body.style.backgroundRepeat = 'no-repeat';
+                } else {
+                    document.body.style.backgroundImage = 'none';
+                }
             }
         } else {
             document.body.style.backgroundImage = 'none';
             this._removeVideoBackground();
+            document.body.classList.remove('bg-video-mode');
         }
 
         // 应用背景模糊度(根据开关状态)
@@ -426,6 +433,12 @@ class SettingsManager {
                 background-color: ${overlayColor};
                 z-index: -1;
                 opacity: ${overlayOpacity};
+            }
+
+            /* 视频背景模式下隐藏伪元素（视频在 z-index: -2，需要透出） */
+            body.bg-video-mode::before,
+            body.bg-video-mode::after {
+                display: none !important;
             }
         `;
     }

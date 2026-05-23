@@ -15,6 +15,7 @@ const compleaveRoute = require('./compleave-routes');
 const yiyanRoute = require('./yiyan-routes');
 const folderRoute = require('./folder-routes');
 const termuxRoute = require('./termux-routes');
+const thumbnailRoute = require('./thumbnail-routes');
 
 /**
  * 注册所有路由到 Express 应用
@@ -58,6 +59,7 @@ function registerRoutes(app, db) {
     app.use('/api/yiyan', yiyanRoute.router);
     app.use('/api/folder', folderRoute.router);
     app.use('/api/termux', termuxRoute);
+    app.use('/api/thumbnail', thumbnailRoute.router);
 }
 
 module.exports = registerRoutes;

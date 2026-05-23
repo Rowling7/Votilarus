@@ -200,7 +200,7 @@ class BackgroundTool {
                             </svg>
                         </div>
                         <span class="bg-tool-item-name">${media.name}</span>`
-                : `<img src="/${media.path}"
+                : `<img src="/api/thumbnail?src=${encodeURIComponent(media.path)}&w=96"
                             alt="${media.name}"
                             loading="lazy"
                             onerror="this.style.opacity='0.3';this.parentElement.querySelector('.bg-tool-item-error')&&(this.parentElement.querySelector('.bg-tool-item-error').style.display='block')">
