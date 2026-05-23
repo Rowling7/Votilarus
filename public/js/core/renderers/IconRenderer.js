@@ -182,7 +182,8 @@ class IconRenderer {
                         'FolderWidget': 'folder',
                         'YiyanWidget': 'yiyan',
                         'HotPointWidget': 'hotpoint',
-                        'SearchWidget': 'search'
+                        'SearchWidget': 'search',
+                        'ConsoleWidget': 'console'
                     };
 
                     const widgetType = widgetTypeMap[widget.title] || widget.title.toLowerCase().replace('widget', '');
@@ -422,7 +423,8 @@ class IconRenderer {
             'FolderWidget': 'folder',
             'YiyanWidget': 'yiyan',
             'HotPointWidget': 'hotpoint',
-            'SearchWidget': 'search'
+            'SearchWidget': 'search',
+            'ConsoleWidget': 'console'
         };
 
         const widgetType = widgetTypeMap[item.title] || item.title.toLowerCase().replace('widget', '');

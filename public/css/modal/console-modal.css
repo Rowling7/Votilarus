@@ -1,0 +1,304 @@
+/* ==================== 控制台模态弹窗样式 ==================== */
+
+/* 遮罩层 */
+.console-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity var(--transition-normal, 0.3s ease), visibility var(--transition-normal, 0.3s ease);
+}
+
+.console-modal-overlay.hidden {
+    opacity: 0;
+    visibility: hidden;
+}
+
+.console-modal-overlay:not(.hidden) {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* 模态框主体 */
+.console-modal {
+    background: var(--glass-bg, rgba(255, 255, 255, 0.9));
+    backdrop-filter: blur(var(--glass-blur, 15px));
+    -webkit-backdrop-filter: blur(var(--glass-blur, 15px));
+    border-radius: 20px;
+    border: 1px solid var(--glass-border, rgba(145, 143, 143, 0.3));
+    box-shadow: var(--shadow-lg, 0 10px 25px rgba(0, 0, 0, 0.15));
+    width: 1000px;
+    height: 700px;
+    max-width: 90vw;
+    max-height: 85vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+    transform: scale(0.9);
+    transition: transform var(--transition-normal, 0.3s ease);
+}
+
+.console-modal-overlay:not(.hidden) .console-modal {
+    transform: scale(1);
+}
+
+/* 头部区域 */
+.console-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.3rem 1.25rem;
+    border-bottom: 1px solid var(--glass-border, rgba(145, 143, 143, 0.2));
+    flex-shrink: 0;
+    cursor: grab;
+    user-select: none;
+}
+
+.console-modal-header:active {
+    cursor: grabbing;
+}
+
+.console-modal-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary, #1a1a1a);
+}
+
+.console-title-icon {
+    width: 20px;
+    height: 20px;
+    color: #6b21a8;
+}
+
+/* 主体区域 - 左右布局 */
+.console-modal-body {
+    display: flex;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+}
+
+/* 左侧工具列表 */
+.console-sidebar {
+    width: 200px;
+    min-width: 180px;
+    border-right: 1px solid var(--glass-border, rgba(145, 143, 143, 0.2));
+    background: rgba(0, 0, 0, 0.02);
+    overflow-y: auto;
+    flex-shrink: 0;
+}
+
+.console-tool-list {
+    display: flex;
+    flex-direction: column;
+    padding: 0.5rem;
+    gap: 0.25rem;
+}
+
+/* 工具列表项 */
+.console-tool-item {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.65rem 0.75rem;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all var(--transition-fast, 0.15s ease);
+    border: 2px solid transparent;
+}
+
+.console-tool-item:hover {
+    background: var(--bg-hover, rgba(59, 130, 246, 0.1));
+}
+
+.console-tool-item.active {
+    background: rgba(59, 130, 246, 0.12);
+    border-color: var(--theme-color, #3b82f6);
+}
+
+.console-tool-icon {
+    font-size: 1.3rem;
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.console-tool-info {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.console-tool-name {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-primary, #1a1a1a);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.console-tool-desc {
+    font-size: 0.7rem;
+    color: var(--text-tertiary, #999999);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* 右侧内容区 */
+.console-content {
+    flex: 1;
+    padding: 1.5rem;
+    overflow-y: auto;
+    min-width: 0;
+}
+
+/* 空状态 */
+.console-empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: var(--text-tertiary, #999999);
+    gap: 0.75rem;
+}
+
+.console-empty-icon {
+    width: 48px;
+    height: 48px;
+    opacity: 0.4;
+}
+
+.console-empty-state p {
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+/* 错误状态 */
+.console-error-state {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: var(--error-color, #ef4444);
+    font-size: 0.9rem;
+}
+
+/* 欢迎页 */
+.console-welcome {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.console-welcome h2 {
+    margin: 0;
+    font-size: 1.3rem;
+    color: var(--text-primary, #1a1a1a);
+}
+
+.console-welcome-desc {
+    margin: 0;
+    color: var(--text-secondary, #666666);
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+.console-welcome-features {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 0.75rem;
+}
+
+.console-welcome-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 1rem 0.75rem;
+    background: rgba(59, 130, 246, 0.06);
+    border-radius: 12px;
+    border: 1px solid rgba(59, 130, 246, 0.1);
+    text-align: center;
+}
+
+.console-welcome-card-icon {
+    font-size: 1.5rem;
+}
+
+.console-welcome-card span:not(.console-welcome-card-icon) {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-primary, #1a1a1a);
+}
+
+.console-welcome-card small {
+    font-size: 0.72rem;
+    color: var(--text-tertiary, #999999);
+    line-height: 1.4;
+}
+
+/* 暗黑模式适配 */
+[data-theme="dark"] .console-modal {
+    background: var(--glass-bg, rgba(30, 30, 30, 0.9));
+    border-color: var(--glass-border, rgba(255, 255, 255, 0.1));
+}
+
+[data-theme="dark"] .console-sidebar {
+    background: rgba(255, 255, 255, 0.03);
+}
+
+[data-theme="dark"] .console-modal-header,
+[data-theme="dark"] .console-sidebar {
+    border-color: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme="dark"] .console-tool-item.active {
+    background: rgba(59, 130, 246, 0.18);
+}
+
+[data-theme="dark"] .console-title-icon {
+    color: #c084fc;
+}
+
+[data-theme="dark"] .console-welcome-card {
+    background: rgba(59, 130, 246, 0.08);
+    border-color: rgba(59, 130, 246, 0.12);
+}
+
+/* 移动端适配 */
+@media (max-width: 768px) {
+    .console-modal {
+        width: 95vw;
+        height: 85vh;
+        border-radius: 14px;
+    }
+
+    .console-sidebar {
+        width: 140px;
+        min-width: 140px;
+    }
+
+    .console-content {
+        padding: 1rem;
+    }
+}

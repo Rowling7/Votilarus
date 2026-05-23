@@ -10,6 +10,7 @@ import WorkTimeWidget from '../widgets/WorkTimeWidget.js';
 import CompleteLeaveWidget from '../widgets/CompleteLeaveWidget.js';
 import YiyanWidget from '../widgets/YiyanWidget.js';
 import FolderWidget from '../widgets/FolderWidget.js'; 
+import ConsoleWidget from '../widgets/ConsoleWidget.js';
 
 class WidgetManager {
     constructor() {
@@ -32,6 +33,7 @@ class WidgetManager {
         this.register('compleave', CompleteLeaveWidget);
         this.register('yiyan', YiyanWidget);
         this.register('folder', FolderWidget);
+        this.register('console', ConsoleWidget);
     }
 
     /**
