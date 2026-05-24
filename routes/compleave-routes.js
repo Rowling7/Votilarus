@@ -9,6 +9,78 @@ function setDatabase(database) {
     db = database;
 }
 
+const crypto = require('crypto');
+
+/**
+ * POST /api/compleave/add
+ * 新增加班或调休记录
+ */
+router.post('/add', (req, res) => {
+    const { name, hours, minutes, type, date } = req.body;
+
+    // 参数校验
+    if (!name || hours === undefined || hours === null || minutes === undefined || minutes === null || !type || !date) {
+        return res.status(400).json({
+            success: false,
+            error: '缺少必要参数：name, hours, minutes, type, date'
+        });
+    }
+
+    // 类型校验：只允许 '1'（加班）或 '-1'（调休）
+    if (type !== '1' && type !== '-1') {
+        return res.status(400).json({
+            success: false,
+            error: '类型参数无效，必须为 "1"（加班）或 "-1"（调休）'
+        });
+    }
+
+    // 数值校验
+    const hoursNum = parseInt(hours, 10);
+    const minutesNum = parseInt(minutes, 10);
+
+    if (isNaN(hoursNum) || isNaN(minutesNum) || hoursNum < 0 || minutesNum < 0 || minutesNum > 59) {
+        return res.status(400).json({
+            success: false,
+            error: '时长格式无效：小时必须为非负整数，分钟必须为 0-59 之间的整数'
+        });
+    }
+
+    // 时长不能同时为 0
+    if (hoursNum === 0 && minutesNum === 0) {
+        return res.status(400).json({
+            success: false,
+            error: '时长不能为 0'
+        });
+    }
+
+    const id = crypto.randomUUID();
+
+    const sql = 'INSERT INTO compleave (id, name, hours, minutes, date, type, isdel) VALUES (?, ?, ?, ?, ?, ?, ?)';
+    db.run(sql, [id, name, hoursNum, minutesNum, date, type, '0'], function (err) {
+        if (err) {
+            console.error('新增加班调休记录失败:', err);
+            return res.status(500).json({
+                success: false,
+                error: '新增记录失败'
+            });
+        }
+
+        const typeName = type === '1' ? '加班' : '调休';
+        res.json({
+            success: true,
+            message: `${typeName}记录添加成功`,
+            data: {
+                id,
+                name,
+                hours: hoursNum,
+                minutes: minutesNum,
+                type,
+                date
+            }
+        });
+    });
+});
+
 /**
  * GET /api/compleave/config
  * 获取加班调休配置

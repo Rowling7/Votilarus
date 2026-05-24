@@ -1,0 +1,289 @@
+/* ==================== 下拉菜单组件样式 ==================== */
+
+/* 遮罩层：用于点击外部关闭菜单 */
+.dropdown-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9998;
+    /* 透明遮罩，仅用于捕获点击事件 */
+}
+
+/* 下拉菜单容器 */
+.dropdown-menu {
+    position: fixed;
+    z-index: 10000;
+    min-width: 180px;
+    max-width: 320px;
+    max-height: 70vh;
+    padding: 0.4rem 0;
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border: 1px solid var(--border-color);
+    border-radius: 0.75rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+    overflow-y: auto;
+    overflow-x: hidden;
+    animation: dropdownFadeIn 0.15s ease;
+    user-select: none;
+}
+
+@keyframes dropdownFadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95) translateY(-4px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+/* 子菜单动画 */
+.dropdown-menu.submenu {
+    animation: submenuSlideIn 0.15s ease;
+}
+
+@keyframes submenuSlideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* 自定义滚动条 */
+.dropdown-menu::-webkit-scrollbar {
+    width: 5px;
+}
+
+.dropdown-menu::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.dropdown-menu::-webkit-scrollbar-thumb {
+    background: rgba(128, 128, 128, 0.3);
+    border-radius: 3px;
+}
+
+.dropdown-menu::-webkit-scrollbar-thumb:hover {
+    background: rgba(128, 128, 128, 0.5);
+}
+
+/* ==================== 菜单项 ==================== */
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.55rem 1rem;
+    cursor: pointer;
+    color: var(--text-primary);
+    font-size: 0.875rem;
+    line-height: 1.4;
+    transition: all var(--transition-fast);
+    white-space: nowrap;
+    position: relative;
+}
+
+.dropdown-item:hover {
+    background: var(--bg-hover);
+    color: var(--theme-color);
+}
+
+.dropdown-item:active {
+    background: rgba(var(--theme-color-rgb), 0.15);
+}
+
+/* 禁用状态 */
+.dropdown-item.disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+/* 危险操作样式 */
+.dropdown-item.danger {
+    color: var(--error-color);
+}
+
+.dropdown-item.danger:hover {
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--error-color);
+}
+
+/* ==================== 图标区域 ==================== */
+.dropdown-item-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.25rem;
+    height: 1.25rem;
+    flex-shrink: 0;
+    font-size: 1rem;
+    opacity: 0.75;
+}
+
+.dropdown-item:hover .dropdown-item-icon {
+    opacity: 1;
+}
+
+/* SVG 图标适配 */
+.dropdown-item-icon svg,
+.dropdown-item-icon img {
+    width: 100%;
+    height: 100%;
+}
+
+/* ==================== 标签文字 ==================== */
+.dropdown-item-label {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* ==================== 快捷键提示 ==================== */
+.dropdown-item-shortcut {
+    margin-left: auto;
+    padding-left: 1.5rem;
+    font-size: 0.75rem;
+    color: var(--text-tertiary);
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    letter-spacing: 0.02em;
+}
+
+/* ==================== 子菜单指示器 ==================== */
+.dropdown-item-arrow {
+    margin-left: 0.25rem;
+    font-size: 0.65rem;
+    opacity: 0.5;
+    flex-shrink: 0;
+}
+
+.dropdown-item:hover .dropdown-item-arrow {
+    opacity: 1;
+    color: var(--theme-color);
+}
+
+/* ==================== 分隔线 ==================== */
+.dropdown-divider {
+    height: 1px;
+    margin: 0.35rem 0.75rem;
+    background: var(--border-color);
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+/* 带有标签的分隔线 */
+.dropdown-divider.labeled {
+    display: flex;
+    align-items: center;
+    height: auto;
+    margin: 0.5rem 0.75rem;
+    background: none;
+    border: none;
+}
+
+.dropdown-divider.labeled::before,
+.dropdown-divider.labeled::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border-color);
+    opacity: 0.6;
+}
+
+.dropdown-divider-label {
+    padding: 0 0.75rem;
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+}
+
+/* ==================== 分组容器 ==================== */
+.dropdown-group {
+    /* 分组 wrapper */
+}
+
+.dropdown-group-label {
+    padding: 0.35rem 1rem;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    pointer-events: none;
+}
+
+.dropdown-group .dropdown-item {
+    padding-left: 1.5rem;
+}
+
+/* ==================== 选中状态 ==================== */
+.dropdown-item.selected {
+    background: rgba(var(--theme-color-rgb), 0.08);
+    color: var(--theme-color);
+}
+
+.dropdown-item.selected::before {
+    content: '✓';
+    position: absolute;
+    left: 0.35rem;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--theme-color);
+}
+
+.dropdown-item.selected .dropdown-item-icon {
+    opacity: 1;
+}
+
+/* ==================== 暗黑模式适配 ==================== */
+[data-theme="dark"] .dropdown-menu {
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+[data-theme="dark"] .dropdown-item:hover {
+    background: rgba(255, 255, 255, 0.06);
+}
+
+[data-theme="dark"] .dropdown-item:active {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .dropdown-item.danger:hover {
+    background: rgba(239, 68, 68, 0.15);
+}
+
+[data-theme="dark"] .dropdown-item.selected {
+    background: rgba(var(--theme-color-rgb), 0.12);
+}
+
+[data-theme="dark"] .dropdown-menu::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+[data-theme="dark"] .dropdown-menu::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.35);
+}
+
+/* ==================== 响应式：移动端适配 ==================== */
+@media (max-width: 768px) {
+    .dropdown-menu {
+        min-width: 160px;
+        max-width: 280px;
+        max-height: 60vh;
+        font-size: 0.9rem;
+    }
+
+    .dropdown-item {
+        padding: 0.65rem 1rem;
+        font-size: 0.9rem;
+    }
+}

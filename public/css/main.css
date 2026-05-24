@@ -20,9 +20,11 @@
 @import 'components/dock.css';
 @import 'components/tooltip.css';
 @import 'components/city-modal.css';
+@import 'components/dropdown-menu.css';
 @import '../js/consoleTools/image-parser.css';
 @import '../js/consoleTools/sshd-tool.css';
 @import '../js/consoleTools/background-tool.css';
+@import '../js/consoleTools/compleave-tool.css';
 
 /*modal*/
 @import 'modal/calendar-modal.css';

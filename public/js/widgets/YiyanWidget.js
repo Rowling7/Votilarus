@@ -200,7 +200,7 @@ class YiyanWidget extends BaseWidget {
         if (contentEl) {
             contentEl.addEventListener('click', (e) => {
                 // 如果点击的是滚动条区域，不刷新
-                if (e.target === contentEl) {
+                if (e.target === contentEl  || e.target.closest('.yiyan-text') ) {
                     this.refresh();
                 }
             });

@@ -4,6 +4,7 @@ import BaseModal from './BaseModal.js';
 import ImageParserTool from '../consoleTools/ImageParser.js';
 import SSHDTool from '../consoleTools/SSHDTool.js';
 import BackgroundTool from '../consoleTools/BackgroundTool.js';
+import CompLeaveTool from '../consoleTools/CompLeaveTool.js';
 
 class ConsoleModal extends BaseModal {
     constructor() {
@@ -140,6 +141,15 @@ class ConsoleModal extends BaseModal {
             icon: '🏞️',
             description: '浏览并设置页面背景图片/视频',
             render: (container) => bgTool.render(container)
+        });
+
+        // 注册调休时长工具
+        const compLeaveTool = new CompLeaveTool();
+        this.registerTool('compleave', {
+            name: '调休时长',
+            icon: '⏱️',
+            description: '记录加班或调休时长，自动更新调休小组件',
+            render: (container) => compLeaveTool.render(container)
         });
 
         this._renderToolList();
