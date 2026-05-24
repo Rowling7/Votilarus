@@ -116,12 +116,12 @@ class DropdownMenu {
             this.overlayEl.className = 'dropdown-overlay';
             this.overlayEl.addEventListener('click', (e) => {
                 e.stopPropagation();
-                this.destroyAll();
+                DropdownMenu.closeAll();
             });
             this.overlayEl.addEventListener('contextmenu', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                this.destroyAll();
+                DropdownMenu.closeAll();
             });
             document.body.appendChild(this.overlayEl);
         }

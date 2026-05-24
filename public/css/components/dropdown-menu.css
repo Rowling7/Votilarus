@@ -4,8 +4,9 @@
 .dropdown-overlay {
     position: fixed;
     inset: 0;
-    z-index: 9998;
-    /* 透明遮罩，仅用于捕获点击事件 */
+    z-index: 9999;
+    background: transparent;
+    cursor: default;
 }
 
 /* 下拉菜单容器 */
