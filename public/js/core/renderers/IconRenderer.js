@@ -183,7 +183,8 @@ class IconRenderer {
                         'YiyanWidget': 'yiyan',
                         'HotPointWidget': 'hotpoint',
                         'SearchWidget': 'search',
-                        'ConsoleWidget': 'console'
+                        'ConsoleWidget': 'console',
+                        'SettingsWidget': 'settings'
                     };
 
                     const widgetType = widgetTypeMap[widget.title] || widget.title.toLowerCase().replace('widget', '');
@@ -424,7 +425,8 @@ class IconRenderer {
             'YiyanWidget': 'yiyan',
             'HotPointWidget': 'hotpoint',
             'SearchWidget': 'search',
-            'ConsoleWidget': 'console'
+            'ConsoleWidget': 'console',
+            'SettingsWidget': 'settings'
         };
 
         const widgetType = widgetTypeMap[item.title] || item.title.toLowerCase().replace('widget', '');

@@ -11,6 +11,7 @@ import CompleteLeaveWidget from '../widgets/CompleteLeaveWidget.js';
 import YiyanWidget from '../widgets/YiyanWidget.js';
 import FolderWidget from '../widgets/FolderWidget.js'; 
 import ConsoleWidget from '../widgets/ConsoleWidget.js';
+import SettingsWidget from '../widgets/SettingsWidget.js';
 
 class WidgetManager {
     constructor() {
@@ -34,6 +35,7 @@ class WidgetManager {
         this.register('yiyan', YiyanWidget);
         this.register('folder', FolderWidget);
         this.register('console', ConsoleWidget);
+        this.register('settings', SettingsWidget);
     }
 
     /**

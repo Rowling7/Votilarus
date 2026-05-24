@@ -20,7 +20,8 @@ class AddWidgetDialogHandler {
             { id: 'search', name: 'SearchWidget', icon: '🔍', description: '搜索快捷方式' },
             { id: 'hotpoint', name: 'HotPointWidget', icon: '🔥', description: '热搜' },
             { id: 'folder', name: 'FolderWidget', icon: '📁', description: '收纳常用图标，快速访问' },
-            { id: 'console', name: 'ConsoleWidget', icon: '💻', description: '控制台工具集合' }
+            { id: 'console', name: 'ConsoleWidget', icon: '💻', description: '控制台工具集合' },
+            { id: 'settings', name: 'SettingsWidget', icon: '⚙️', description: '打开设置面板，自定义外观与功能' }
         ];
     }
 
@@ -153,8 +154,9 @@ class AddWidgetDialogHandler {
                 'search': { title: 'SearchWidget', width: 2, height: 3 },
                 'hotpoint': { title: 'HotPointWidget', width: 2, height: 3 },
                 'folder': { title: 'FolderWidget', width: 2, height: 2 },
-                'console': { title: 'ConsoleWidget', width: 1, height: 1 }
-        }; 
+                'console': { title: 'ConsoleWidget', width: 1, height: 1 },
+                'settings': { title: 'SettingsWidget', width: 1, height: 1 }
+            };
 
         const config = widgetConfigs[widgetId] || { title: widgetId, width: 2, height: 2 };
 

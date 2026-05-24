@@ -49,6 +49,7 @@
 @import 'widgets/yiyan-widget.css';
 @import 'widgets/folder-widget.css';
 @import 'widgets/console-widget.css';
+@import 'widgets/settings-widget.css';
 
 /* Effects */
 @import 'effects/glassmorphism.css';
