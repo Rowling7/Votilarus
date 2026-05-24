@@ -12,7 +12,7 @@ class SettingsWidget extends BaseWidget {
     constructor(container, widgetId = null) {
         super(container, widgetId, 'SettingsWidget');
         // 设置组件仅支持 1x1 尺寸
-        this.supportedSizes = ['1x1', '2x2'];
+        this.supportedSizes = ['1x1', '1x2','2x1','2x2'];
     }
 
     /**

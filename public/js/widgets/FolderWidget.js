@@ -70,13 +70,12 @@ class FolderWidget extends BaseWidget {
             this.folderItems.forEach(item => {
                 const iconPath = this._processIconPath(item.icon_path);
                 html += `
-                    <div class="folder-grid-item" data-item-id="${item.item_id}" data-folder-item-id="${item.folder_item_id}">
+                    <div class="folder-grid-item" data-item-id="${item.item_id}" data-folder-item-id="${item.folder_item_id}" data-url="${item.link_url || ''}">
                         <div class="folder-icon-wrapper">
                             ${iconPath
                                 ? `<div class="folder-icon-bg" style="background-image: url('/${iconPath}')"></div>`
                                 : `<div class="folder-icon-letter">${(item.title || '?').charAt(0).toUpperCase()}</div>`
                             }
-                            <div class="folder-icon-remove" data-item-id="${item.item_id}" title="从文件夹移除">❌</div>
                         </div>
                     </div>
                 `;
@@ -98,7 +97,7 @@ class FolderWidget extends BaseWidget {
     _bindGridEvents() {
         if (!this.gridEl) return;
 
-        // 绑定添加按钮
+        // 绑定添加快捷方式按钮
         const addBtn = this.gridEl.querySelector(`#folder-add-${this.widgetId}`);
         if (addBtn) {
             addBtn.addEventListener('click', (e) => {
@@ -107,12 +106,14 @@ class FolderWidget extends BaseWidget {
             });
         }
 
-        // 绑定移除按钮
-        this.gridEl.querySelectorAll('.folder-icon-remove').forEach(btn => {
-            btn.addEventListener('click', (e) => {
+        // 绑定快捷方式点击事件 - 直接打开链接
+        this.gridEl.querySelectorAll('.folder-grid-item:not(.folder-grid-add)').forEach(itemEl => {
+            itemEl.addEventListener('click', (e) => {
                 e.stopPropagation();
-                const itemId = parseInt(btn.dataset.itemId);
-                this.removeItem(itemId);
+                const url = itemEl.dataset.url;
+                if (url) {
+                    window.open(url, '_blank');
+                }
             });
         });
     }
