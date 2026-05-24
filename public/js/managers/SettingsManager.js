@@ -40,7 +40,10 @@ class SettingsManager {
             title_font_color: '#ffffff',
             title_max_length: '8',
             tooltip_delay: '300',
+            // 侧栏设置
+            sidebar_visible: '1',
             // Dock 设置
+            dock_visible: '1',
             dock_position: 'bottom',
             dock_max_icons: '10',
             dock_blur: '10',
@@ -212,6 +215,12 @@ class SettingsManager {
         const widgetBorderRadius = this.settings.widget_border_radius || '1.4';
         document.documentElement.style.setProperty('--widget-border-radius', `${widgetBorderRadius}rem`);
 
+        // 应用侧栏显示
+        this.applySidebarVisible();
+
+        // 应用Dock显示
+        this.applyDockVisible();
+
         // 应用背景设置
         this.applyBackgroundSettings();
     } // 结束 applySettings 方法
@@ -283,6 +292,36 @@ class SettingsManager {
 
         // 应用到 body 元素
         document.body.style.fontFamily = fontFamily;
+    }
+
+    /**
+     * 应用侧栏显示/隐藏
+     */
+    applySidebarVisible() {
+        const sidebarVisible = this.settings.sidebar_visible !== '0';
+        const sidebar = document.querySelector('.sidebar');
+        if (sidebar) {
+            if (sidebarVisible) {
+                sidebar.style.display = '';
+            } else {
+                sidebar.style.display = 'none';
+            }
+        }
+    }
+
+    /**
+     * 应用Dock栏显示/隐藏
+     */
+    applyDockVisible() {
+        const dockVisible = this.settings.dock_visible !== '0';
+        const dock = document.getElementById('dock');
+        if (dock) {
+            if (dockVisible) {
+                dock.style.display = '';
+            } else {
+                dock.style.display = 'none';
+            }
+        }
     }
 
     /**
@@ -541,6 +580,9 @@ class SettingsManager {
             gridGap: parseFloat(this.settings.cell_gap) || 2,
             sidebarWidth: parseInt(this.settings.sidebar_width) || 50,
 
+            // 侧栏设置
+            sidebarVisible: this.settings.sidebar_visible !== '0',
+
             // 外观主题
             themeMode: this.settings.theme_mode || 'light',
             themeColor: this.settings.theme_color || '#3b82f6',
@@ -569,6 +611,7 @@ class SettingsManager {
             tooltipDelay: parseInt(this.settings.tooltip_delay) || 300,
 
             // Dock 设置
+            dockVisible: this.settings.dock_visible !== '0',
             dockPosition: this.settings.dock_position || 'bottom',
             dockMaxIcons: parseInt(this.settings.dock_max_icons) || 10,
             dockBlur: parseInt(this.settings.dock_blur) || 10,
@@ -607,6 +650,9 @@ class SettingsManager {
             cell_gap: newSettings.gridGap,
             sidebar_width: newSettings.sidebarWidth,
 
+            // 侧栏设置
+            sidebar_visible: newSettings.sidebarVisible ? '1' : '0',
+
             // 外观主题
             theme_mode: newSettings.themeMode,
             theme_color: newSettings.themeColor,
@@ -635,6 +681,7 @@ class SettingsManager {
             tooltip_delay: newSettings.tooltipDelay,
 
             // Dock 设置
+            dock_visible: newSettings.dockVisible ? '1' : '0',
             dock_position: newSettings.dockPosition,
             dock_max_icons: newSettings.dockMaxIcons,
             dock_blur: newSettings.dockBlur,

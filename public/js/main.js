@@ -59,6 +59,9 @@ class App {
             // 渲染侧边栏
             SidebarRenderer.render(CategoryManager.getCategories());
 
+            // 侧边栏 DOM 已就绪，重新应用侧边栏显示/隐藏设置
+            SettingsManager.applySidebarVisible();
+
             // 渲染所有图标
             const renderStart = performance.now();
             await IconRenderer.renderAllCategories();
@@ -75,6 +78,9 @@ class App {
 
             // 初始化 Dock 栏
             await DockRenderer.init();
+
+            // Dock DOM 已就绪，重新应用 Dock 显示/隐藏设置
+            SettingsManager.applyDockVisible();
 
             // 初始化图标编辑器
             IconEditorHandler.init();

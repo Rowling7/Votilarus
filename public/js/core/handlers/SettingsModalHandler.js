@@ -43,6 +43,7 @@ class SettingsModalHandler {
             <div class="modal-tabs">
                 <button class="tab-btn active" data-tab="appearance">🎨 外观主题</button>
                 <button class="tab-btn" data-tab="icon">🖼️ 图标设置</button>
+                <button class="tab-btn" data-tab="sidebar">📂 侧栏设置</button>
                 <button class="tab-btn" data-tab="dock">⚓ Dock 设置</button>
                 <button class="tab-btn" data-tab="search">🔍 搜索设置</button>
                 <button class="tab-btn" data-tab="widget">🧩 组件设置</button>
@@ -54,6 +55,9 @@ class SettingsModalHandler {
                 </div>
                 <div class="tab-content" id="tab-icon">
                     ${this.generateIconSettingsSection()}
+                </div>
+                <div class="tab-content" id="tab-sidebar">
+                    ${this.generateSidebarSection()}
                 </div>
                 <div class="tab-content" id="tab-dock">
                     ${this.generateDockSection()}
@@ -89,6 +93,7 @@ class SettingsModalHandler {
         return `
             ${this.generateAppearanceSection()}
             ${this.generateIconSettingsSection()}
+            ${this.generateSidebarSection()}
             ${this.generateDockSection()}
             ${this.generateSearchSection()}
             ${this.generateAdvancedSettingsSections()}
@@ -213,7 +218,7 @@ class SettingsModalHandler {
     }
 
     /**
-     * 生成图标设置部分
+     * 生成图标设置部分（已移除 sidebar_width，移至侧栏设置 tab）
      */
     generateIconSettingsSection() {
         return `
@@ -238,19 +243,6 @@ class SettingsModalHandler {
                     <label for="grid-gap">网格间距</label>
                     <input type="number" id="grid-gap" min="2" max="5" step="0.5" value="2">
                     <div class="setting-description">网格间距（rem 单位，2-5）</div>
-                </div>
-                
-                <div class="setting-item">
-                    <label for="sidebar-width">侧栏宽度</label>
-                    <select id="sidebar-width">
-                        <option value="50">50px（默认）</option>
-                        <option value="60">60px</option>
-                        <option value="70">70px</option>
-                        <option value="80">80px</option>
-                        <option value="100">100px</option>
-                        <option value="120">120px</option>
-                    </select>
-                    <div class="setting-description">侧栏固定宽度（< 40px 时自动隐藏）</div>
                 </div>
                 
                 <!-- 图标样式 -->
@@ -322,6 +314,40 @@ class SettingsModalHandler {
     }
 
     /**
+     * 生成侧栏设置部分
+     */
+    generateSidebarSection() {
+        return `
+            <!-- 侧栏设置 -->
+            <div class="settings-section">
+                <h3>📂 侧栏设置</h3>
+                
+                <div class="setting-item">
+                    <label>显示侧栏</label>
+                    <div class="switch-container">
+                        <div class="switch active" id="sidebar-visible-switch"></div>
+                        <span>启用/禁用</span>
+                    </div>
+                    <div class="setting-description">控制是否显示左侧分类侧栏</div>
+                </div>
+                
+                <div class="setting-item">
+                    <label for="sidebar-width">侧栏宽度</label>
+                    <select id="sidebar-width">
+                        <option value="50">50px（默认）</option>
+                        <option value="60">60px</option>
+                        <option value="70">70px</option>
+                        <option value="80">80px</option>
+                        <option value="100">100px</option>
+                        <option value="120">120px</option>
+                    </select>
+                    <div class="setting-description">侧栏固定宽度（< 40px 时自动隐藏）</div>
+                </div>
+            </div>
+        `;
+    }
+
+    /**
      * 生成 Dock 设置部分
      */
     generateDockSection() {
@@ -329,6 +355,15 @@ class SettingsModalHandler {
             <!-- 1. Dock 设置 -->
             <div class="settings-section">
                 <h3>⚓ Dock 设置</h3>
+                
+                <div class="setting-item">
+                    <label>显示 Dock 栏</label>
+                    <div class="switch-container">
+                        <div class="switch active" id="dock-visible-switch"></div>
+                        <span>启用/禁用</span>
+                    </div>
+                    <div class="setting-description">控制是否显示底部 Dock 栏</div>
+                </div>
                 
                 <div class="setting-item">
                     <label for="dock-position">Dock 位置</label>
@@ -678,7 +713,9 @@ class SettingsModalHandler {
             'bg-blur-switch',
             'bg-opacity-switch',
             'overlay-color-switch',
-            'overlay-opacity-switch'
+            'overlay-opacity-switch',
+            'sidebar-visible-switch',
+            'dock-visible-switch'
         ];
 
         switches.forEach(switchId => {
@@ -775,7 +812,10 @@ class SettingsModalHandler {
         document.getElementById('grid-rows').value = settings.gridRows || 5;
         document.getElementById('grid-cols').value = settings.gridCols || 13;
         document.getElementById('grid-gap').value = settings.gridGap || 2;
+
+        // 侧栏设置
         document.getElementById('sidebar-width').value = settings.sidebarWidth || 50;
+        this.setSwitchState('sidebar-visible-switch', settings.sidebarVisible !== false); // 默认显示
 
         // 外观主题
         document.getElementById('theme-mode').value = settings.themeMode || 'light';
@@ -834,6 +874,7 @@ class SettingsModalHandler {
         document.getElementById('dock-opacity-value').textContent = settings.dockOpacity || 0.3;
         document.getElementById('fisheye-scale').value = settings.fisheyeScale || 1.5;
         document.getElementById('fisheye-range').value = settings.fisheyeRange || 2;
+        this.setSwitchState('dock-visible-switch', settings.dockVisible !== false); // 默认显示
 
         // 搜索设置 - 先加载搜索引擎列表，再填充
         await this.populateSearchEngines();
@@ -905,7 +946,10 @@ class SettingsModalHandler {
             gridRows: parseInt(document.getElementById('grid-rows').value),
             gridCols: parseInt(document.getElementById('grid-cols').value),
             gridGap: parseFloat(document.getElementById('grid-gap').value) || 2,
+
+            // 侧栏设置
             sidebarWidth: parseInt(document.getElementById('sidebar-width').value),
+            sidebarVisible: document.getElementById('sidebar-visible-switch').classList.contains('active'),
 
             // 外观主题
             themeMode: document.getElementById('theme-mode').value,
@@ -940,6 +984,7 @@ class SettingsModalHandler {
             dockOpacity: parseFloat(document.getElementById('dock-opacity').value),
             fisheyeScale: parseFloat(document.getElementById('fisheye-scale').value),
             fisheyeRange: parseInt(document.getElementById('fisheye-range').value),
+            dockVisible: document.getElementById('dock-visible-switch').classList.contains('active'),
 
             // 搜索设置
             defaultSearchEngine: document.getElementById('default-search-engine').value,
@@ -979,31 +1024,34 @@ class SettingsModalHandler {
             document.body.style.backgroundImage = 'none';
         }
 
-        // 3. 应用图标圆角
+        // 4. 应用图标圆角
         this.applyIconRadius(settings.iconRadius);
 
-        // 4. 应用标题设置
+        // 5. 应用标题设置
         this.applyTitleSettings(settings);
 
-        // 5. 应用搜索框位置
+        // 6. 应用搜索框位置
         this.applySearchBoxPosition(settings.searchBoxPosition);
 
-        // 6. 应用搜索框样式
+        // 7. 应用搜索框样式
         this.applySearchBoxStyle(settings.searchBoxStyle);
 
-        // 7. 更新搜索引擎图标（如果默认搜索引擎改变）
+        // 8. 更新搜索引擎图标（如果默认搜索引擎改变）
         this.updateSearchEngineIcon();
 
-        // 8. 应用网格设置
+        // 9. 应用网格设置
         this.applyGridSettings(settings);
 
-        // 9. 应用 Dock 设置
+        // 10. 应用 Dock 设置
         this.applyDockSettings(settings);
 
-        // 10. 应用组件圆角
+        // 11. 应用侧栏设置
+        this.applySidebarSettings(settings);
+
+        // 12. 应用组件圆角
         this.applyWidgetBorderRadius(settings.widgetBorderRadius);
 
-        // 11. 应用背景设置（包括开关状态）
+        // 13. 应用背景设置（包括开关状态）
         this.applyBackgroundSettings(settings);
     }
 
@@ -1211,11 +1259,39 @@ class SettingsModalHandler {
     }
 
     /**
+     * 应用侧栏设置
+     */
+    applySidebarSettings(settings) {
+        const sidebar = document.getElementById('sidebar');
+        if (!sidebar) return;
+
+        if (settings.sidebarVisible === false) {
+            sidebar.style.display = 'none';
+        } else {
+            sidebar.style.display = '';
+        }
+
+        // 应用侧栏宽度
+        if (settings.sidebarWidth) {
+            document.documentElement.style.setProperty('--sidebar-width', `${settings.sidebarWidth}px`);
+            sidebar.style.width = settings.sidebarWidth + 'px';
+        }
+    }
+
+    /**
      * 应用 Dock 设置
      */
     applyDockSettings(settings) {
         const dock = document.getElementById('dock');
         if (!dock) return;
+
+        // 处理 Dock 显示/隐藏
+        if (settings.dockVisible === false) {
+            dock.style.display = 'none';
+            return;
+        } else {
+            dock.style.display = '';
+        }
 
         // 更新 Dock 位置
         dock.style.bottom = '';

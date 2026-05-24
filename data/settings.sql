@@ -89,5 +89,7 @@ INSERT INTO "settings" VALUES (53, 'bio', 'Everything will be OK!', 'personal', 
 INSERT INTO "settings" VALUES (54, 'cell_base_size', '4', 'personal', '网格基础大小', '1', '0');
 INSERT INTO "settings" VALUES (55, 'widget_border_radius', '1.4', 'personal', '组件圆角半径（rem单位，0-3）', '1', '0');
 INSERT INTO "settings" VALUES (56, 'global_font', 'NotoSansSC-Regular', 'personal', '全局字体设置', '1', '0');
+INSERT INTO "settings" VALUES (57, 'sidebar_visible', '1', 'personal', '侧栏显示开关', '1', '0');
+INSERT INTO "settings" VALUES (58, 'dock_visible', '1', 'personal', 'Dock栏显示开关', '1', '0');
 
 PRAGMA foreign_keys = true;
