@@ -48,7 +48,7 @@ class ConsoleModal extends BaseModal {
         this.modal.id = 'consoleModal';
 
         this.modal.innerHTML = `
-            <div class="console-modal-header" data-no-drag>
+            <div class="console-modal-header">
                 <div class="console-modal-title">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="console-title-icon">
                         <polyline points="4 17 10 11 4 5"></polyline>
