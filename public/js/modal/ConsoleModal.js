@@ -1,4 +1,4 @@
-// ==================== 控制台模态弹窗 ====================
+// ==================== 控制台&工具台模态弹窗 ====================
 
 import BaseModal from './BaseModal.js';
 import ImageParserTool from '../consoleTools/ImageParser.js';
@@ -53,7 +53,7 @@ class ConsoleModal extends BaseModal {
                         <polyline points="4 17 10 11 4 5"></polyline>
                         <line x1="12" y1="19" x2="20" y2="19"></line>
                     </svg>
-                    <span>控制台</span>
+                    <span>控制台&工具台</span>
                 </div>
             </div>
             <div class="console-modal-body">
@@ -110,7 +110,7 @@ class ConsoleModal extends BaseModal {
                 id: 'welcome',
                 name: '欢迎',
                 icon: '👋',
-                description: '控制台使用说明与工具概览',
+                description: '控制台&工具台使用说明与工具概览',
                 render: (container) => this._renderWelcomeTool(container)
             }
         ];
@@ -220,7 +220,7 @@ class ConsoleModal extends BaseModal {
     _renderWelcomeTool(container) {
         container.innerHTML = `
             <div class="console-welcome">
-                <h2>👋 欢迎使用控制台</h2>
+                <h2>👋 欢迎使用控制台&工具台</h2>
                 <p class="console-welcome-desc">这里将汇聚各种实用小工具，左侧菜单会随着工具增加而扩展。</p>
                 <div class="console-welcome-features">
                     <div class="console-welcome-card">
