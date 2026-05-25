@@ -214,6 +214,9 @@ class WeatherForecastModal extends BaseModal {
         // 调用父类的 open 方法
         await super.open();
 
+        // 加载已保存的底图设置
+        await this._loadMapBaseStyle();
+
         // 获取天气数据
         await this.fetchWeatherData();
     }
@@ -286,6 +289,61 @@ class WeatherForecastModal extends BaseModal {
     }
 
     /**
+     * 从 settings 表加载已保存的底图偏好
+     * @private
+     */
+    async _loadMapBaseStyle() {
+        try {
+            const response = await fetch('/api/settings/weather_map_base_style');
+            if (response.ok) {
+                const result = await response.json();
+                if (result.value === 'city') {
+                    this.isSatelliteMap = false;
+                } else {
+                    this.isSatelliteMap = true;
+                }
+            }
+            // 如果 404（未找到设置），保持默认值 true
+        } catch (error) {
+            console.warn('[WeatherForecastModal] 加载底图设置失败，使用默认值:', error);
+        }
+
+        // 同步按钮标签
+        this._syncToggleButtonLabel();
+    }
+
+    /**
+     * 同步底图切换按钮的标签和 title
+     * @private
+     */
+    _syncToggleButtonLabel() {
+        if (this.mapBaseToggleLabel) {
+            this.mapBaseToggleLabel.textContent = this.isSatelliteMap ? '卫星地图' : '城市地图';
+        }
+        if (this.mapBaseToggleBtn) {
+            this.mapBaseToggleBtn.title = this.isSatelliteMap ? '切换到城市地图' : '切换到卫星地图';
+        }
+    }
+
+    /**
+     * 保存底图偏好到 settings 表
+     * @private
+     */
+    async _saveMapBaseStyle() {
+        try {
+            await fetch('/api/settings', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    weather_map_base_style: this.isSatelliteMap ? 'satellite' : 'city'
+                })
+            });
+        } catch (error) {
+            console.warn('[WeatherForecastModal] 保存底图设置失败:', error);
+        }
+    }
+
+    /**
      * 初始化 Leaflet 地图
      */
     initMap() {
@@ -303,7 +361,8 @@ class WeatherForecastModal extends BaseModal {
         });
 
         // 添加基础图层（使用高德地图，国内访问稳定）
-        this.currentBaseLayer = L.tileLayer('https://webst0{s}.is.autonavi.com/appmaptile?style=6&x={x}&y={y}&z={z}', {
+        const style = this.isSatelliteMap ? 6 : 7;
+        this.currentBaseLayer = L.tileLayer(`https://webst0{s}.is.autonavi.com/appmaptile?style=${style}&x={x}&y={y}&z={z}`, {
             maxZoom: 18,
             attribution: '© 高德地图',
             subdomains: '1234'
@@ -384,13 +443,11 @@ class WeatherForecastModal extends BaseModal {
             this.currentTileLayer.addTo(this.map);
         }
 
-        // 更新按钮标签
-        if (this.mapBaseToggleLabel) {
-            this.mapBaseToggleLabel.textContent = label;
-        }
+        // 更新按钮标签和 title
+        this._syncToggleButtonLabel();
 
-        // 更新按钮 title
-        this.mapBaseToggleBtn.title = this.isSatelliteMap ? '切换到城市地图' : '切换到卫星地图';
+        // 持久化保存设置
+        this._saveMapBaseStyle();
     }
 
     /**
