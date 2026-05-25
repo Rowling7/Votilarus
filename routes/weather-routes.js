@@ -710,7 +710,9 @@ router.get('/forecast/:city', async (req, res) => {
                 weather_icon: currentData.weather_icon,
                 pressure: currentData.pressure,
                 clouds: currentData.clouds_all,
-                visibility: currentData.visibility ? (currentData.visibility / 1000).toFixed(1) : null
+                visibility: currentData.visibility ? (currentData.visibility / 1000).toFixed(1) : null,
+                latitude: currentData.latitude,
+                longitude: currentData.longitude
             },
             forecast: dailyForecast
         };

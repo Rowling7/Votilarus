@@ -2,3 +2,4 @@ daemon/
 node_modules/
 data/thumbnail_cache/
 service.js
+static/background/weather_json

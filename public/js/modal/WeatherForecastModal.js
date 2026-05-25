@@ -35,6 +35,8 @@ class WeatherForecastModal extends BaseModal {
         this.currentTileLayer = null; // 当前天气瓦片图层
         this.currentMapLayer = 'temp_new'; // 当前地图图层类型
         this.userLocationMarker = null; // 用户位置标记
+        this.cityLatitude = null; // 当前城市纬度
+        this.cityLongitude = null; // 当前城市经度
 
         this.init();
     }
@@ -350,10 +352,14 @@ class WeatherForecastModal extends BaseModal {
         const mapElement = document.getElementById('weatherMap');
         if (!mapElement) return;
 
-        // 创建地图实例，默认中心为中国，缩放级别 6
+        // 使用城市坐标初始化地图（有坐标则缩放到城市级别，否则用中国中心）
+        const centerLat = this.cityLatitude || 35.8617;
+        const centerLng = this.cityLongitude || 104.1954;
+        const initialZoom = this.cityLatitude ? 10 : 6;
+
         this.map = L.map('weatherMap', {
-            center: [35.8617, 104.1954], // 中国中心坐标
-            zoom: 6,
+            center: [centerLat, centerLng],
+            zoom: initialZoom,
             minZoom: 3,
             maxZoom: 10,
             zoomControl: true,
@@ -613,6 +619,20 @@ class WeatherForecastModal extends BaseModal {
                     预报天数: this.weatherData.forecast?.length || 0,
                     总卡片数: (this.weatherData.history?.length || 0) + 1 + (this.weatherData.forecast?.length || 0)
                 });
+
+                // 保存城市坐标（用于地图定位）
+                if (this.weatherData.current && this.weatherData.current.latitude && this.weatherData.current.longitude) {
+                    this.cityLatitude = this.weatherData.current.latitude;
+                    this.cityLongitude = this.weatherData.current.longitude;
+                } else {
+                    this.cityLatitude = null;
+                    this.cityLongitude = null;
+                }
+
+                // 如果地图已存在，切换到新城市时更新地图中心
+                if (this.map && this.cityLatitude && this.cityLongitude) {
+                    this.map.setView([this.cityLatitude, this.cityLongitude], 10);
+                }
 
                 // 重新渲染时添加动画效果
                 this.renderWeatherCards();
