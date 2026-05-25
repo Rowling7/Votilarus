@@ -150,7 +150,7 @@ class WorkTimeWidget extends BaseWidget {
         // 每200ms更新一次
         this.interval = setInterval(() => {
             this.updateDisplay();
-        }, 200);
+        }, 10);
     }
 
     /**
