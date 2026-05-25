@@ -26,6 +26,7 @@
 @import '../js/consoleTools/background-tool.css';
 @import '../js/consoleTools/compleave-tool.css';
 @import '../js/consoleTools/time-interval.css';
+@import '../js/consoleTools/dino-game.css';
 
 /*modal*/
 @import 'modal/calendar-modal.css';

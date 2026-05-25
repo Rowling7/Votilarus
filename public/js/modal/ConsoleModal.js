@@ -6,6 +6,7 @@ import SSHDTool from '../consoleTools/SSHDTool.js';
 import BackgroundTool from '../consoleTools/BackgroundTool.js';
 import CompLeaveTool from '../consoleTools/CompLeaveTool.js';
 import TimeIntervalTool from '../consoleTools/TimeIntervalTool.js';
+import DinoGameTool from '../consoleTools/DinoGameTool.js';
 
 class ConsoleModal extends BaseModal {
     constructor() {
@@ -160,6 +161,15 @@ class ConsoleModal extends BaseModal {
             icon: '⏱️',
             description: '选择两个日期时间，计算时间间隔',
             render: (container) => timeIntervalTool.render(container)
+        });
+
+        // 注册小恐龙跳跃游戏工具
+        const dinoGameTool = new DinoGameTool();
+        this.registerTool('dino-game', {
+            name: '小恐龙跳跃',
+            icon: '🦖',
+            description: '类 Chrome 小恐龙跳跃游戏，分数存入 IndexedDB',
+            render: (container) => dinoGameTool.render(container)
         });
 
         this._renderToolList();

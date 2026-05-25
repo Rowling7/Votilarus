@@ -1,0 +1,269 @@
+/* ==================== 小恐龙跳跃游戏工具样式 ==================== */
+
+.dino-tool {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    gap: 0.65rem;
+}
+
+.dino-tool-title {
+    margin: 0;
+    font-size: 1.3rem;
+    color: var(--text-primary, #1a1a1a);
+    flex-shrink: 0;
+}
+
+.dino-tool-desc {
+    margin: -0.3rem 0 0 0;
+    color: var(--text-secondary, #666);
+    font-size: 0.82rem;
+    flex-shrink: 0;
+}
+
+/* ==================== 游戏容器 ==================== */
+.dino-game-wrapper {
+    position: relative;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 0;
+}
+
+.dino-game-container {
+    position: relative;
+    width: 100%;
+    max-width: 560px;
+    height: 200px;
+    overflow: hidden;
+    background: #f7f7f7;
+    border-radius: 14px;
+    border: 1px solid var(--glass-border, rgba(145, 143, 143, 0.2));
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+/* ==================== 高分榜 ==================== */
+.dino-scoreboard {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    max-width: 560px;
+    gap: 0.75rem;
+    flex-shrink: 0;
+}
+
+.dino-score-current {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-primary, #1a1a1a);
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.dino-score-label {
+    font-weight: 500;
+    color: var(--text-secondary, #666);
+    font-size: 0.82rem;
+}
+
+.dino-highscores {
+    background: rgba(255, 255, 255, 0.6);
+    border: 1px solid var(--glass-border, rgba(145, 143, 143, 0.15));
+    border-radius: 12px;
+    padding: 0.5rem 0.7rem;
+    width: 100%;
+    max-width: 560px;
+    flex-shrink: 0;
+}
+
+.dino-highscores-title {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--text-secondary, #888);
+    margin: 0 0 0.3rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.dino-highscores-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.dino-highscores-list li {
+    font-size: 0.72rem;
+    color: var(--text-secondary, #888);
+    background: rgba(0, 0, 0, 0.04);
+    padding: 0.15rem 0.5rem;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.dino-highscore-rank {
+    font-weight: 600;
+    color: var(--text-primary, #1a1a1a);
+    min-width: 14px;
+}
+
+.dino-highscore-rank.gold {
+    color: #f59e0b;
+}
+
+.dino-highscore-rank.silver {
+    color: #9ca3af;
+}
+
+.dino-highscore-rank.bronze {
+    color: #d97706;
+}
+
+.dino-highscore-score {
+    font-weight: 700;
+    color: var(--text-primary, #1a1a1a);
+}
+
+/* ==================== 游戏画布 ==================== */
+.dino-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+/* ==================== 游戏状态消息 ==================== */
+.dino-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.35);
+    color: #fff;
+    user-select: none;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.dino-overlay.visible {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.dino-overlay-title {
+    font-size: 1.4rem;
+    font-weight: 800;
+    margin-bottom: 0.3rem;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+}
+
+.dino-overlay-sub {
+    font-size: 0.82rem;
+    opacity: 0.85;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.dino-overlay-score {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-top: 0.3rem;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+/* ==================== 操作按钮 ==================== */
+.dino-actions {
+    display: flex;
+    gap: 0.75rem;
+    flex-shrink: 0;
+}
+
+.dino-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.55rem 1.2rem;
+    border: 1px solid var(--glass-border, rgba(145, 143, 143, 0.3));
+    border-radius: 12px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background: transparent;
+    color: var(--text-primary, #1a1a1a);
+    user-select: none;
+}
+
+.dino-btn:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+}
+
+.dino-btn:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+.dino-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.dino-btn-start {
+    background: rgba(34, 197, 94, 0.1);
+    border-color: rgba(34, 197, 94, 0.3);
+    color: #16a34a;
+}
+
+.dino-btn-start:hover:not(:disabled) {
+    background: rgba(34, 197, 94, 0.18);
+}
+
+.dino-btn-reset {
+    background: rgba(239, 68, 68, 0.06);
+    border-color: rgba(239, 68, 68, 0.2);
+    color: #ef4444;
+}
+
+.dino-btn-reset:hover:not(:disabled) {
+    background: rgba(239, 68, 68, 0.1);
+}
+
+/* ==================== 控制提示 ==================== */
+.dino-controls-hint {
+    font-size: 0.72rem;
+    color: var(--text-secondary, #999);
+    text-align: center;
+    flex-shrink: 0;
+    margin: 0;
+}
+
+/* ==================== 暗色主题 ==================== */
+[data-theme="dark"] .dino-game-container {
+    background: #2a2a2a;
+}
+
+[data-theme="dark"] .dino-highscores {
+    background: rgba(255, 255, 255, 0.04);
+}
+
+[data-theme="dark"] .dino-highscores-list li {
+    background: rgba(255, 255, 255, 0.06);
+}
