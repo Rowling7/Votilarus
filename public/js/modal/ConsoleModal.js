@@ -12,6 +12,9 @@ import RelativeCalculator from '../consoleTools/RelativeCalculator.js';
 import NumberToChinese from '../consoleTools/NumberToChinese.js';
 import SqlFormatter from '../consoleTools/SqlFormatter.js';
 
+// 始终显示的固定工具 ID
+const ALWAYS_VISIBLE_TOOL_IDS = ['welcome', 'settings'];
+
 class ConsoleModal extends BaseModal {
     constructor() {
         super({
@@ -26,6 +29,7 @@ class ConsoleModal extends BaseModal {
         this._toolCache = new Map();
         this._toolEntries = [];
         this._activeToolId = null;
+        this._toolEnabledMap = {}; // { toolId: true/false }
 
         this.init();
     }
@@ -107,7 +111,55 @@ class ConsoleModal extends BaseModal {
     }
 
     /**
-     * 注册内置工具（后续可在此扩展）
+     * 获取工具是否开启的设置键
+     * @param {string} toolId
+     * @returns {string}
+     * @private
+     */
+    _getToolEnabledKey(toolId) {
+        return `console_tool_enabled_${toolId}`;
+    }
+
+    /**
+     * 从 API 直接加载所有工具的开关状态（不从 SettingsManager 读取，
+     * 以避免页面加载时 SettingsManager.init() 尚未完成的竞态问题）
+     * @private
+     */
+    async _loadToolEnabledSettings() {
+        // 默认所有工具都开启
+        this._toolEnabledMap = {};
+        for (const entry of this._toolEntries) {
+            this._toolEnabledMap[entry.id] = true;
+        }
+
+        try {
+            // 构建所有工具设置键的数组
+            const keys = this._toolEntries.map(entry => this._getToolEnabledKey(entry.id));
+            // 通过批量接口一次性查询
+            const response = await fetch('/api/settings/batch', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ keys })
+            });
+
+            if (!response.ok) return;
+
+            const data = await response.json();
+            for (const entry of this._toolEntries) {
+                const key = this._getToolEnabledKey(entry.id);
+                const value = data[key];
+                if (value !== undefined) {
+                    this._toolEnabledMap[entry.id] = value === '1';
+                }
+            }
+        } catch (err) {
+            // API 请求失败时所有工具默认开启，静默处理
+            console.warn('[ConsoleModal] 加载工具开关状态失败，默认全部开启:', err.message);
+        }
+    }
+
+    /**
+     * 注册内置工具
      * @private
      */
     _registerBuiltinTools() {
@@ -212,7 +264,18 @@ class ConsoleModal extends BaseModal {
             render: (container) => sqlFormatter.render(container)
         });
 
-        this._renderToolList();
+        // 注册设置工具（始终在最后注册，以保证之前所有工具都已加入 _toolEntries）
+        this._toolEntries.push({
+            id: 'settings',
+            name: '设置',
+            icon: '⚙️',
+            description: '管理控制台工具的显示与隐藏',
+            render: (container) => this._renderSettingsTool(container)
+        });
+
+        this._loadToolEnabledSettings().then(() => {
+            this._renderToolList();
+        });
     }
 
     /**
@@ -235,13 +298,30 @@ class ConsoleModal extends BaseModal {
     }
 
     /**
+     * 判断某个工具是否应当显示在侧栏中
+     * @param {string} toolId
+     * @returns {boolean}
+     * @private
+     */
+    _isToolVisible(toolId) {
+        // 始终显示固定工具
+        if (ALWAYS_VISIBLE_TOOL_IDS.includes(toolId)) {
+            return true;
+        }
+        // 根据开关状态判断
+        return this._toolEnabledMap[toolId] !== false;
+    }
+
+    /**
      * 渲染工具列表
      * @private
      */
     _renderToolList() {
         if (!this._toolListEl) return;
 
-        this._toolListEl.innerHTML = this._toolEntries.map(tool => `
+        const visibleEntries = this._toolEntries.filter(t => this._isToolVisible(t.id));
+
+        this._toolListEl.innerHTML = visibleEntries.map(tool => `
             <div class="console-tool-item" data-tool-id="${tool.id}">
                 <span class="console-tool-icon">${tool.icon}</span>
                 <div class="console-tool-info">
@@ -311,6 +391,104 @@ class ConsoleModal extends BaseModal {
                 </div>
             </div>
         `;
+    }
+
+    /**
+     * 渲染设置工具 - 管理各小工具的显示/隐藏开关
+     * @param {HTMLElement} container
+     * @private
+     */
+    _renderSettingsTool(container) {
+        // 获取所有可开关的工具（排除始终显示的工具）
+        const toggleableTools = this._toolEntries.filter(
+            t => !ALWAYS_VISIBLE_TOOL_IDS.includes(t.id)
+        );
+
+        container.innerHTML = `
+            <div class="console-settings">
+                <h2 class="console-settings-title">⚙️ 控制台设置</h2>
+                <p class="console-settings-desc">在此开启或关闭控制台中的小工具，关闭后工具将从左侧侧栏中隐藏。</p>
+                <div class="console-settings-list" id="consoleSettingsList">
+                    ${toggleableTools.map(tool => `
+                        <div class="console-settings-item" data-tool-id="${tool.id}">
+                            <div class="console-settings-item-info">
+                                <span class="console-settings-item-icon">${tool.icon}</span>
+                                <div class="console-settings-item-text">
+                                    <span class="console-settings-item-name">${tool.name}</span>
+                                    <span class="console-settings-item-desc">${tool.description}</span>
+                                </div>
+                            </div>
+                            <label class="console-settings-toggle">
+                                <input type="checkbox"
+                                       class="console-settings-checkbox"
+                                       data-tool-id="${tool.id}"
+                                       ${this._toolEnabledMap[tool.id] !== false ? 'checked' : ''}>
+                                <span class="console-settings-slider"></span>
+                            </label>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+
+        // 绑定开关事件
+        const listEl = container.querySelector('#consoleSettingsList');
+        if (listEl) {
+            listEl.addEventListener('change', async (e) => {
+                const checkbox = e.target.closest('.console-settings-checkbox');
+                if (!checkbox) return;
+
+                const toolId = checkbox.dataset.toolId;
+                const enabled = checkbox.checked;
+
+                try {
+                    const SettingsManager = (await import('../managers/SettingsManager.js')).default;
+                    const key = this._getToolEnabledKey(toolId);
+                    await SettingsManager.set(key, enabled ? '1' : '0');
+
+                    // 更新本地状态
+                    this._toolEnabledMap[toolId] = enabled;
+
+                    // 重新渲染侧栏工具列表
+                    this._renderToolList();
+
+                    // 如果当前打开的正是被关闭的工具，自动切回欢迎页
+                    if (!enabled && this._activeToolId === toolId) {
+                        this._activateTool('welcome');
+                    }
+
+                    this._showSettingsFeedback(container, `✅ 已${enabled ? '开启' : '关闭'}「${this._toolEntries.find(t => t.id === toolId)?.name || toolId}」`, true);
+                } catch (err) {
+                    console.error(`[ConsoleModal] 保存工具开关状态失败:`, err);
+                    checkbox.checked = !enabled; // 回滚
+                    this._showSettingsFeedback(container, `❌ 设置失败: ${err.message}`, false);
+                }
+            });
+        }
+    }
+
+    /**
+     * 在设置页显示操作反馈
+     * @param {HTMLElement} container - 设置页容器
+     * @param {string} message - 反馈消息
+     * @param {boolean} success - 是否成功
+     * @private
+     */
+    _showSettingsFeedback(container, message, success = true) {
+        // 移除旧的反馈
+        const oldFeedback = container.querySelector('.console-settings-feedback');
+        if (oldFeedback) oldFeedback.remove();
+
+        const feedback = document.createElement('div');
+        feedback.className = 'console-settings-feedback visible ' + (success ? 'success' : 'error');
+        feedback.textContent = message;
+        container.appendChild(feedback);
+
+        clearTimeout(this._settingsFeedbackTimer);
+        this._settingsFeedbackTimer = setTimeout(() => {
+            feedback.classList.remove('visible');
+            setTimeout(() => feedback.remove(), 300);
+        }, 3000);
     }
 
     /**

@@ -285,6 +285,193 @@
     border-color: rgba(59, 130, 246, 0.12);
 }
 
+/* ==================== 控制台设置页样式 ==================== */
+
+.console-settings {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    height: 100%;
+}
+
+.console-settings-title {
+    margin: 0;
+    font-size: 1.2rem;
+    color: var(--text-primary, #1a1a1a);
+}
+
+.console-settings-desc {
+    margin: 0;
+    color: var(--text-secondary, #666666);
+    font-size: 0.85rem;
+    line-height: 1.5;
+}
+
+.console-settings-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    flex: 1;
+    overflow-y: auto;
+    padding-right: 0.5rem;
+}
+
+.console-settings-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem 0.85rem;
+    border-radius: 12px;
+    background: rgba(59, 130, 246, 0.04);
+    border: 1px solid rgba(59, 130, 246, 0.08);
+    transition: background var(--transition-fast, 0.15s ease);
+}
+
+.console-settings-item:hover {
+    background: rgba(59, 130, 246, 0.08);
+}
+
+.console-settings-item-info {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    min-width: 0;
+    flex: 1;
+}
+
+.console-settings-item-icon {
+    font-size: 1.3rem;
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.console-settings-item-text {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.console-settings-item-name {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-primary, #1a1a1a);
+}
+
+.console-settings-item-desc {
+    font-size: 0.7rem;
+    color: var(--text-tertiary, #999999);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* 开关（Toggle）样式 */
+.console-settings-toggle {
+    position: relative;
+    display: inline-block;
+    width: 44px;
+    height: 24px;
+    flex-shrink: 0;
+    margin-left: 0.75rem;
+    cursor: pointer;
+}
+
+.console-settings-toggle input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+    position: absolute;
+}
+
+.console-settings-slider {
+    position: absolute;
+    inset: 0;
+    background: var(--text-tertiary, #ccc);
+    border-radius: 24px;
+    transition: background var(--transition-normal, 0.25s ease);
+}
+
+.console-settings-slider::before {
+    content: '';
+    position: absolute;
+    left: 3px;
+    top: 3px;
+    width: 18px;
+    height: 18px;
+    background: #fff;
+    border-radius: 50%;
+    transition: transform var(--transition-normal, 0.25s ease);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+.console-settings-checkbox:checked + .console-settings-slider {
+    background: var(--theme-color, #3b82f6);
+}
+
+.console-settings-checkbox:checked + .console-settings-slider::before {
+    transform: translateX(20px);
+}
+
+/* 设置页反馈消息 */
+.console-settings-feedback {
+    position: fixed;
+    bottom: 1.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 0.6rem 1.2rem;
+    border-radius: 10px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    z-index: 100;
+    opacity: 0;
+    transition: opacity var(--transition-normal, 0.3s ease);
+    pointer-events: none;
+}
+
+.console-settings-feedback.visible {
+    opacity: 1;
+}
+
+.console-settings-feedback.success {
+    background: rgba(34, 197, 94, 0.15);
+    color: #16a34a;
+    border: 1px solid rgba(34, 197, 94, 0.25);
+}
+
+.console-settings-feedback.error {
+    background: rgba(239, 68, 68, 0.15);
+    color: #dc2626;
+    border: 1px solid rgba(239, 68, 68, 0.25);
+}
+
+/* 暗黑模式适配 */
+[data-theme="dark"] .console-settings-item {
+    background: rgba(59, 130, 246, 0.06);
+    border-color: rgba(59, 130, 246, 0.1);
+}
+
+[data-theme="dark"] .console-settings-item:hover {
+    background: rgba(59, 130, 246, 0.1);
+}
+
+[data-theme="dark"] .console-settings-slider {
+    background: #555;
+}
+
+[data-theme="dark"] .console-settings-feedback.success {
+    background: rgba(34, 197, 94, 0.12);
+    color: #4ade80;
+}
+
+[data-theme="dark"] .console-settings-feedback.error {
+    background: rgba(239, 68, 68, 0.12);
+    color: #f87171;
+}
+
 /* 移动端适配 */
 @media (max-width: 768px) {
     .console-modal {
@@ -300,5 +487,9 @@
 
     .console-content {
         padding: 1rem;
+    }
+
+    .console-settings-item {
+        padding: 0.6rem 0.7rem;
     }
 }
