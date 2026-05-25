@@ -33,7 +33,7 @@ class NavSidebar extends HTMLElement {
     background: var(--glass-bg);
     backdrop-filter: blur(var(--glass-blur));
     -webkit-backdrop-filter: blur(var(--glass-blur));
-    border-radius: 1rem;
+    border-radius: 2rem;
     box-shadow: var(--shadow-lg);
     z-index: 1000;
     padding: 1rem 0.5rem;
@@ -192,6 +192,24 @@ class NavSidebar extends HTMLElement {
     background: var(--theme-color);
     color: white;
     font-weight: bold;
+}
+
+/* 侧栏全屏模式（模式 2） */
+.sidebar.sidebar-mode-full {
+    top: 0 !important;
+    transform: none !important;
+    height: 100vh;
+    max-height: 100vh;
+    border-radius: 0;
+    border-top-left-radius: 0rem !important;
+    border-bottom-left-radius: 0rem !important;
+    backdrop-filter: blur(var(--glass-blur, 15px));
+    -webkit-backdrop-filter: blur(var(--glass-blur, 15px));
+    background: rgba(255, 255, 255, 0) !important;
+}
+
+[data-theme="dark"] .sidebar.sidebar-mode-full {
+    background: var(--glass-bg, rgba(30, 30, 30, 0.92));
 }
 
 /* 侧栏渐入动画 */

@@ -9,6 +9,7 @@ class SettingsManager {
             theme_mode: 'light',
             theme_color: '#3b82f6',
             global_font: 'NotoSansSC-Regular',
+            sidebar_mode: '1',
             sidebar_width: '50',
             cell_base_size: '4',
             cell_gap: '2',
@@ -307,6 +308,34 @@ class SettingsManager {
                 sidebar.style.display = 'none';
             }
         }
+
+        // 同时应用侧栏显示模式
+        this.applySidebarMode();
+    }
+
+    /**
+     * 应用侧栏显示模式
+     * @private
+     */
+    applySidebarMode() {
+        const sidebarMode = this.settings.sidebar_mode || '1';
+        const sidebar = document.querySelector('.sidebar');
+        if (!sidebar) {
+            // DOM 尚未就绪（侧栏由 SidebarRenderer 异步创建），持续重试直到找到
+            if (!this._sidebarModeRetryCount) this._sidebarModeRetryCount = 0;
+            if (this._sidebarModeRetryCount < 50) { // 最多重试 50 次（5 秒）
+                this._sidebarModeRetryCount++;
+                setTimeout(() => this.applySidebarMode(), 100);
+            }
+            return;
+        }
+        this._sidebarModeRetryCount = 0;
+
+        if (sidebarMode === '2') {
+            sidebar.classList.add('sidebar-mode-full');
+        } else {
+            sidebar.classList.remove('sidebar-mode-full');
+        }
     }
 
     /**
@@ -581,6 +610,7 @@ class SettingsManager {
             sidebarWidth: parseInt(this.settings.sidebar_width) || 50,
 
             // 侧栏设置
+            sidebarMode: this.settings.sidebar_mode || '1',
             sidebarVisible: this.settings.sidebar_visible !== '0',
 
             // 外观主题
@@ -651,6 +681,7 @@ class SettingsManager {
             sidebar_width: newSettings.sidebarWidth,
 
             // 侧栏设置
+            sidebar_mode: newSettings.sidebarMode || '1',
             sidebar_visible: newSettings.sidebarVisible ? '1' : '0',
 
             // 外观主题

@@ -182,6 +182,24 @@
     box-shadow: 0 0 15px rgba(var(--theme-color-rgb), 0.4);
 }
 
+/* 侧栏全屏模式（模式 2） */
+.sidebar.sidebar-mode-full {
+    top: 0 !important;
+    transform: none !important;
+    height: 100vh;
+    max-height: 100vh;
+    border-radius: 0;
+    background: rgba(255, 255, 255, 0) !important;
+    border-top-left-radius: 0rem !important;
+    border-bottom-left-radius: 0rem !important;
+    backdrop-filter: blur(var(--glass-blur, 15px));
+    -webkit-backdrop-filter: blur(var(--glass-blur, 15px));
+}
+
+[data-theme="dark"] .sidebar.sidebar-mode-full {
+    background:  rgba(30, 30, 30, 0.92);
+}
+
 /* 侧栏渐入动画 */
 .sidebar {
     animation: fadeIn 0.3s ease backwards;

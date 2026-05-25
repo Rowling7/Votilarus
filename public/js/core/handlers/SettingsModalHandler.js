@@ -332,6 +332,15 @@ class SettingsModalHandler {
                 </div>
                 
                 <div class="setting-item">
+                    <label for="sidebar-mode">侧栏显示模式</label>
+                    <select id="sidebar-mode">
+                        <option value="1">模式 1：默认居中（top: 50%，max-height: 80vh）</option>
+                        <option value="2">模式 2：全屏高度（height: 100vh，背景模糊）</option>
+                    </select>
+                    <div class="setting-description">选择侧栏的显示样式</div>
+                </div>
+                
+                <div class="setting-item">
                     <label for="sidebar-width">侧栏宽度</label>
                     <select id="sidebar-width">
                         <option value="50">50px（默认）</option>
@@ -814,6 +823,7 @@ class SettingsModalHandler {
         document.getElementById('grid-gap').value = settings.gridGap || 2;
 
         // 侧栏设置
+        document.getElementById('sidebar-mode').value = settings.sidebarMode || '1';
         document.getElementById('sidebar-width').value = settings.sidebarWidth || 50;
         this.setSwitchState('sidebar-visible-switch', settings.sidebarVisible !== false); // 默认显示
 
@@ -948,6 +958,7 @@ class SettingsModalHandler {
             gridGap: parseFloat(document.getElementById('grid-gap').value) || 2,
 
             // 侧栏设置
+            sidebarMode: document.getElementById('sidebar-mode').value || '1',
             sidebarWidth: parseInt(document.getElementById('sidebar-width').value),
             sidebarVisible: document.getElementById('sidebar-visible-switch').classList.contains('active'),
 
@@ -1267,6 +1278,7 @@ class SettingsModalHandler {
 
         if (settings.sidebarVisible === false) {
             sidebar.style.display = 'none';
+            return;
         } else {
             sidebar.style.display = '';
         }
@@ -1275,6 +1287,14 @@ class SettingsModalHandler {
         if (settings.sidebarWidth) {
             document.documentElement.style.setProperty('--sidebar-width', `${settings.sidebarWidth}px`);
             sidebar.style.width = settings.sidebarWidth + 'px';
+        }
+
+        // 应用侧栏显示模式
+        const sidebarMode = settings.sidebarMode || '1';
+        if (sidebarMode === '2') {
+            sidebar.classList.add('sidebar-mode-full');
+        } else {
+            sidebar.classList.remove('sidebar-mode-full');
         }
     }
 
