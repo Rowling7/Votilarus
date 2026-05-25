@@ -883,6 +883,90 @@ router.put('/city', (req, res) => {
     }
 });
 
+/**
+ * GET /api/weather/geoip
+ * 通过客户端 IP 获取大致地理位置（兜底方案）
+ */
+router.get('/geoip', (req, res) => {
+    // 获取客户端 IP（支持代理转发）
+    const clientIp = req.headers['x-forwarded-for'] || req.headers['x-real-ip'] || req.connection.remoteAddress || req.ip;
+    // 如果是 IPv6 映射的 IPv4 地址，提取 IPv4
+    const ip = (clientIp || '').replace(/^::ffff:/, '').replace(/^::1$/, '127.0.0.1');
+
+    // 本地回环地址使用默认位置
+    if (ip === '127.0.0.1' || ip === 'localhost') {
+        return res.json({
+            success: true,
+            data: {
+                ip: ip,
+                lat: 35.8617,
+                lon: 104.1954,
+                city: '中国',
+                country: '中国'
+            },
+            message: '本地环境，使用默认位置'
+        });
+    }
+
+    // 使用 ipapi.co 免费服务查询 IP 地理位置
+    const apiUrl = `https://ipapi.co/${ip}/json/`;
+
+    https.get(apiUrl, (apiRes) => {
+        let data = '';
+
+        apiRes.on('data', (chunk) => {
+            data += chunk;
+        });
+
+        apiRes.on('end', () => {
+            try {
+                const jsonData = JSON.parse(data);
+
+                // 检查是否有错误
+                if (jsonData.error) {
+                    console.error('[GeoIP] IP 定位失败:', jsonData.reason || jsonData.error);
+                    return res.status(502).json({
+                        success: false,
+                        error: jsonData.reason || 'IP 定位服务不可用'
+                    });
+                }
+
+                // 检查返回的经纬度是否有效
+                if (!jsonData.latitude || !jsonData.longitude) {
+                    return res.status(502).json({
+                        success: false,
+                        error: '无法确定 IP 地理位置'
+                    });
+                }
+
+                res.json({
+                    success: true,
+                    data: {
+                        ip: jsonData.ip,
+                        lat: parseFloat(jsonData.latitude),
+                        lon: parseFloat(jsonData.longitude),
+                        city: jsonData.city || '',
+                        region: jsonData.region || '',
+                        country: jsonData.country_name || jsonData.country || ''
+                    }
+                });
+            } catch (error) {
+                console.error('[GeoIP] 解析 IP 定位数据失败:', error);
+                res.status(502).json({
+                    success: false,
+                    error: '解析 IP 定位数据失败'
+                });
+            }
+        });
+    }).on('error', (error) => {
+        console.error('[GeoIP] 请求 IP 定位服务失败:', error);
+        res.status(502).json({
+            success: false,
+            error: 'IP 定位服务网络错误'
+        });
+    });
+});
+
 // 导出模块
 module.exports = {
     router,

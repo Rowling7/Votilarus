@@ -230,7 +230,7 @@ class WeatherForecastModal extends BaseModal {
     }
 
     /**
-     * 切换到预报视图（点击“预报”按钮）
+     * 切换到预报视图（点击"预报"按钮）
      */
     switchToForecast() {
         // 显示天气卡片
@@ -340,57 +340,115 @@ class WeatherForecastModal extends BaseModal {
     }
 
     /**
-     * 定位用户位置
+     * 定位用户位置（带降级重试 + IP 兜底）
      */
     locateUserPosition() {
         if (!navigator.geolocation) {
-            toast.error('您的浏览器不支持地理定位');
+            // 浏览器不支持定位，直接使用 IP 定位
+            this._attemptIpLocation();
             return;
         }
 
         toast.info('正在获取您的位置...');
+        this._attemptLocatePosition(true);
+    }
 
+    /**
+     * 执行定位请求（支持降级重试）
+     * @param {boolean} highAccuracy - 是否使用高精度模式
+     * @private
+     */
+    _attemptLocatePosition(highAccuracy) {
         navigator.geolocation.getCurrentPosition(
             (position) => {
                 const { latitude, longitude } = position.coords;
-                console.log('[WeatherMap] 用户位置:', latitude, longitude);
-
-                // 移除旧标记
-                if (this.userLocationMarker) {
-                    this.map.removeLayer(this.userLocationMarker);
-                }
-
-                // 添加新标记
-                this.userLocationMarker = L.marker([latitude, longitude]).addTo(this.map);
-                this.userLocationMarker.bindPopup('您的位置').openPopup();
-
-                // 移动地图到用户位置
-                this.map.setView([latitude, longitude], 10);
-
-                toast.success('已定位到您的位置');
+                this._onLocationReceived(latitude, longitude, 'GPS');
             },
             (error) => {
-                console.error('[WeatherMap] 定位失败:', error);
-                let message = '定位失败';
-                switch (error.code) {
-                    case error.PERMISSION_DENIED:
-                        message = '您拒绝了定位请求';
-                        break;
-                    case error.POSITION_UNAVAILABLE:
-                        message = '位置信息不可用';
-                        break;
-                    case error.TIMEOUT:
-                        message = '定位超时';
-                        break;
+                console.error('[WeatherMap] 定位失败 (高精度:' + highAccuracy + '):', error);
+
+                // 降级策略：高精度失败时用低精度重试一次
+                if (highAccuracy) {
+                    console.log('[WeatherMap] 高精度定位失败，降级使用低精度模式重试...');
+                    toast.info('正在尝试使用低精度定位...');
+                    this._attemptLocatePosition(false);
+                    return;
                 }
-                toast.error(message);
+
+                // 低精度也失败 -> 使用 IP 定位兜底
+                console.log('[WeatherMap] 浏览器定位全部失败，使用 IP 定位兜底...');
+                this._attemptIpLocation();
             },
             {
-                enableHighAccuracy: true,
-                timeout: 10000,
-                maximumAge: 0
+                enableHighAccuracy: highAccuracy,
+                timeout: highAccuracy ? 15000 : 10000,
+                maximumAge: highAccuracy ? 0 : 300000
             }
         );
+    }
+
+    /**
+     * 通过 IP 获取近似位置（兜底方案）
+     * @private
+     */
+    async _attemptIpLocation() {
+        toast.info('正在通过 IP 估算位置...');
+
+        try {
+            const response = await fetch('/api/weather/geoip');
+            const result = await response.json();
+
+            if (result.success && result.data) {
+                const { lat, lon } = result.data;
+                console.log('[WeatherMap] IP 定位成功:', result.data.city || result.data.country, lat, lon);
+                this._onLocationReceived(lat, lon, 'IP');
+                toast.success('已定位到您的大致位置（IP 定位）');
+            } else {
+                toast.error('IP 定位失败：' + (result.error || '未知错误'));
+            }
+        } catch (error) {
+            console.error('[WeatherMap] IP 定位请求失败:', error);
+            toast.error('定位失败，所有定位方式均不可用');
+        }
+    }
+
+    /**
+     * 统一处理获取到的位置
+     * @param {number} latitude
+     * @param {number} longitude
+     * @param {string} source - 位置来源: 'GPS' | 'IP'
+     * @private
+     */
+    _onLocationReceived(latitude, longitude, source) {
+        console.log('[WeatherMap] 用户位置 (' + source + '):', latitude, longitude);
+
+        // 移除旧标记
+        if (this.userLocationMarker) {
+            this.map.removeLayer(this.userLocationMarker);
+        }
+
+        // 添加新标记（IP 定位使用不同颜色标记）
+        const markerOptions = source === 'IP' ? {
+            icon: L.divIcon({
+                className: 'ip-location-marker',
+                html: `<div style="
+                    width: 24px; height: 24px;
+                    background: rgba(255, 165, 0, 0.8);
+                    border: 3px solid #fff;
+                    border-radius: 50%;
+                    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+                "></div>`,
+                iconSize: [24, 24],
+                iconAnchor: [12, 12]
+            })
+        } : undefined;
+
+        this.userLocationMarker = L.marker([latitude, longitude], markerOptions).addTo(this.map);
+        const popupText = source === 'IP' ? '您的大致位置（IP 定位）' : '您的位置';
+        this.userLocationMarker.bindPopup(popupText).openPopup();
+
+        // 移动地图到用户位置
+        this.map.setView([latitude, longitude], 10);
     }
 
     /**
