@@ -10,6 +10,7 @@ import DinoGameTool from '../consoleTools/DinoGameTool.js';
 import TimestampConverter from '../consoleTools/TimestampConverter.js';
 import RelativeCalculator from '../consoleTools/RelativeCalculator.js';
 import NumberToChinese from '../consoleTools/NumberToChinese.js';
+import SqlFormatter from '../consoleTools/SqlFormatter.js';
 
 class ConsoleModal extends BaseModal {
     constructor() {
@@ -200,6 +201,15 @@ class ConsoleModal extends BaseModal {
             icon: '🔢',
             description: '阿拉伯数字与中文大写金额相互转换',
             render: (container) => numberToChinese.render(container)
+        });
+
+        // 注册 SQL 格式化工具
+        const sqlFormatter = new SqlFormatter();
+        this.registerTool('sql-formatter', {
+            name: 'SQL 格式化',
+            icon: '🗄️',
+            description: '格式化 SQL 语句，支持 MySQL / MSSQL / SQLite3',
+            render: (container) => sqlFormatter.render(container)
         });
 
         this._renderToolList();

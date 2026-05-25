@@ -30,6 +30,7 @@
 @import '../js/consoleTools/timestamp-converter.css';
 @import '../js/consoleTools/relative-calculator.css';
 @import '../js/consoleTools/number-to-chinese.css';
+@import '../js/consoleTools/sql-formatter.css';
 
 /*modal*/
 @import 'modal/calendar-modal.css';

@@ -1,0 +1,444 @@
+/* ==================== SQL 格式化工具样式 ==================== */
+
+.sqlfmt-tool {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    height: 100%;
+    padding: 0;
+}
+
+.sqlfmt-title {
+    margin: 0;
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: var(--text-primary, #1a1a1a);
+}
+
+.sqlfmt-desc {
+    margin: -0.4rem 0 0 0;
+    font-size: 0.82rem;
+    color: var(--text-secondary, #666);
+    line-height: 1.5;
+}
+
+/* ==================== 区域 ==================== */
+
+.sqlfmt-section {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+}
+
+.sqlfmt-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.sqlfmt-label {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--text-secondary, #666);
+}
+
+/* ==================== 单选按钮（方言选择） ==================== */
+
+.sqlfmt-radio-group {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.sqlfmt-radio {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.4rem 0.75rem;
+    border: 1px solid var(--border-color, rgba(0, 0, 0, 0.1));
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 0.85rem;
+    color: var(--text-primary, #1a1a1a);
+}
+
+.sqlfmt-radio:hover {
+    border-color: var(--accent, #3b82f6);
+    background: rgba(59, 130, 246, 0.06);
+}
+
+.sqlfmt-radio input[type="radio"] {
+    accent-color: var(--accent, #3b82f6);
+}
+
+.sqlfmt-radio:has(input:checked) {
+    border-color: var(--accent, #3b82f6);
+    background: rgba(59, 130, 246, 0.08);
+    font-weight: 500;
+}
+
+/* ==================== 选项复选框 ==================== */
+
+.sqlfmt-options-row {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.sqlfmt-checkbox {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.82rem;
+    color: var(--text-primary, #1a1a1a);
+    cursor: pointer;
+    user-select: none;
+}
+
+.sqlfmt-checkbox input[type="checkbox"] {
+    accent-color: var(--accent, #3b82f6);
+}
+
+/* ==================== 文本输入框 ==================== */
+
+.sqlfmt-textarea {
+    width: 100%;
+    min-height: 100px;
+    max-height: 400px;
+    padding: 0.65rem 0.75rem;
+    border: 1px solid var(--border-color, rgba(0, 0, 0, 0.12));
+    border-radius: 8px;
+    background: var(--bg-input, rgba(255, 255, 255, 0.6));
+    color: var(--text-primary, #1a1a1a);
+    font-size: 0.85rem;
+    font-family: 'Courier New', 'Consolas', 'Monaco', monospace;
+    line-height: 1.55;
+    outline: none;
+    resize: vertical;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    box-sizing: border-box;
+    tab-size: 4;
+}
+
+.sqlfmt-textarea:focus {
+    border-color: var(--accent, #3b82f6);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+}
+
+.sqlfmt-textarea::placeholder {
+    color: var(--text-muted, #aaa);
+    font-family: inherit;
+}
+
+/* 输出框 - 只读 */
+.sqlfmt-output {
+    background: rgba(59, 130, 246, 0.03);
+    cursor: default;
+    min-height: 80px;
+}
+
+/* ==================== 输出区域（带行号） ==================== */
+
+.sqlfmt-output-wrap {
+    position: relative;
+    display: flex;
+}
+
+.sqlfmt-line-numbers {
+    flex-shrink: 0;
+    padding: 0.65rem 0.5rem;
+    min-width: 2.5em;
+    text-align: right;
+    font-size: 0.78rem;
+    font-family: 'Courier New', 'Consolas', 'Monaco', monospace;
+    line-height: 1.55;
+    color: var(--text-muted, #999);
+    background: rgba(0, 0, 0, 0.03);
+    border: 1px solid var(--border-color, rgba(0, 0, 0, 0.12));
+    border-right: none;
+    border-radius: 8px 0 0 8px;
+    user-select: none;
+    white-space: pre;
+    overflow: hidden;
+}
+
+.sqlfmt-output-wrap .sqlfmt-output {
+    border-radius: 0 8px 8px 0;
+    min-height: 80px;
+    resize: vertical;
+}
+
+/* ==================== 操作按钮 ==================== */
+
+.sqlfmt-actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.sqlfmt-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.3rem;
+    padding: 0.55rem 1rem;
+    border: 1px solid var(--border-color, rgba(0, 0, 0, 0.1));
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.6);
+    color: var(--text-primary, #1a1a1a);
+    font-size: 0.82rem;
+    font-weight: 500;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.sqlfmt-btn:hover {
+    background: rgba(59, 130, 246, 0.08);
+    color: var(--accent, #3b82f6);
+    border-color: rgba(59, 130, 246, 0.2);
+    transform: translateY(-1px);
+}
+
+.sqlfmt-btn:active {
+    transform: translateY(0);
+}
+
+.sqlfmt-btn-primary {
+    background: rgba(59, 130, 246, 0.1);
+    color: var(--accent, #3b82f6);
+    border-color: rgba(59, 130, 246, 0.2);
+    font-weight: 600;
+}
+
+.sqlfmt-btn-primary:hover {
+    background: rgba(59, 130, 246, 0.18);
+    border-color: rgba(59, 130, 246, 0.35);
+}
+
+/* ==================== 统计信息 ==================== */
+
+.sqlfmt-stats {
+    display: none;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    padding: 0.5rem 0.75rem;
+    border-radius: 8px;
+    background: rgba(59, 130, 246, 0.04);
+    border: 1px solid rgba(59, 130, 246, 0.08);
+}
+
+.sqlfmt-stats.visible {
+    display: flex;
+}
+
+.sqlfmt-stat-item {
+    font-size: 0.78rem;
+    color: var(--text-secondary, #666);
+}
+
+/* ==================== 示例 ==================== */
+
+.sqlfmt-details {
+    border: 1px solid var(--border-color, rgba(0, 0, 0, 0.1));
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.sqlfmt-details-summary {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: var(--text-secondary, #666);
+    cursor: pointer;
+    user-select: none;
+    transition: color 0.2s;
+}
+
+.sqlfmt-details-summary:hover {
+    color: var(--accent, #3b82f6);
+}
+
+.sqlfmt-details[open] .sqlfmt-details-summary {
+    border-bottom: 1px solid var(--border-color, rgba(0, 0, 0, 0.1));
+}
+
+.sqlfmt-examples {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    padding: 0.5rem 0.75rem;
+}
+
+.sqlfmt-example-btn {
+    padding: 0.35rem 0.7rem;
+    border: 1px solid var(--border-color, rgba(0, 0, 0, 0.1));
+    border-radius: 6px;
+    background: rgba(59, 130, 246, 0.06);
+    color: var(--accent, #3b82f6);
+    font-size: 0.78rem;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.sqlfmt-example-btn:hover {
+    background: rgba(59, 130, 246, 0.12);
+    transform: translateY(-1px);
+}
+
+.sqlfmt-example-btn:active {
+    transform: translateY(0);
+}
+
+/* ==================== 操作反馈消息 ==================== */
+
+.sqlfmt-feedback {
+    margin-top: 0;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    opacity: 0;
+    transition: opacity 0.25s;
+}
+
+.sqlfmt-feedback.visible {
+    opacity: 1;
+}
+
+.sqlfmt-feedback.success {
+    background: rgba(34, 197, 94, 0.08);
+    border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+.sqlfmt-feedback.error {
+    background: rgba(239, 68, 68, 0.08);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.sqlfmt-feedback-text {
+    margin: 0;
+    font-size: 0.82rem;
+    color: var(--text-primary, #1a1a1a);
+    line-height: 1.4;
+}
+
+/* ==================== 暗黑模式适配 ==================== */
+
+[data-theme="dark"] .sqlfmt-textarea {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.1);
+    color: #e0e0e0;
+}
+
+[data-theme="dark"] .sqlfmt-textarea:focus {
+    border-color: var(--accent, #3b82f6);
+}
+
+[data-theme="dark"] .sqlfmt-output {
+    background: rgba(59, 130, 246, 0.06);
+}
+
+[data-theme="dark"] .sqlfmt-line-numbers {
+    background: rgba(255, 255, 255, 0.04);
+    border-color: rgba(255, 255, 255, 0.1);
+    color: #666;
+}
+
+[data-theme="dark"] .sqlfmt-radio {
+    background: rgba(255, 255, 255, 0.04);
+    border-color: rgba(255, 255, 255, 0.1);
+    color: #d0d0d0;
+}
+
+[data-theme="dark"] .sqlfmt-radio:hover {
+    border-color: var(--accent, #3b82f6);
+}
+
+[data-theme="dark"] .sqlfmt-radio:has(input:checked) {
+    background: rgba(59, 130, 246, 0.15);
+}
+
+[data-theme="dark"] .sqlfmt-btn {
+    background: rgba(255, 255, 255, 0.04);
+    border-color: rgba(255, 255, 255, 0.1);
+    color: #d0d0d0;
+}
+
+[data-theme="dark"] .sqlfmt-btn:hover {
+    background: rgba(59, 130, 246, 0.15);
+    color: var(--accent, #3b82f6);
+}
+
+[data-theme="dark"] .sqlfmt-btn-primary {
+    background: rgba(59, 130, 246, 0.18);
+}
+
+[data-theme="dark"] .sqlfmt-btn-primary:hover {
+    background: rgba(59, 130, 246, 0.28);
+}
+
+[data-theme="dark"] .sqlfmt-stats {
+    background: rgba(59, 130, 246, 0.08);
+    border-color: rgba(59, 130, 246, 0.15);
+}
+
+[data-theme="dark"] .sqlfmt-details {
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .sqlfmt-details-summary {
+    color: #aaa;
+}
+
+[data-theme="dark"] .sqlfmt-details[open] .sqlfmt-details-summary {
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .sqlfmt-example-btn {
+    background: rgba(59, 130, 246, 0.12);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .sqlfmt-example-btn:hover {
+    background: rgba(59, 130, 246, 0.2);
+}
+
+[data-theme="dark"] .sqlfmt-feedback.success {
+    background: rgba(34, 197, 94, 0.12);
+}
+
+[data-theme="dark"] .sqlfmt-feedback.error {
+    background: rgba(239, 68, 68, 0.12);
+}
+
+/* ==================== 响应式 ==================== */
+
+@media (max-width: 768px) {
+    .sqlfmt-radio-group {
+        flex-direction: column;
+        gap: 0.4rem;
+    }
+
+    .sqlfmt-options-row {
+        flex-direction: column;
+        gap: 0.4rem;
+    }
+
+    .sqlfmt-actions {
+        flex-direction: column;
+    }
+
+    .sqlfmt-btn {
+        width: 100%;
+    }
+
+    .sqlfmt-examples {
+        flex-direction: column;
+    }
+
+    .sqlfmt-example-btn {
+        width: 100%;
+    }
+}
