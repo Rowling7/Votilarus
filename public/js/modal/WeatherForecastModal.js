@@ -246,9 +246,15 @@ class WeatherForecastModal extends BaseModal {
 
         // 初始化地图（如果尚未初始化）
         if (!this.map) {
-            setTimeout(() => {
-                this.initMap();
-            }, 100);
+            // 如果坐标已经可用，直接初始化地图
+            if (this.cityLatitude && this.cityLongitude) {
+                setTimeout(() => {
+                    this.initMap();
+                }, 100);
+            } else {
+                // 数据还在加载中，标记等待初始化，由 fetchWeatherData() 完成后触发
+                this._pendingMapInit = true;
+            }
         }
     }
 
@@ -355,13 +361,13 @@ class WeatherForecastModal extends BaseModal {
         // 使用城市坐标初始化地图（有坐标则缩放到城市级别，否则用中国中心）
         const centerLat = this.cityLatitude || 35.8617;
         const centerLng = this.cityLongitude || 104.1954;
-        const initialZoom = this.cityLatitude ? 10 : 6;
+        const initialZoom = this.cityLatitude ? 18 : 3;
 
         this.map = L.map('weatherMap', {
             center: [centerLat, centerLng],
             zoom: initialZoom,
             minZoom: 3,
-            maxZoom: 10,
+            maxZoom: 18,
             zoomControl: true,
             attributionControl: false
         });
@@ -632,6 +638,14 @@ class WeatherForecastModal extends BaseModal {
                 // 如果地图已存在，切换到新城市时更新地图中心
                 if (this.map && this.cityLatitude && this.cityLongitude) {
                     this.map.setView([this.cityLatitude, this.cityLongitude], 10);
+                }
+
+                // 如果之前 switchToMap() 标记了等待初始化，现在触发
+                if (this._pendingMapInit && this.cityLatitude && this.cityLongitude) {
+                    this._pendingMapInit = false;
+                    setTimeout(() => {
+                        this.initMap();
+                    }, 100);
                 }
 
                 // 重新渲染时添加动画效果

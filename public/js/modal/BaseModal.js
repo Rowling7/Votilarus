@@ -288,7 +288,7 @@ class BaseModal {
 
         // 忽略来自交互元素的拖拽（input/textarea/select/button/a）
         const target = e.target;
-        if (target.closest('input, textarea, select, button, a, .modal-control-buttons, [data-no-drag]')) {
+        if (target.closest('input, textarea, select, button, a, .modal-control-buttons,.map-container, [data-no-drag]')) {
             return;
         }
 
