@@ -27,6 +27,7 @@
 @import '../js/consoleTools/compleave-tool.css';
 @import '../js/consoleTools/time-interval.css';
 @import '../js/consoleTools/dino-game.css';
+@import '../js/consoleTools/timestamp-converter.css';
 
 /*modal*/
 @import 'modal/calendar-modal.css';

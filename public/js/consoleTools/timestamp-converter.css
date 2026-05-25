@@ -1,0 +1,318 @@
+/* ==================== 时间戳转换工具样式 ==================== */
+
+.timestamp-tool {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    height: 100%;
+    padding: 0;
+}
+
+.timestamp-title {
+    margin: 0;
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: var(--text-primary, #1a1a1a);
+}
+
+.timestamp-desc {
+    margin: -0.5rem 0 0 0;
+    font-size: 0.82rem;
+    color: var(--text-secondary, #666);
+    line-height: 1.5;
+}
+
+/* ==================== 当前时间戳栏 ==================== */
+
+.timestamp-now-bar {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    background: rgba(59, 130, 246, 0.06);
+    border: 1px solid rgba(59, 130, 246, 0.1);
+}
+
+.timestamp-now-label {
+    font-size: 0.82rem;
+    color: var(--text-secondary, #666);
+    flex-shrink: 0;
+}
+
+.timestamp-now-value {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--accent, #3b82f6);
+    font-variant-numeric: tabular-nums;
+    font-family: 'Courier New', monospace;
+}
+
+.timestamp-now-btn {
+    margin-left: auto;
+    padding: 0.3rem 0.6rem;
+    border: 1px solid var(--border-color, rgba(0, 0, 0, 0.1));
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.6);
+    color: var(--text-secondary, #666);
+    font-size: 0.75rem;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.timestamp-now-btn:hover {
+    background: rgba(59, 130, 246, 0.08);
+    color: var(--accent, #3b82f6);
+    border-color: rgba(59, 130, 246, 0.2);
+}
+
+/* ==================== 区域 ==================== */
+
+.timestamp-section {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.timestamp-section-title {
+    margin: 0;
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: var(--text-primary, #1a1a1a);
+}
+
+.timestamp-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.timestamp-label {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--text-secondary, #666);
+}
+
+.timestamp-input-group {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.timestamp-input {
+    flex: 1;
+    padding: 0.6rem 0.75rem;
+    border: 1px solid var(--border-color, rgba(0, 0, 0, 0.12));
+    border-radius: 8px;
+    background: var(--bg-input, rgba(255, 255, 255, 0.6));
+    color: var(--text-primary, #1a1a1a);
+    font-size: 0.9rem;
+    font-family: 'Courier New', monospace;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    box-sizing: border-box;
+}
+
+.timestamp-input:focus {
+    border-color: var(--accent, #3b82f6);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+}
+
+.timestamp-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.6rem 1rem;
+    border: 1px solid var(--border-color, rgba(0, 0, 0, 0.1));
+    border-radius: 8px;
+    background: rgba(59, 130, 246, 0.08);
+    color: var(--accent, #3b82f6);
+    font-size: 0.82rem;
+    font-weight: 500;
+    font-family: inherit;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s;
+}
+
+.timestamp-btn:hover {
+    background: rgba(59, 130, 246, 0.14);
+    transform: translateY(-1px);
+}
+
+.timestamp-btn:active {
+    transform: translateY(0);
+}
+
+/* ==================== 结果框 ==================== */
+
+.timestamp-result-box {
+    padding: 0.85rem 1rem;
+    border-radius: 8px;
+    background: rgba(59, 130, 246, 0.04);
+    border: 1px solid rgba(59, 130, 246, 0.1);
+    display: none;
+    flex-direction: column;
+    gap: 0.45rem;
+}
+
+.timestamp-result-box.visible {
+    display: flex;
+}
+
+.timestamp-result-row {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+}
+
+.timestamp-result-key {
+    font-size: 0.78rem;
+    color: var(--text-secondary, #666);
+    flex-shrink: 0;
+    min-width: 6em;
+}
+
+.timestamp-result-val {
+    font-size: 0.88rem;
+    color: var(--text-primary, #1a1a1a);
+    font-weight: 500;
+    font-family: 'Courier New', monospace;
+    word-break: break-all;
+}
+
+/* ==================== 快捷按钮 ==================== */
+
+.timestamp-quick-btns {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.timestamp-quick-btn {
+    padding: 0.35rem 0.75rem;
+    border: 1px solid var(--border-color, rgba(0, 0, 0, 0.1));
+    border-radius: 6px;
+    background: rgba(59, 130, 246, 0.06);
+    color: var(--accent, #3b82f6);
+    font-size: 0.78rem;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.timestamp-quick-btn:hover {
+    background: rgba(59, 130, 246, 0.12);
+    transform: translateY(-1px);
+}
+
+.timestamp-quick-btn:active {
+    transform: translateY(0);
+}
+
+/* ==================== 操作反馈消息 ==================== */
+
+.timestamp-feedback {
+    margin-top: 0;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    opacity: 0;
+    transition: opacity 0.25s;
+}
+
+.timestamp-feedback.visible {
+    opacity: 1;
+}
+
+.timestamp-feedback.success {
+    background: rgba(34, 197, 94, 0.08);
+    border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+.timestamp-feedback.error {
+    background: rgba(239, 68, 68, 0.08);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.timestamp-feedback-text {
+    margin: 0;
+    font-size: 0.82rem;
+    color: var(--text-primary, #1a1a1a);
+    line-height: 1.4;
+}
+
+/* ==================== 暗黑模式适配 ==================== */
+
+[data-theme="dark"] .timestamp-input {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.1);
+    color: #e0e0e0;
+}
+
+[data-theme="dark"] .timestamp-input:focus {
+    border-color: var(--accent, #3b82f6);
+}
+
+[data-theme="dark"] .timestamp-btn {
+    background: rgba(59, 130, 246, 0.15);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .timestamp-result-box {
+    background: rgba(59, 130, 246, 0.08);
+    border-color: rgba(59, 130, 246, 0.15);
+}
+
+[data-theme="dark"] .timestamp-now-bar {
+    background: rgba(59, 130, 246, 0.08);
+    border-color: rgba(59, 130, 246, 0.15);
+}
+
+[data-theme="dark"] .timestamp-now-btn {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.1);
+    color: #aaa;
+}
+
+[data-theme="dark"] .timestamp-now-btn:hover {
+    background: rgba(59, 130, 246, 0.15);
+    color: var(--accent, #3b82f6);
+}
+
+[data-theme="dark"] .timestamp-quick-btn {
+    background: rgba(59, 130, 246, 0.12);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .timestamp-quick-btn:hover {
+    background: rgba(59, 130, 246, 0.2);
+}
+
+[data-theme="dark"] .timestamp-feedback.success {
+    background: rgba(34, 197, 94, 0.12);
+}
+
+[data-theme="dark"] .timestamp-feedback.error {
+    background: rgba(239, 68, 68, 0.12);
+}
+
+/* ==================== 响应式 ==================== */
+
+@media (max-width: 768px) {
+    .timestamp-input-group {
+        flex-direction: column;
+    }
+
+    .timestamp-btn {
+        width: 100%;
+    }
+
+    .timestamp-result-row {
+        flex-direction: column;
+        gap: 0.15rem;
+    }
+
+    .timestamp-result-key {
+        min-width: auto;
+    }
+}

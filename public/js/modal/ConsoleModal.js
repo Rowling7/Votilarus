@@ -7,6 +7,7 @@ import BackgroundTool from '../consoleTools/BackgroundTool.js';
 import CompLeaveTool from '../consoleTools/CompLeaveTool.js';
 import TimeIntervalTool from '../consoleTools/TimeIntervalTool.js';
 import DinoGameTool from '../consoleTools/DinoGameTool.js';
+import TimestampConverter from '../consoleTools/TimestampConverter.js';
 
 class ConsoleModal extends BaseModal {
     constructor() {
@@ -170,6 +171,15 @@ class ConsoleModal extends BaseModal {
             icon: '🦖',
             description: '类 Chrome 小恐龙跳跃游戏，分数存入 IndexedDB',
             render: (container) => dinoGameTool.render(container)
+        });
+
+        // 注册时间戳转换工具
+        const timestampConverter = new TimestampConverter();
+        this.registerTool('timestamp-converter', {
+            name: '时间戳转换',
+            icon: '🕒',
+            description: 'Unix 时间戳与日期时间双向转换',
+            render: (container) => timestampConverter.render(container)
         });
 
         this._renderToolList();
