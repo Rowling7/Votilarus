@@ -25,7 +25,7 @@ class CompLeaveTool {
 
         container.innerHTML = `
             <div class="compleave-tool">
-                <h2 class="compleave-tool-title">⏱️ 调休时长</h2>
+                <h2 class="compleave-tool-title">🏄‍♂️ 调休时长</h2>
                 <p class="compleave-tool-desc">记录加班或调休时长，提交后自动刷新调休小组件。</p>
 
                 <form class="compleave-tool-form" id="compleaveForm">

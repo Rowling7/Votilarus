@@ -5,6 +5,7 @@ import ImageParserTool from '../consoleTools/ImageParser.js';
 import SSHDTool from '../consoleTools/SSHDTool.js';
 import BackgroundTool from '../consoleTools/BackgroundTool.js';
 import CompLeaveTool from '../consoleTools/CompLeaveTool.js';
+import TimeIntervalTool from '../consoleTools/TimeIntervalTool.js';
 
 class ConsoleModal extends BaseModal {
     constructor() {
@@ -147,9 +148,18 @@ class ConsoleModal extends BaseModal {
         const compLeaveTool = new CompLeaveTool();
         this.registerTool('compleave', {
             name: '调休时长',
-            icon: '⏱️',
+            icon: '🏄‍♂️',
             description: '记录加班或调休时长，自动更新调休小组件',
             render: (container) => compLeaveTool.render(container)
+        });
+
+        // 注册时间间隔工具
+        const timeIntervalTool = new TimeIntervalTool();
+        this.registerTool('time-interval', {
+            name: '时间间隔',
+            icon: '⏱️',
+            description: '选择两个日期时间，计算时间间隔',
+            render: (container) => timeIntervalTool.render(container)
         });
 
         this._renderToolList();

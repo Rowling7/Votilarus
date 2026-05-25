@@ -1,0 +1,359 @@
+/* ==================== 时间间隔工具样式 ==================== */
+
+.time-interval-tool {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    height: 100%;
+    padding: 0;
+}
+
+.time-interval-title {
+    margin: 0;
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: var(--text-primary, #1a1a1a);
+}
+
+.time-interval-desc {
+    margin: -0.5rem 0 0 0;
+    font-size: 0.82rem;
+    color: var(--text-secondary, #666);
+    line-height: 1.5;
+}
+
+/* ==================== 表单 ==================== */
+
+.time-interval-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.time-interval-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.time-interval-label {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--text-secondary, #666);
+}
+
+.time-interval-input {
+    width: 100%;
+    padding: 0.6rem 0.75rem;
+    border: 1px solid var(--border-color, rgba(0, 0, 0, 0.12));
+    border-radius: 8px;
+    background: var(--bg-input, rgba(255, 255, 255, 0.6));
+    color: var(--text-primary, #1a1a1a);
+    font-size: 0.9rem;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    box-sizing: border-box;
+}
+
+.time-interval-input:focus {
+    border-color: var(--accent, #3b82f6);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+}
+
+/* ==================== 快速按钮 ==================== */
+
+.time-interval-quick-btns {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.time-interval-quick-btn {
+    padding: 0.35rem 0.75rem;
+    border: 1px solid var(--border-color, rgba(0, 0, 0, 0.1));
+    border-radius: 6px;
+    background: rgba(59, 130, 246, 0.06);
+    color: var(--accent, #3b82f6);
+    font-size: 0.78rem;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.time-interval-quick-btn:hover {
+    background: rgba(59, 130, 246, 0.12);
+    transform: translateY(-1px);
+}
+
+.time-interval-quick-btn:active {
+    transform: translateY(0);
+}
+
+/* ==================== 按钮 ==================== */
+
+.time-interval-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.7rem 1.5rem;
+    border: 1px solid var(--border-color, rgba(0, 0, 0, 0.1));
+    border-radius: 8px;
+    background: rgba(59, 130, 246, 0.08);
+    color: var(--accent, #3b82f6);
+    font-size: 0.85rem;
+    font-weight: 500;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.time-interval-btn:hover:not(:disabled) {
+    background: rgba(59, 130, 246, 0.14);
+    transform: translateY(-1px);
+}
+
+.time-interval-btn:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+.time-interval-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.time-interval-btn-icon {
+    width: 17px;
+    height: 17px;
+    flex-shrink: 0;
+}
+
+/* ==================== 结果区域 ==================== */
+
+.time-interval-result {
+    margin-top: 0.5rem;
+    padding: 1.25rem;
+    border-radius: 10px;
+    background: rgba(59, 130, 246, 0.04);
+    border: 1px solid rgba(59, 130, 246, 0.1);
+    display: none;
+}
+
+.time-interval-result.visible {
+    display: block;
+}
+
+.time-interval-result-title {
+    margin: 0 0 0.75rem 0;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-primary, #1a1a1a);
+}
+
+/* 大数字展示区 */
+.time-interval-result-display {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+}
+
+.time-interval-result-unit {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.15rem;
+}
+
+.time-interval-result-value {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--accent, #3b82f6);
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+}
+
+.time-interval-result-value.seconds-value {
+    color: var(--text-secondary, #666);
+}
+
+.time-interval-result-label {
+    font-size: 0.72rem;
+    color: var(--text-secondary, #666);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* 详细描述 */
+.time-interval-result-description {
+    text-align: center;
+    padding: 0.75rem;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.4);
+    border: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+.time-interval-result-description-text {
+    margin: 0;
+    font-size: 0.88rem;
+    color: var(--text-primary, #1a1a1a);
+    line-height: 1.6;
+    word-break: break-all;
+}
+
+/* ==================== 交换按钮 ==================== */
+
+.time-interval-swap-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border: 1px solid var(--border-color, rgba(0, 0, 0, 0.1));
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.6);
+    color: var(--text-secondary, #666);
+    cursor: pointer;
+    transition: all 0.2s;
+    margin: 0 auto;
+    flex-shrink: 0;
+}
+
+.time-interval-swap-btn:hover {
+    background: rgba(59, 130, 246, 0.08);
+    color: var(--accent, #3b82f6);
+    border-color: rgba(59, 130, 246, 0.2);
+    transform: rotate(180deg);
+}
+
+.time-interval-swap-btn svg {
+    width: 16px;
+    height: 16px;
+}
+
+/* ==================== 交换区域 ==================== */
+
+.time-interval-dates {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+}
+
+.time-interval-date-group {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+/* ==================== 操作反馈消息 ==================== */
+
+.time-interval-feedback {
+    margin-top: 0;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    opacity: 0;
+    transition: opacity 0.25s;
+}
+
+.time-interval-feedback.visible {
+    opacity: 1;
+}
+
+.time-interval-feedback.success {
+    background: rgba(34, 197, 94, 0.08);
+    border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+.time-interval-feedback.error {
+    background: rgba(239, 68, 68, 0.08);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.time-interval-feedback-text {
+    margin: 0;
+    font-size: 0.82rem;
+    color: var(--text-primary, #1a1a1a);
+    line-height: 1.4;
+}
+
+/* ==================== 暗黑模式适配 ==================== */
+
+[data-theme="dark"] .time-interval-input {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.1);
+    color: #e0e0e0;
+}
+
+[data-theme="dark"] .time-interval-input:focus {
+    border-color: var(--accent, #3b82f6);
+}
+
+[data-theme="dark"] .time-interval-btn {
+    background: rgba(59, 130, 246, 0.15);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .time-interval-result {
+    background: rgba(59, 130, 246, 0.08);
+    border-color: rgba(59, 130, 246, 0.15);
+}
+
+[data-theme="dark"] .time-interval-result-description {
+    background: rgba(255, 255, 255, 0.03);
+    border-color: rgba(255, 255, 255, 0.05);
+}
+
+[data-theme="dark"] .time-interval-swap-btn {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.1);
+    color: #aaa;
+}
+
+[data-theme="dark"] .time-interval-swap-btn:hover {
+    background: rgba(59, 130, 246, 0.15);
+    color: var(--accent, #3b82f6);
+}
+
+[data-theme="dark"] .time-interval-quick-btn {
+    background: rgba(59, 130, 246, 0.12);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .time-interval-quick-btn:hover {
+    background: rgba(59, 130, 246, 0.2);
+}
+
+[data-theme="dark"] .time-interval-feedback.success {
+    background: rgba(34, 197, 94, 0.12);
+}
+
+[data-theme="dark"] .time-interval-feedback.error {
+    background: rgba(239, 68, 68, 0.12);
+}
+
+/* ==================== 响应式 ==================== */
+
+@media (max-width: 768px) {
+    .time-interval-dates {
+        flex-direction: column;
+    }
+    
+    .time-interval-swap-btn {
+        transform: rotate(90deg);
+    }
+    
+    .time-interval-swap-btn:hover {
+        transform: rotate(270deg);
+    }
+    
+    .time-interval-result-display {
+        gap: 0.65rem;
+    }
+    
+    .time-interval-result-value {
+        font-size: 1.4rem;
+    }
+}

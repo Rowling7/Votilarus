@@ -25,6 +25,7 @@
 @import '../js/consoleTools/sshd-tool.css';
 @import '../js/consoleTools/background-tool.css';
 @import '../js/consoleTools/compleave-tool.css';
+@import '../js/consoleTools/time-interval.css';
 
 /*modal*/
 @import 'modal/calendar-modal.css';
