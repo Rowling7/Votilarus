@@ -6,7 +6,7 @@ const registerRoutes = require('./routes');
 const WeatherScheduler = require('./scheduler/weather-scheduler');
 
 const app = express();
-const PORT = process.env.PORT || 4000;
+const PORT = process.env.PORT || 3000;
 const DB_PATH = path.join(__dirname, 'data', 'Votilarus.db');
 
 // 中间件
