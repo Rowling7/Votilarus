@@ -28,6 +28,8 @@
 @import '../js/consoleTools/time-interval.css';
 @import '../js/consoleTools/dino-game.css';
 @import '../js/consoleTools/timestamp-converter.css';
+@import '../js/consoleTools/relative-calculator.css';
+@import '../js/consoleTools/number-to-chinese.css';
 
 /*modal*/
 @import 'modal/calendar-modal.css';

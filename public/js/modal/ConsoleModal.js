@@ -8,6 +8,8 @@ import CompLeaveTool from '../consoleTools/CompLeaveTool.js';
 import TimeIntervalTool from '../consoleTools/TimeIntervalTool.js';
 import DinoGameTool from '../consoleTools/DinoGameTool.js';
 import TimestampConverter from '../consoleTools/TimestampConverter.js';
+import RelativeCalculator from '../consoleTools/RelativeCalculator.js';
+import NumberToChinese from '../consoleTools/NumberToChinese.js';
 
 class ConsoleModal extends BaseModal {
     constructor() {
@@ -180,6 +182,24 @@ class ConsoleModal extends BaseModal {
             icon: '🕒',
             description: 'Unix 时间戳与日期时间双向转换',
             render: (container) => timestampConverter.render(container)
+        });
+
+        // 注册亲戚计算器工具
+        const relativeCalculator = new RelativeCalculator();
+        this.registerTool('relative-calculator', {
+            name: '亲戚计算器',
+            icon: '👨‍👩‍👧‍👦',
+            description: '查询亲戚关系对应称呼',
+            render: (container) => relativeCalculator.render(container)
+        });
+
+        // 注册数字大写转换工具
+        const numberToChinese = new NumberToChinese();
+        this.registerTool('number-to-chinese', {
+            name: '数字大写',
+            icon: '🔢',
+            description: '阿拉伯数字与中文大写金额相互转换',
+            render: (container) => numberToChinese.render(container)
         });
 
         this._renderToolList();

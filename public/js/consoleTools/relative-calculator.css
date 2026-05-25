@@ -1,0 +1,395 @@
+/* ==================== 亲戚计算器工具样式 ==================== */
+
+.relative-tool {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    height: 100%;
+    padding: 0;
+}
+
+.relative-title {
+    margin: 0;
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: var(--text-primary, #1a1a1a);
+}
+
+.relative-desc {
+    margin: -0.5rem 0 0 0;
+    font-size: 0.82rem;
+    color: var(--text-secondary, #666);
+    line-height: 1.5;
+}
+
+/* ==================== 区域 ==================== */
+
+.relative-section {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.relative-section-title {
+    margin: 0;
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: var(--text-primary, #1a1a1a);
+}
+
+.relative-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.relative-label {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--text-secondary, #666);
+}
+
+/* ==================== 选择器 ==================== */
+
+.relative-select {
+    width: 100%;
+    padding: 0.55rem 0.75rem;
+    border: 1px solid var(--border-color, rgba(0, 0, 0, 0.12));
+    border-radius: 8px;
+    background: var(--bg-input, rgba(255, 255, 255, 0.6));
+    color: var(--text-primary, #1a1a1a);
+    font-size: 0.88rem;
+    font-family: inherit;
+    outline: none;
+    cursor: pointer;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    box-sizing: border-box;
+}
+
+.relative-select:focus {
+    border-color: var(--accent, #3b82f6);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+}
+
+/* ==================== 关系链标签 ==================== */
+
+.relative-chain-box {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+    min-height: 42px;
+    padding: 0.5rem 0.65rem;
+    border: 1px solid var(--border-color, rgba(0, 0, 0, 0.12));
+    border-radius: 8px;
+    background: var(--bg-input, rgba(255, 255, 255, 0.6));
+    transition: border-color 0.2s;
+    cursor: text;
+}
+
+.relative-chain-placeholder {
+    font-size: 0.82rem;
+    color: var(--text-secondary, #666);
+    opacity: 0.6;
+}
+
+.relative-chain-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.25rem 0.55rem;
+    border-radius: 5px;
+    background: rgba(59, 130, 246, 0.1);
+    border: 1px solid rgba(59, 130, 246, 0.18);
+    color: var(--accent, #3b82f6);
+    font-size: 0.82rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+    user-select: none;
+}
+
+.relative-chain-tag:hover {
+    background: rgba(239, 68, 68, 0.1);
+    border-color: rgba(239, 68, 68, 0.25);
+    color: #ef4444;
+    text-decoration: line-through;
+}
+
+.relative-chain-tag::after {
+    content: '×';
+    margin-left: 0.1rem;
+    font-size: 0.75rem;
+    opacity: 0.6;
+}
+
+/* ==================== 快捷按钮 ==================== */
+
+.relative-quick-btns {
+    display: flex;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+}
+
+.relative-quick-btn {
+    padding: 0.3rem 0.65rem;
+    border: 1px solid var(--border-color, rgba(0, 0, 0, 0.1));
+    border-radius: 6px;
+    background: rgba(59, 130, 246, 0.06);
+    color: var(--accent, #3b82f6);
+    font-size: 0.78rem;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.relative-quick-btn:hover {
+    background: rgba(59, 130, 246, 0.12);
+    transform: translateY(-1px);
+}
+
+.relative-quick-btn:active {
+    transform: translateY(0);
+}
+
+/* ==================== 操作按钮 ==================== */
+
+.relative-actions {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.relative-btn {
+    flex: 1;
+    padding: 0.65rem 1rem;
+    border: 1px solid var(--border-color, rgba(0, 0, 0, 0.1));
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.6);
+    color: var(--text-primary, #1a1a1a);
+    font-size: 0.85rem;
+    font-weight: 500;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.relative-btn:hover {
+    background: rgba(59, 130, 246, 0.06);
+    border-color: rgba(59, 130, 246, 0.15);
+    transform: translateY(-1px);
+}
+
+.relative-btn.primary {
+    background: rgba(59, 130, 246, 0.08);
+    color: var(--accent, #3b82f6);
+}
+
+.relative-btn.primary:hover {
+    background: rgba(59, 130, 246, 0.14);
+}
+
+.relative-btn:active {
+    transform: translateY(0);
+}
+
+/* ==================== 预设关系 ==================== */
+
+.relative-preset-list {
+    display: flex;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+}
+
+.relative-preset-btn {
+    padding: 0.35rem 0.7rem;
+    border: 1px dashed var(--border-color, rgba(0, 0, 0, 0.12));
+    border-radius: 6px;
+    background: transparent;
+    color: var(--text-secondary, #666);
+    font-size: 0.78rem;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.relative-preset-btn:hover {
+    border-style: solid;
+    border-color: rgba(59, 130, 246, 0.25);
+    background: rgba(59, 130, 246, 0.06);
+    color: var(--accent, #3b82f6);
+}
+
+/* ==================== 结果区域 ==================== */
+
+.relative-result {
+    display: none;
+}
+
+.relative-result.visible {
+    display: block;
+}
+
+.relative-result-card {
+    padding: 1.15rem 1.25rem;
+    border-radius: 10px;
+    background: rgba(59, 130, 246, 0.04);
+    border: 1px solid rgba(59, 130, 246, 0.1);
+}
+
+.relative-result-title {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-primary, #1a1a1a);
+    margin-bottom: 0.75rem;
+}
+
+.relative-result-detail {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.relative-result-label {
+    font-size: 0.82rem;
+    color: var(--text-secondary, #666);
+    flex-shrink: 0;
+}
+
+.relative-result-chain {
+    font-size: 0.88rem;
+    color: var(--text-primary, #1a1a1a);
+    font-weight: 500;
+}
+
+.relative-result-name {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--accent, #3b82f6);
+}
+
+.relative-result-hint {
+    margin-top: 0.5rem;
+    padding: 0.65rem 1rem;
+    border-radius: 8px;
+    background: rgba(59, 130, 246, 0.04);
+    border: 1px solid rgba(59, 130, 246, 0.08);
+    font-size: 0.82rem;
+    color: var(--text-secondary, #666);
+    line-height: 1.5;
+}
+
+/* ==================== 反馈消息 ==================== */
+
+.relative-feedback {
+    margin-top: 0;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    opacity: 0;
+    transition: opacity 0.25s;
+}
+
+.relative-feedback.visible {
+    opacity: 1;
+}
+
+.relative-feedback.success {
+    background: rgba(34, 197, 94, 0.08);
+    border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+.relative-feedback.error {
+    background: rgba(239, 68, 68, 0.08);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.relative-feedback-text {
+    margin: 0;
+    font-size: 0.82rem;
+    color: var(--text-primary, #1a1a1a);
+    line-height: 1.4;
+}
+
+/* ==================== 暗黑模式适配 ==================== */
+
+[data-theme="dark"] .relative-select {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.1);
+    color: #e0e0e0;
+}
+
+[data-theme="dark"] .relative-select:focus {
+    border-color: var(--accent, #3b82f6);
+}
+
+[data-theme="dark"] .relative-chain-box {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .relative-chain-tag {
+    background: rgba(59, 130, 246, 0.18);
+    border-color: rgba(59, 130, 246, 0.25);
+    color: #90caf9;
+}
+
+[data-theme="dark"] .relative-chain-tag:hover {
+    background: rgba(239, 68, 68, 0.2);
+    border-color: rgba(239, 68, 68, 0.3);
+    color: #fca5a5;
+}
+
+[data-theme="dark"] .relative-btn {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .relative-btn.primary {
+    background: rgba(59, 130, 246, 0.15);
+}
+
+[data-theme="dark"] .relative-quick-btn {
+    background: rgba(59, 130, 246, 0.12);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .relative-quick-btn:hover {
+    background: rgba(59, 130, 246, 0.2);
+}
+
+[data-theme="dark"] .relative-preset-btn {
+    border-color: rgba(255, 255, 255, 0.1);
+    color: #aaa;
+}
+
+[data-theme="dark"] .relative-preset-btn:hover {
+    border-color: rgba(59, 130, 246, 0.3);
+    background: rgba(59, 130, 246, 0.12);
+    color: #90caf9;
+}
+
+[data-theme="dark"] .relative-result-card {
+    background: rgba(59, 130, 246, 0.08);
+    border-color: rgba(59, 130, 246, 0.15);
+}
+
+[data-theme="dark"] .relative-result-hint {
+    background: rgba(59, 130, 246, 0.06);
+    border-color: rgba(59, 130, 246, 0.1);
+}
+
+[data-theme="dark"] .relative-feedback.success {
+    background: rgba(34, 197, 94, 0.12);
+}
+
+[data-theme="dark"] .relative-feedback.error {
+    background: rgba(239, 68, 68, 0.12);
+}
+
+/* ==================== 响应式 ==================== */
+
+@media (max-width: 768px) {
+    .relative-actions {
+        flex-direction: column;
+    }
+}
