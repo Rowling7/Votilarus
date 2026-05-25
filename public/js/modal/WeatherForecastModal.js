@@ -30,7 +30,9 @@ class WeatherForecastModal extends BaseModal {
         this.themeColor = 'rgba(102, 126, 234, 0.3)';
         this.currentMetric = 'temperature'; // 当前显示的指标
         this.map = null; // Leaflet 地图实例
-        this.currentTileLayer = null; // 当前瓦片图层
+        this.currentBaseLayer = null; // 当前底图图层
+        this.isSatelliteMap = true; // 当前底图是否为卫星图
+        this.currentTileLayer = null; // 当前天气瓦片图层
         this.currentMapLayer = 'temp_new'; // 当前地图图层类型
         this.userLocationMarker = null; // 用户位置标记
 
@@ -105,6 +107,15 @@ class WeatherForecastModal extends BaseModal {
                             <button class="map-layer-btn" data-layer="pressure_new">气压</button>
                             <button class="map-layer-btn" data-layer="snow_new">降雪</button>
                         </div>
+                        <button class="map-base-toggle-btn" title="切换底图">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="3" width="7" height="7" rx="1"></rect>
+                                <rect x="14" y="3" width="7" height="7" rx="1"></rect>
+                                <rect x="3" y="14" width="7" height="7" rx="1"></rect>
+                                <rect x="14" y="14" width="7" height="7" rx="1"></rect>
+                            </svg>
+                            <span class="toggle-label">卫星地图</span>
+                        </button>
                         <div id="weatherMap"></div>
                         <button class="locate-btn" title="定位到我的位置">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -132,6 +143,8 @@ class WeatherForecastModal extends BaseModal {
         this.mapContainer = this.overlay.querySelector('.map-container');
         this.mapLayerBtns = this.overlay.querySelectorAll('.map-layer-btn');
         this.locateBtn = this.overlay.querySelector('.locate-btn');
+        this.mapBaseToggleBtn = this.overlay.querySelector('.map-base-toggle-btn');
+        this.mapBaseToggleLabel = this.overlay.querySelector('.map-base-toggle-btn .toggle-label');
     }
 
     /**
@@ -176,6 +189,11 @@ class WeatherForecastModal extends BaseModal {
         // 定位按钮
         this.locateBtn.addEventListener('click', () => {
             this.locateUserPosition();
+        });
+
+        // 底图切换按钮
+        this.mapBaseToggleBtn.addEventListener('click', () => {
+            this.toggleBaseLayer();
         });
     }
 
@@ -285,7 +303,7 @@ class WeatherForecastModal extends BaseModal {
         });
 
         // 添加基础图层（使用高德地图，国内访问稳定）
-        L.tileLayer('https://webst0{s}.is.autonavi.com/appmaptile?style=6&x={x}&y={y}&z={z}', {
+        this.currentBaseLayer = L.tileLayer('https://webst0{s}.is.autonavi.com/appmaptile?style=6&x={x}&y={y}&z={z}', {
             maxZoom: 18,
             attribution: '© 高德地图',
             subdomains: '1234'
@@ -337,6 +355,42 @@ class WeatherForecastModal extends BaseModal {
         if (this.map) {
             this.addWeatherTileLayer(layerType);
         }
+    }
+
+    /**
+     * 切换底图（卫星地图 ↔ 城市地图）
+     */
+    toggleBaseLayer() {
+        if (!this.map || !this.currentBaseLayer) return;
+
+        // 移除当前底图
+        this.map.removeLayer(this.currentBaseLayer);
+
+        // 切换底图类型
+        this.isSatelliteMap = !this.isSatelliteMap;
+
+        // 高德地图 style=6 为卫星影像图（地形地图），style=7 为矢量街道图（城市地图）
+        const style = this.isSatelliteMap ? 6 : 7;
+        const label = this.isSatelliteMap ? '卫星地图' : '城市地图';
+
+        this.currentBaseLayer = L.tileLayer(`https://webst0{s}.is.autonavi.com/appmaptile?style=${style}&x={x}&y={y}&z={z}`, {
+            maxZoom: 18,
+            attribution: '© 高德地图',
+            subdomains: '1234'
+        }).addTo(this.map);
+
+        // 重新添加天气图层（保持在底图之上）
+        if (this.currentTileLayer) {
+            this.currentTileLayer.addTo(this.map);
+        }
+
+        // 更新按钮标签
+        if (this.mapBaseToggleLabel) {
+            this.mapBaseToggleLabel.textContent = label;
+        }
+
+        // 更新按钮 title
+        this.mapBaseToggleBtn.title = this.isSatelliteMap ? '切换到城市地图' : '切换到卫星地图';
     }
 
     /**
@@ -468,6 +522,7 @@ class WeatherForecastModal extends BaseModal {
         if (this.map) {
             this.map.remove();
             this.map = null;
+            this.currentBaseLayer = null;
             this.currentTileLayer = null;
             this.userLocationMarker = null;
         }
@@ -1002,6 +1057,7 @@ class WeatherForecastModal extends BaseModal {
         if (this.map) {
             this.map.remove();
             this.map = null;
+            this.currentBaseLayer = null;
             this.currentTileLayer = null;
             this.userLocationMarker = null;
         }

@@ -612,6 +612,42 @@
     box-shadow: 0 2px 8px rgba(var(--theme-color-rgb), 0.3);
 }
 
+/* 底图切换按钮 */
+.map-base-toggle-btn {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.5rem 0.9rem;
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
+    color: var(--text-primary);
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    z-index: 1000;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.map-base-toggle-btn:hover {
+    background: var(--bg-hover);
+    border-color: var(--theme-color);
+    color: var(--theme-color);
+    transform: translateY(-1px);
+}
+
+.map-base-toggle-btn svg {
+    stroke: currentColor;
+    flex-shrink: 0;
+}
+
+.map-base-toggle-btn .toggle-label {
+    white-space: nowrap;
+}
+
 /* 定位按钮 */
 .locate-btn {
     position: absolute;
