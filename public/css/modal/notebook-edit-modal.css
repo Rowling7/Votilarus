@@ -149,7 +149,7 @@
 }
 
 /* 开关样式 */
-.switch {
+.notebook-edit-body.switch {
     position: relative;
     width: 48px;
     height: 26px;
@@ -160,7 +160,7 @@
     flex-shrink: 0;
 }
 
-.switch::before {
+.notebook-edit-body.switch::before {
     content: '';
     position: absolute;
     top: 3px;
@@ -173,11 +173,11 @@
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
-.switch.active {
+.notebook-edit-body.switch.active {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 }
 
-.switch.active::before {
+.notebook-edit-body.switch.active::before {
     transform: translateX(22px);
 }
 
@@ -308,16 +308,16 @@
     box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
 }
 
-[data-theme="dark"] .switch-group {
+[data-theme="dark"] .notebook-edit-body.switch-group {
     background: var(--glass-bg-secondary-dark, rgba(255, 255, 255, 0.05));
     border-color: var(--glass-border-dark, rgba(255, 255, 255, 0.1));
 }
 
-[data-theme="dark"] .switch-item span {
+[data-theme="dark"] .notebook-edit-body.switch-item span {
     color: var(--text-primary-dark, #ffffff);
 }
 
-[data-theme="dark"] .switch {
+[data-theme="dark"] .notebook-edit-body.switch {
     background: var(--glass-border-dark, rgba(255, 255, 255, 0.2));
 }
 
@@ -326,12 +326,12 @@
     border-top-color: var(--glass-border-dark, rgba(255, 255, 255, 0.1));
 }
 
-[data-theme="dark"] .btn-secondary {
+[data-theme="dark"] .notebook-edit-body.btn-secondary {
     background: var(--glass-bg-secondary-dark, rgba(255, 255, 255, 0.1));
     color: var(--text-primary-dark, #ffffff);
 }
 
-[data-theme="dark"] .btn-secondary:hover {
+[data-theme="dark"] .notebook-edit-body.btn-secondary:hover {
     background: var(--glass-border-dark, rgba(255, 255, 255, 0.15));
 }
 
