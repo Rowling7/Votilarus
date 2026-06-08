@@ -20,7 +20,7 @@ class BaseModal {
             closeOnEscape: true,
             enableMaximize: true, // 是否启用最大化功能
             draggable: true,      // 是否启用拖拽，默认启用
-            dragHandle: null,     // 拖拽手柄选择器，null 表示整个 modal 可拖拽（交互元素除外）
+            dragHandle: null,     // 拖拽手柄选择器，null 时自动检测 [class*="-header"] 的标题栏
             ...options
         };
 
@@ -249,11 +249,27 @@ class BaseModal {
      * 绑定拖拽事件
      * @private
      */
+    /**
+     * 查找拖拽目标元素（dragTarget）
+     * 优先使用 options.dragHandle 选择器，否则自动检测标题栏
+     * @returns {HTMLElement|null}
+     * @private
+     */
+    _findDragTarget() {
+        if (this.options.dragHandle) {
+            return this.modal.querySelector(this.options.dragHandle);
+        }
+        // 自动检测：查找第一个 class 名包含 "-header" 的子元素
+        const headerEl = this.modal.querySelector('[class*="-header"]');
+        return headerEl || this.modal;
+    }
+
+    /**
+     * 绑定拖拽事件
+     * @private
+     */
     _bindDragEvents() {
         if (!this.options.draggable || !this.modal) return;
-
-        // 设置拖拽光标
-        this.modal.style.cursor = 'grab';
 
         this._handleDragStart = (e) => {
             this._onDragStart(e);
@@ -267,12 +283,11 @@ class BaseModal {
             this._onDragEnd();
         };
 
-        // 确定拖拽触发元素：dragHandle 指定的元素 或 整个 modal
-        const dragTarget = this.options.dragHandle
-            ? this.modal.querySelector(this.options.dragHandle)
-            : this.modal;
+        // 确定拖拽触发元素
+        const dragTarget = this._findDragTarget();
 
         if (dragTarget) {
+            dragTarget.style.cursor = 'grab';
             dragTarget.addEventListener('mousedown', this._handleDragStart);
         }
     }
@@ -292,8 +307,9 @@ class BaseModal {
             return;
         }
 
-        // 如果指定了 dragHandle，只在 handle 上触发（此处为二次检查）
-        if (this.options.dragHandle && !target.closest(this.options.dragHandle)) {
+        // 二次检查：确保拖拽起始点在拖拽手柄范围内
+        const dragTarget = this._findDragTarget();
+        if (dragTarget && dragTarget !== this.modal && !dragTarget.contains(target)) {
             return;
         }
 
@@ -352,9 +368,14 @@ class BaseModal {
         document.body.style.webkitUserSelect = '';
 
         // 移除拖拽中的视觉反馈
-        this.modal.style.cursor = 'grab';
         this.modal.style.transition = '';
         this.modal.classList.remove('modal-dragging');
+
+        // 恢复拖拽手柄光标
+        const dragTarget = this._findDragTarget();
+        if (dragTarget) {
+            dragTarget.style.cursor = 'grab';
+        }
 
         // 移除全局监听
         document.removeEventListener('mousemove', this._handleDragMove);
@@ -401,9 +422,7 @@ class BaseModal {
 
         // 移除拖拽 mousedown 监听
         if (this._handleDragStart && this.modal) {
-            const dragTarget = this.options.dragHandle
-                ? this.modal.querySelector(this.options.dragHandle)
-                : this.modal;
+            const dragTarget = this._findDragTarget();
             if (dragTarget) {
                 dragTarget.removeEventListener('mousedown', this._handleDragStart);
             }
