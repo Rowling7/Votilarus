@@ -190,6 +190,48 @@ router.get('/list', (req, res) => {
     });
 });
 
+// 删除历史记录（软删除）
+router.delete('/:id', (req, res) => {
+    const { id } = req.params;
+
+    if (!id) {
+        res.status(400).json({
+            success: false,
+            error: '缺少必要参数: id'
+        });
+        return;
+    }
+
+    const sql = `UPDATE history 
+        SET deleted_flag = 1, deleted_at = datetime('now','localtime'), updated_at = datetime('now','localtime') 
+        WHERE id = ? AND deleted_flag = 0`;
+
+    db.run(sql, [id], function (err) {
+        if (err) {
+            console.error('删除历史记录失败:', err.message);
+            res.status(500).json({
+                success: false,
+                error: err.message
+            });
+            return;
+        }
+
+        if (this.changes === 0) {
+            res.status(404).json({
+                success: false,
+                error: '记录不存在或已被删除'
+            });
+            return;
+        }
+
+        res.json({
+            success: true,
+            message: '历史记录已删除',
+            changes: this.changes
+        });
+    });
+});
+
 module.exports = {
     router,
     setDatabase

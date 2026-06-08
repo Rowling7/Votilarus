@@ -1,0 +1,47 @@
+/* ==================== 历史记录小组件样式 ==================== */
+
+.history-widget {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 0.5rem;
+    background: linear-gradient(135deg, rgb(219, 234, 254) 0%, rgb(224, 231, 255) 100%);
+    border-radius: var(--widget-border-radius, 1.4rem);
+    transition: all 0.2s ease;
+    user-select: none;
+}
+
+/* 图标 */
+.history-widget-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    line-height: 1;
+    transition: transform 0.2s ease;
+}
+
+
+/* 不同尺寸适配 */
+.widget-1x1 .history-widget-icon {
+    font-size: 1.6rem;
+}
+
+.widget-1x2 .history-widget-icon,
+.widget-2x1 .history-widget-icon {
+    font-size: 2.2rem;
+}
+
+.widget-2x2 .history-widget-icon {
+    font-size: 2.8rem;
+}
+
+/* 暗黑模式适配 */
+[data-theme="dark"] .history-widget {
+    background: linear-gradient(135deg, rgb(30, 64, 175) 0%, rgb(55, 48, 163) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+

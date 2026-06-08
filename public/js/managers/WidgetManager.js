@@ -12,6 +12,7 @@ import YiyanWidget from '../widgets/YiyanWidget.js';
 import FolderWidget from '../widgets/FolderWidget.js'; 
 import ConsoleWidget from '../widgets/ConsoleWidget.js';
 import SettingsWidget from '../widgets/SettingsWidget.js';
+import HistoryWidget from '../widgets/HistoryWidget.js';
 
 class WidgetManager {
     constructor() {
@@ -36,6 +37,7 @@ class WidgetManager {
         this.register('folder', FolderWidget);
         this.register('console', ConsoleWidget);
         this.register('settings', SettingsWidget);
+        this.register('history', HistoryWidget);
     }
 
     /**

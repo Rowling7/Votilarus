@@ -43,6 +43,7 @@
 @import 'modal/yiyan-favorites-modal.css';
 @import 'modal/folder-expand-modal.css';
 @import 'modal/console-modal.css';
+@import 'modal/history-view-modal.css';
 
 /* Widgets */
 @import 'widgets/clock-widget.css';
@@ -55,6 +56,7 @@
 @import 'widgets/yiyan-widget.css';
 @import 'widgets/folder-widget.css';
 @import 'widgets/console-widget.css';
+@import 'widgets/history-widget.css';
 @import 'widgets/settings-widget.css';
 
 /* Effects */
