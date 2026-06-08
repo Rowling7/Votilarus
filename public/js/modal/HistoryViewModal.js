@@ -199,7 +199,8 @@ class HistoryViewModal extends BaseModal {
 
         this.emptyEl.classList.add('hidden');
 
-        this.listEl.innerHTML = this.records.map(item => this._renderItem(item)).join('');
+        const startIndex = (this.currentPage - 1) * this.pageSize;
+        this.listEl.innerHTML = this.records.map((item, index) => this._renderItem(item, startIndex + index + 1)).join('');
 
         // 绑定每个条目的事件
         this.listEl.querySelectorAll('.history-item').forEach(itemEl => {
@@ -239,22 +240,15 @@ class HistoryViewModal extends BaseModal {
     /**
      * 渲染单个条目 HTML
      */
-    _renderItem(item) {
+    _renderItem(item, seqNum) {
         const title = this._escapeHtml(item.title || item.url || '无标题');
         const url = this._escapeHtml(item.url || '');
         const lastVisit = item.last_visit_at ? this._formatDate(item.last_visit_at) : '';
-        const iconPath = item.icon_path;
-
-        const iconHtml = iconPath
-            ? `<img src="${this._escapeHtml(iconPath)}" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
-            : '';
-        const fallbackIcon = `<span style="display:${iconPath ? 'none' : 'flex'};width:100%;height:100%;align-items:center;justify-content:center;font-size:1rem;">🌐</span>`;
 
         return `
             <div class="history-item" data-id="${item.id}">
-                <div class="history-item-icon">
-                    ${iconHtml}
-                    ${fallbackIcon}
+                <div class="history-item-icon history-item-seq">
+                    #${seqNum}
                 </div>
                 <div class="history-item-body">
                     <a class="history-item-title" href="#" title="${url}">${title}</a>
