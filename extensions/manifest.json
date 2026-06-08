@@ -1,0 +1,27 @@
+{
+  "manifest_version": 3,
+  "name": "Votilarus History Tracker",
+  "version": "1.0",
+  "description": "将浏览器历史记录同步到Votilarus数据库",
+  "permissions": [
+    "history",
+    "storage",
+    "alarms"
+  ],
+  "host_permissions": [
+    "http://localhost:3000/*",
+    "http://192.168.101.12:3000/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Votilarus History"
+  },
+  "icons": {
+    "16": "icon16.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
+  }
+}

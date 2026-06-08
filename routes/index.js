@@ -16,6 +16,7 @@ const yiyanRoute = require('./yiyan-routes');
 const folderRoute = require('./folder-routes');
 const termuxRoute = require('./termux-routes');
 const thumbnailRoute = require('./thumbnail-routes');
+const historyRoute = require('./history-routes');
 
 /**
  * 注册所有路由到 Express 应用
@@ -40,6 +41,7 @@ function registerRoutes(app, db) {
     compleaveRoute.setDatabase(db);
     yiyanRoute.setDatabase(db);
     folderRoute.setDatabase(db);
+    historyRoute.setDatabase(db);
 
     // 注册路由
     app.use('/api/categories', categoriesRoute.router);
@@ -60,6 +62,7 @@ function registerRoutes(app, db) {
     app.use('/api/folder', folderRoute.router);
     app.use('/api/termux', termuxRoute);
     app.use('/api/thumbnail', thumbnailRoute.router);
+    app.use('/api/ext-history', historyRoute.router);
 }
 
 module.exports = registerRoutes;
